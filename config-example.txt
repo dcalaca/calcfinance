@@ -1,0 +1,29 @@
+# CONFIGURAÇÃO DO FINANCEHUB
+# ================================
+
+# Para configurar o projeto, crie um arquivo .env.local na raiz do projeto
+# com o seguinte conteúdo:
+
+NEXT_PUBLIC_SUPABASE_URL=https://kfsteismyqpekbaqwuez.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtmc3RlaXNteXFwZWtiYXF3dWV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk0ODU4NDMsImV4cCI6MjA2NTA2MTg0M30.nuHieAbGz65Lm5KlNamxO_HS_SFy0DGm6tIIbty7Z8A
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+VERCEL_URL=localhost:3000
+SUPABASE_URL=https://kfsteismyqpekbaqwuez.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtmc3RlaXNteXFwZWtiYXF3dWV6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTQ4NTg0MywiZXhwIjoyMDY1MDYxODQzfQ.4pcJS-lSfxwkfp4VoYMFqsgrpSf8qV-LYcVsjdY1nkw
+
+# INSTRUÇÕES:
+# 1. Crie uma conta no Supabase: https://supabase.com
+# 2. Crie um novo projeto
+# 3. Copie as credenciais do painel do Supabase
+# 4. Substitua os valores acima pelas suas credenciais reais
+# 5. Salve o arquivo como .env.local (sem extensão)
+
+# DEPENDÊNCIAS INSTALADAS:
+# ✅ Node.js v24.4.1
+# ✅ pnpm v10.15.1
+# ✅ Todas as dependências do package.json
+
+# PRÓXIMOS PASSOS:
+# 1. Configure o arquivo .env.local
+# 2. Execute: pnpm dev
+# 3. Acesse: http://localhost:3000
