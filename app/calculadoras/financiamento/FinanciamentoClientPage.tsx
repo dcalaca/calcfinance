@@ -62,7 +62,7 @@ export default function FinanciamentoClientPage() {
     return parcelas
   }
 
-  const calcularFinanciamento = () => {
+  const calcularFinanciamento = async () => {
     // Validações
     if (valorImovel <= 0 || entrada < 0 || prazo <= 0 || taxaPrice <= 0 || taxaSac <= 0) {
       toast.error("Preencha todos os campos com valores válidos")

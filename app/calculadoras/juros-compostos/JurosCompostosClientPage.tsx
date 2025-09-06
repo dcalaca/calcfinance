@@ -25,7 +25,7 @@ export default function JurosCompostosClientPage() {
   const { saveCalculation } = useFinanceCalculations()
   const { user } = useFinanceAuth()
 
-  const calcularJurosCompostos = () => {
+  const calcularJurosCompostos = async () => {
     // Validações corrigidas
     if (valorInicial <= 0) {
       toast.error("O valor inicial deve ser maior que zero")

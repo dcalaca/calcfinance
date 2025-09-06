@@ -27,7 +27,7 @@ export default function FinanciamentoVeicularClientPage() {
   const { saveCalculation } = useFinanceCalculations()
   const { user } = useFinanceAuth()
 
-  const calcularFinanciamentoVeicular = () => {
+  const calcularFinanciamentoVeicular = async () => {
     // Validações
     if (valorVeiculo <= 0 || entrada < 0 || prazo <= 0 || taxa <= 0) {
       toast.error("Preencha todos os campos com valores válidos")
