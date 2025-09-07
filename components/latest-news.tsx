@@ -83,7 +83,7 @@ export async function LatestNews() {
               <Card key={n.id} className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="relative h-40 w-full overflow-hidden">
                   <Image
-                    src={n.image_url || "/placeholder.svg?height=200&width=300&query=news"}
+                    src="/placeholder.svg?height=200&width=300&query=news"
                     alt={n.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
