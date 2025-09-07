@@ -84,7 +84,7 @@ export function useOrcamentosRefatorado() {
       console.log("✅ Itens encontrados:", itensData.length)
 
       // Combinar orçamentos com seus itens e calcular totais
-      const orcamentosComItens: OrcamentoComItens[] = (orcamentosData || []).map(orcamento => {
+      const orcamentosComItens: OrcamentoComItens[] = (orcamentosData || []).map((orcamento: OrcamentoComItens) => {
         const receitas = itensData.filter(item => 
           item.orcamento_id === orcamento.id && item.tipo === "receita"
         )
