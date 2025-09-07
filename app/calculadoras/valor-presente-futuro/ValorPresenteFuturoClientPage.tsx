@@ -89,12 +89,12 @@ export default function ValorPresenteFuturoClientPage() {
         currency: "BRL",
       }).format(resultado.valorCalculado)}`
 
-      await saveCalculation({
-        type: "valor_presente_futuro",
+      await saveCalculation(
+        "valor_presente_futuro",
         title,
-        inputs: { valor, taxa, periodo, tipoCalculo },
-        result: resultado,
-      })
+        { valor, taxa, periodo, tipoCalculo },
+        resultado
+      )
 
       toast.success("Cálculo salvo com sucesso!")
     } catch (error) {
