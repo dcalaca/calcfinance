@@ -539,7 +539,7 @@ export default function MeuOrcamentoPage() {
                 <Button 
                   className="w-full" 
                   onClick={() => setMostrarFormulario(!mostrarFormulario)}
-                  disabled={!orcamentoAtualFiltrado && filtroMes}
+                  disabled={!orcamentoAtualFiltrado && !!filtroMes}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Adicionar Item
