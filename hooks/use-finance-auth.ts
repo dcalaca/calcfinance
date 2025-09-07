@@ -177,7 +177,14 @@ export function useFinanceAuth() {
 
     try {
       console.log("🔓 Chamando supabase.auth.signOut()...")
-      const { error } = await supabase.auth.signOut()
+      
+      // Adicionar timeout para evitar travamento
+      const signOutPromise = supabase.auth.signOut()
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 3000)
+      )
+      
+      const { error } = await Promise.race([signOutPromise, timeoutPromise]) as any
       
       if (error) {
         console.error("❌ Erro no logout:", error)
@@ -208,6 +215,7 @@ export function useFinanceAuth() {
       setUser(null)
       setFinanceUser(null)
       if (typeof window !== 'undefined') {
+        console.log("🔄 Redirecionando mesmo com erro...")
         window.location.href = '/'
       }
     }
