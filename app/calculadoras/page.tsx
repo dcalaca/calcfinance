@@ -5,10 +5,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, DollarSign, Target, Car } from "lucide-react"
 import Link from "next/link"
-import { AuthGuard } from "@/components/auth-guard"
+import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function CalculadorasPage() {
   const [activeCategory, setActiveCategory] = useState("Todos")
+  const { user, loading } = useFinanceAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login")
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   const calculators = [
     {
@@ -92,9 +117,8 @@ export default function CalculadorasPage() {
     activeCategory === "Todos" ? calculators : calculators.filter((calc) => calc.category === activeCategory)
 
   return (
-    <AuthGuard>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Calculadoras Financeiras</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -186,6 +210,6 @@ export default function CalculadorasPage() {
         </Card>
         </div>
       </div>
-    </AuthGuard>
+    </div>
   )
 }

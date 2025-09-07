@@ -16,20 +16,42 @@ interface AuthGuardProps {
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { user, loading } = useFinanceAuth()
   const router = useRouter()
-  const [isChecking, setIsChecking] = useState(true)
+  const [timeoutReached, setTimeoutReached] = useState(false)
 
+  // Timeout de 10 segundos para evitar loading infinito
   useEffect(() => {
-    if (!loading) {
-      setIsChecking(false)
-    }
-  }, [loading])
+    const timer = setTimeout(() => {
+      setTimeoutReached(true)
+    }, 10000)
 
-  if (isChecking || loading) {
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Se ainda está carregando e não atingiu timeout, mostrar loading
+  if (loading && !timeoutReached) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-slate-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Se atingiu timeout, mostrar erro
+  if (timeoutReached && loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-8 w-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Erro de Conexão</h2>
+          <p className="text-slate-600 mb-4">Não foi possível verificar sua autenticação</p>
+          <Button onClick={() => window.location.reload()}>
+            Tentar Novamente
+          </Button>
         </div>
       </div>
     )
