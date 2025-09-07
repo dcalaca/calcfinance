@@ -41,7 +41,13 @@ export function middleware(request: NextRequest) {
     // Verificar se há pelo menos um cookie do Supabase
     const hasSupabaseCookie = supabaseCookies.length > 0
     
-    if (!hasSupabaseCookie) {
+    // Verificar também se há token de acesso no header Authorization
+    const authHeader = request.headers.get('authorization')
+    const hasAuthHeader = !!authHeader
+    
+    console.log("🔐 Header Authorization:", hasAuthHeader)
+    
+    if (!hasSupabaseCookie && !hasAuthHeader) {
       console.log("❌ Middleware - Usuário não autenticado, redirecionando para login")
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
@@ -56,9 +62,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/calculadoras/:path*',
-    '/dashboard/:path*',
-    '/historico/:path*',
-    '/meu-orcamento/:path*'
+    // Desabilitar temporariamente para testar
+    // '/calculadoras/:path*',
+    // '/dashboard/:path*',
+    // '/historico/:path*',
+    // '/meu-orcamento/:path*'
   ]
 }
