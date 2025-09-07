@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
-import type { Orcamento, OrcamentoItem } from "@/lib/supabase-types"
+import type { Orcamento, OrcamentoItem, OrcamentoComItens } from "@/lib/supabase-types"
 import { useFinanceAuth } from "./use-finance-auth"
 
 export function useOrcamentos() {
   const { user, financeUser, loading: authLoading } = useFinanceAuth()
-  const [orcamentos, setOrcamentos] = useState<Orcamento[]>([])
-  const [orcamentoAtual, setOrcamentoAtual] = useState<Orcamento | null>(null)
+  const [orcamentos, setOrcamentos] = useState<OrcamentoComItens[]>([])
+  const [orcamentoAtual, setOrcamentoAtual] = useState<OrcamentoComItens | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export function useOrcamentos() {
     if (!user) throw new Error("Usuário não logado")
 
     try {
-      const orcamento = orcamentos.find(o => o.id === orcamentoId)
+      const orcamento = orcamentos.find((o: OrcamentoComItens) => o.id === orcamentoId)
       if (!orcamento) throw new Error("Orçamento não encontrado")
 
       const novaLista = item.tipo === "receita" 
@@ -166,7 +166,7 @@ export function useOrcamentos() {
     if (!user) throw new Error("Usuário não logado")
 
     try {
-      const orcamento = orcamentos.find(o => o.id === orcamentoId)
+      const orcamento = orcamentos.find((o: OrcamentoComItens) => o.id === orcamentoId)
       if (!orcamento) throw new Error("Orçamento não encontrado")
 
       const novaLista = (tipo === "receita" ? orcamento.receitas : orcamento.despesas)
