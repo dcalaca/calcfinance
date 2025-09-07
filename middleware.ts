@@ -15,7 +15,8 @@ export function middleware(request: NextRequest) {
     '/calculadoras/financiamento',
     '/calculadoras/financiamento-veicular',
     '/dashboard',
-    '/historico'
+    '/historico',
+    '/meu-orcamento'
   ]
   
   // Verificar se a rota atual precisa de autenticação
@@ -48,6 +49,7 @@ export const config = {
   matcher: [
     '/calculadoras/:path*',
     '/dashboard/:path*',
-    '/historico/:path*'
+    '/historico/:path*',
+    '/meu-orcamento/:path*'
   ]
 }

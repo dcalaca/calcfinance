@@ -82,3 +82,30 @@ export interface CalculationTemplate {
   created_at: string
   updated_at: string
 }
+
+export interface OrcamentoItem {
+  id: string
+  nome: string
+  valor: number
+  categoria: string
+  tipo: "receita" | "despesa"
+  data?: string
+  observacoes?: string
+}
+
+export interface Orcamento {
+  id: string
+  user_id: string
+  mes_referencia: string // YYYY-MM-DD
+  nome: string
+  descricao?: string
+  receitas: OrcamentoItem[]
+  despesas: OrcamentoItem[]
+  total_receitas: number
+  total_despesas: number
+  saldo: number
+  status: "ativo" | "arquivado" | "excluido"
+  is_favorite: boolean
+  created_at: string
+  updated_at: string
+}

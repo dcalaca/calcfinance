@@ -114,6 +114,12 @@ export function Header() {
                         Histórico
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/meu-orcamento" className="flex items-center">
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        Meu Orçamento
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
