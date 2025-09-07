@@ -45,17 +45,22 @@ function LoginForm() {
     setIsSubmitting(true)
 
     try {
+      console.log("Tentando fazer login com:", formData.email)
       const { error } = await signIn(formData.email, formData.password)
+      console.log("Resultado do login:", { error })
 
       if (error) {
+        console.error("Erro no login:", error)
         toast.error("Erro ao fazer login: " + String(error))
       } else {
+        console.log("Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         const redirectTo = searchParams.get('redirect') || '/dashboard'
         router.push(redirectTo)
       }
     } catch (error) {
-      toast.error("Erro inesperado ao fazer login")
+      console.error("Erro inesperado no login:", error)
+      toast.error("Erro inesperado ao fazer login: " + String(error))
     } finally {
       setIsSubmitting(false)
     }
