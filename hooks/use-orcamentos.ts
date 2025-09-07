@@ -108,7 +108,7 @@ export function useOrcamentos() {
     }
   }
 
-  const atualizarOrcamento = async (id: string, updates: Partial<Orcamento>) => {
+  const atualizarOrcamento = async (id: string, updates: Partial<OrcamentoComItens>) => {
     if (!user) throw new Error("Usuário não logado")
 
     try {
