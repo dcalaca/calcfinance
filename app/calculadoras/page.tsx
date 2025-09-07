@@ -13,8 +13,15 @@ export default function CalculadorasPage() {
   const { user, loading } = useFinanceAuth()
   const router = useRouter()
 
+  console.log("🔧 CalculadorasPage - user:", user?.email)
+  console.log("🔧 CalculadorasPage - loading:", loading)
+
   useEffect(() => {
+    console.log("🔧 CalculadorasPage - useEffect executado")
+    console.log("🔧 CalculadorasPage - loading:", loading, "user:", user?.email)
+    
     if (!loading && !user) {
+      console.log("❌ CalculadorasPage - Redirecionando para login")
       router.push("/login")
     }
   }, [user, loading, router])

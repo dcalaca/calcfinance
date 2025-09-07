@@ -19,6 +19,12 @@ export function useFinanceAuth() {
       return
     }
 
+    // Timeout de segurança para evitar loading infinito
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ Timeout de segurança - forçando loading para false")
+      setLoading(false)
+    }, 5000) // 5 segundos
+
     // Get initial user
     const getUser = async () => {
       try {
@@ -57,7 +63,10 @@ export function useFinanceAuth() {
       setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      clearTimeout(timeoutId)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signUp = async (email: string, password: string, fullName?: string) => {
