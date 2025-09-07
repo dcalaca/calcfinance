@@ -23,7 +23,7 @@ export function useFinanceAuth() {
     const timeoutId = setTimeout(() => {
       console.log("⏰ Timeout de segurança - forçando loading para false")
       setLoading(false)
-    }, 5000) // 5 segundos
+    }, 10000) // 10 segundos - mais tempo para o Supabase responder
 
     // Get initial user
     const getUser = async () => {
@@ -33,11 +33,17 @@ export function useFinanceAuth() {
           data: { user },
         } = await supabase.auth.getUser()
         console.log("👤 Usuário encontrado:", user ? "Sim" : "Não")
+        console.log("👤 Email do usuário:", user?.email)
         setUser(user)
+        
+        if (user) {
+          console.log("✅ Usuário inicial definido:", user.email)
+        }
       } catch (error) {
         console.error("❌ Erro ao buscar usuário:", error)
       } finally {
         setLoading(false)
+        clearTimeout(timeoutId) // Limpar timeout quando receber resposta
       }
     }
 
@@ -48,8 +54,12 @@ export function useFinanceAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       console.log("🔄 Mudança de estado de autenticação:", event, session?.user ? "Usuário logado" : "Usuário deslogado")
+      console.log("👤 Usuário da sessão:", session?.user?.email)
+      
       setUser(session?.user ?? null)
+      
       if (session?.user) {
+        console.log("✅ Usuário definido:", session.user.email)
         // Buscar dados do usuário na tabela calc_users
         const { data: userData } = await supabase
           .from('calc_users')
@@ -58,9 +68,12 @@ export function useFinanceAuth() {
           .single()
         setFinanceUser(userData)
       } else {
+        console.log("❌ Nenhum usuário na sessão")
         setFinanceUser(null)
       }
+      
       setLoading(false)
+      clearTimeout(timeoutId) // Limpar timeout quando receber resposta
     })
 
     return () => {
