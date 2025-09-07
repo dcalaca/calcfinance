@@ -48,11 +48,10 @@ export function Header() {
                 <Image
                   src="/logo.png"
                   alt="FinanceHub"
-                  width={120}
-                  height={40}
-                  className="h-10 w-auto"
+                  width={80}
+                  height={32}
+                  className="h-8 w-auto"
                   priority
-                  style={{ width: "auto", height: "auto" }}
                 />
               </Link>
             </div>

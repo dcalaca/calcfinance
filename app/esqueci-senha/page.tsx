@@ -46,11 +46,10 @@ export default function EsqueciSenhaPage() {
           <Image 
             src="/logo.png" 
             alt="FinanceHub" 
-            width={180} 
-            height={40} 
-            className="mx-auto mb-4"
+            width={120} 
+            height={48} 
+            className="mx-auto mb-4 h-12 w-auto"
             priority
-            style={{ width: "auto", height: "auto" }}
           />
           <h1 className="text-2xl font-bold text-slate-900">Recuperar Senha</h1>
           <p className="text-slate-600">Digite seu e-mail para receber as instruções</p>
