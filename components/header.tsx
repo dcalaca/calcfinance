@@ -56,7 +56,6 @@ export function Header() {
                   width={80}
                   height={32}
                   className="h-8 w-auto"
-                  priority
                 />
               </Link>
             </div>
