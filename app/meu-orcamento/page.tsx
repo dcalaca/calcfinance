@@ -198,6 +198,19 @@ export default function MeuOrcamentoPage() {
     return resultado
   }
 
+  const formatarMesAbreviado = (data: string) => {
+    // Dividir a data em partes para evitar problemas de timezone
+    const [ano, mes, dia] = data.split('-').map(Number)
+    
+    // Criar data local (mês é 0-indexado, então subtrair 1)
+    const date = new Date(ano, mes - 1, dia)
+    
+    return date.toLocaleDateString('pt-BR', { 
+      year: '2-digit', 
+      month: 'short' 
+    })
+  }
+
 
   const handleCriarOrcamentosFaltantes = async () => {
     console.log("🔧 Criando orçamentos faltantes...")
@@ -310,7 +323,7 @@ export default function MeuOrcamentoPage() {
   // Dados para o gráfico mensal - agrupar por mês e somar valores
   const dadosGrafico = orcamentos.reduce((acc, orcamento) => {
     const mesKey = orcamento.mes_referencia
-    const mesFormatado = formatarMes(orcamento.mes_referencia)
+    const mesFormatado = formatarMesAbreviado(orcamento.mes_referencia)
     
     if (!acc[mesKey]) {
       acc[mesKey] = {
@@ -331,8 +344,8 @@ export default function MeuOrcamentoPage() {
 
   // Converter para array e ordenar
   const dadosGraficoArray = Object.values(dadosGrafico).sort((a, b) => {
-    const orcamentoA = orcamentos.find(o => formatarMes(o.mes_referencia) === a.mes)
-    const orcamentoB = orcamentos.find(o => formatarMes(o.mes_referencia) === b.mes)
+    const orcamentoA = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === a.mes)
+    const orcamentoB = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === b.mes)
     
     if (!orcamentoA || !orcamentoB) return 0
     
