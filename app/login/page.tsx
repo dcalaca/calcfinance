@@ -48,8 +48,8 @@ function LoginForm() {
 
     try {
       console.log("Tentando fazer login com:", formData.email)
-      const { error } = await signIn(formData.email, formData.password)
-      console.log("Resultado do login:", { error })
+      const { data, error } = await signIn(formData.email, formData.password)
+      console.log("Resultado do login:", { data, error })
 
       if (error) {
         console.error("Erro no login:", error)
@@ -57,14 +57,13 @@ function LoginForm() {
       } else {
         console.log("Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
+        
+        // Forçar redirecionamento imediatamente após login bem-sucedido
         const redirectTo = searchParams.get('redirect') || '/dashboard'
         console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
         
-        // Aguardar um pouco para garantir que o estado foi atualizado
-        setTimeout(() => {
-          console.log("🔄 handleSubmit - Executando redirecionamento...")
-          router.push(redirectTo)
-        }, 100)
+        // Usar window.location.href para forçar redirecionamento
+        window.location.href = redirectTo
       }
     } catch (error) {
       console.error("Erro inesperado no login:", error)
