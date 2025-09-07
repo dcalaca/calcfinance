@@ -185,7 +185,7 @@ function RegisterForm() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting || loading}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Criando conta..." : "Criar conta"}
               </Button>
             </form>
