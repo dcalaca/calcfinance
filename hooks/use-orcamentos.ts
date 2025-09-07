@@ -57,7 +57,7 @@ export function useOrcamentos() {
       const hoje = new Date()
       const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-01`
       
-      const orcamentoMesAtual = data?.find(o => o.mes_referencia === mesAtual)
+      const orcamentoMesAtual = data?.find((o: Orcamento) => o.mes_referencia === mesAtual)
       if (orcamentoMesAtual) {
         setOrcamentoAtual(orcamentoMesAtual)
       } else if (data && data.length > 0) {
