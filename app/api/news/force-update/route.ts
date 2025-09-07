@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Transformar dados para o formato do nosso site
     const news = data.articles?.map((article: any) => ({
       id: article.url?.split('/').pop() || Math.random().toString(36),
-      title: article.title || 'Título não disponível',
+      title: article.title || article.description || 'Título não disponível',
       content: article.description || 'Conteúdo não disponível',
       source: article.source?.name || 'Fonte desconhecida',
       url: article.url || '#',
