@@ -44,22 +44,43 @@ export async function GET(request: NextRequest) {
       isActive: true
     })) || [];
 
-    // Filtrar notícias em português e priorizar fontes brasileiras
-    const filteredNews = news.filter(article => {
+    // Filtrar apenas notícias em português e conteúdo financeiro
+    const filteredNews = news.filter((article: any) => {
       const title = article.title.toLowerCase();
       const content = article.content?.toLowerCase() || '';
-      const source = article.source.toLowerCase();
       
-      // Priorizar fontes brasileiras conhecidas
-      const brazilianSources = ['infomoney', 'valor', 'exame', 'cnn brasil', 'folha', 'estadão', 'g1', 'uol', 'globo'];
-      const isBrazilianSource = brazilianSources.some(sourceName => source.includes(sourceName));
+      // Filtrar idiomas não desejados (palavras específicas)
+      const englishWords = ['stocks', 'firm', 'scored', 'entry', 'america', 'watched', 'financial', 'club', 'tech', 's&p', '500'];
+      const spanishWords = ['doña', 'alejandra', 'tiene', 'años', 'deseo', 'ancestral', 'artesanía', 'perdure', 'porfirio', 'escandón', 'cristóbal', 'huichochitlán', 'comunidad', 'otomí', 'norte', 'toluca', 'todavía', 'posible', 'escuchar', 'sonid'];
+      const turkishWords = ['trump', 'venezuela', 'tehdit', 'uçaklarınızı', 'düşürürüz', 'abd', 'başkanı', 'donald', 'venezuela', 'savaş', 'uçağının', 'donanma', 'gemisine', 'yakın', 'uçuş', 'gerçekleştirmesine', 'tepki', 'haberturk', 'com', 'tr'];
       
-      // Priorizar notícias em português (palavras comuns em português)
-      const portugueseWords = ['de', 'da', 'do', 'das', 'dos', 'com', 'para', 'por', 'em', 'na', 'no', 'nas', 'nos', 'que', 'uma', 'um', 'o', 'a', 'os', 'as'];
-      const hasPortugueseWords = portugueseWords.some(word => title.includes(word) || content.includes(word));
+      // Se contém palavras específicas em inglês, espanhol ou turco, rejeitar
+      if (englishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      if (spanishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      if (turkishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
       
-      return isBrazilianSource || hasPortugueseWords;
-    }).slice(0, 20); // Limitar a 20 notícias
+      // Bloquear conteúdo claramente não financeiro
+      const nonFinancialWords = [
+        'jogador', 'atleta', 'futebol', 'futebolista', 'seleção', 'raphinha', 'neymar',
+        'novela', 'série', 'filme', 'cinema', 'teatro', 'tv', 'programa', 'reality',
+        'caverna', 'encantada', 'sbt', 'disney', 'disneyland', 'paris', 'racismo',
+        'parque', 'diversões', 'funcionário', 'abraço', 'hug', 'ignorado', 'filho'
+      ];
+      
+      // Se contém palavras não financeiras, rejeitar
+      if (nonFinancialWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      
+      // Aceitar apenas notícias em português
+      return true;
+    }).slice(0, 20);
 
     return NextResponse.json({ 
       success: true,
@@ -80,19 +101,25 @@ export async function GET(request: NextRequest) {
 }
 
 function getCategoryFromTitle(title: string): string {
-  if (!title) return 'Economia';
-  
   const titleLower = title.toLowerCase();
   
   if (titleLower.includes('dólar') || titleLower.includes('moeda') || titleLower.includes('câmbio')) {
-    return 'Economia';
-  } else if (titleLower.includes('bolsa') || titleLower.includes('ibovespa') || titleLower.includes('ações')) {
+    return 'Câmbio';
+  }
+  
+  if (titleLower.includes('bolsa') || titleLower.includes('ibovespa') || titleLower.includes('ações')) {
     return 'Bolsa';
-  } else if (titleLower.includes('bitcoin') || titleLower.includes('cripto') || titleLower.includes('ethereum')) {
+  }
+  
+  if (titleLower.includes('bitcoin') || titleLower.includes('cripto') || titleLower.includes('ethereum')) {
     return 'Criptomoedas';
-  } else if (titleLower.includes('selic') || titleLower.includes('juros') || titleLower.includes('copom')) {
+  }
+  
+  if (titleLower.includes('selic') || titleLower.includes('juros') || titleLower.includes('copom')) {
     return 'Juros';
-  } else if (titleLower.includes('fii') || titleLower.includes('fundos') || titleLower.includes('imobiliário')) {
+  }
+  
+  if (titleLower.includes('fii') || titleLower.includes('fundos') || titleLower.includes('investimento')) {
     return 'Investimentos';
   }
   
