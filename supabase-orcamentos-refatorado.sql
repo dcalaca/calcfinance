@@ -1,7 +1,7 @@
     -- Tabela de orçamentos (apenas metadados)
     CREATE TABLE IF NOT EXISTS calc_orcamentos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES calc_users(id) ON DELETE CASCADE,
     mes_referencia DATE NOT NULL,
     nome VARCHAR NOT NULL,
     descricao TEXT,
@@ -17,7 +17,7 @@
     CREATE TABLE IF NOT EXISTS calc_orcamento_itens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     orcamento_id UUID NOT NULL REFERENCES calc_orcamentos(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES calc_users(id) ON DELETE CASCADE,
     nome VARCHAR NOT NULL,
     valor NUMERIC(10,2) NOT NULL,
     categoria VARCHAR NOT NULL,
