@@ -21,8 +21,9 @@ type NewsItem = {
  */
 async function getLatestNews(): Promise<NewsItem[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/news`, {
-      next: { revalidate: 7200 } // Revalida a cada 2 horas
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3003'}/api/news`, {
+      cache: "no-store", // Sempre buscar notícias frescas
+      next: { revalidate: 0 } // Forçar revalidação
     })
     
     if (!response.ok) {

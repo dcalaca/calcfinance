@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic"
+export const revalidate = 0 // Sempre revalidar
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, ArrowRight } from "lucide-react"
@@ -24,7 +25,8 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
     console.log('🔍 Buscando notícias de:', `${baseUrl}/api/news`)
 
     const response = await fetch(`${baseUrl}/api/news`, {
-      cache: "no-store", // Sem cache para desenvolvimento
+      cache: "no-store", // Sem cache - sempre buscar notícias frescas
+      next: { revalidate: 0 }, // Forçar revalidação
       headers: {
         "User-Agent": "FinanceHub/1.0",
       },
@@ -122,7 +124,18 @@ export default async function NoticiasPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Notícias Financeiras</h1>
-          <p className="text-xl text-slate-600">Mantenha-se atualizado com as principais notícias do mercado</p>
+          <p className="text-xl text-slate-600 mb-4">Mantenha-se atualizado com as principais notícias do mercado</p>
+          <div className="flex justify-center gap-4">
+            <a 
+              href="/noticias/atualizar" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 inline-flex items-center gap-2"
+            >
+              🔄 Atualizar Notícias
+            </a>
+            <span className="text-sm text-slate-500 flex items-center">
+              Última atualização: {new Date().toLocaleString('pt-BR')}
+            </span>
+          </div>
         </div>
 
         {/* Grid de Notícias */}
