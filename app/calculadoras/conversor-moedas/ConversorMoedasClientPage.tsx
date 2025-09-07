@@ -232,7 +232,7 @@ export default function ConversorMoedasClientPage() {
   }, [])
 
   // Converter moedas
-  const converter = () => {
+  const converter = async () => {
     if (!taxas[moedaOrigem] || !taxas[moedaDestino] || valor <= 0) {
       toast.error("Preencha todos os campos corretamente")
       return
