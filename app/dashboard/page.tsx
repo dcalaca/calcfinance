@@ -193,8 +193,10 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/calculos/${calculation.id}`}>
+                            <Eye className="w-4 h-4" />
+                          </Link>
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleDeleteCalculation(calculation.id)}>
                           <Trash2 className="w-4 h-4 text-red-600" />
