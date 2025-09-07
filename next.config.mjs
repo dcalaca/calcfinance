@@ -24,8 +24,7 @@ const nextConfig = {
   
   // Configurações de performance
   experimental: {
-    // Otimizações de bundle
-    optimizeCss: true,
+    // Otimizações de bundle (removido optimizeCss que pode causar problemas com critters)
   },
   
   // Headers de segurança
