@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -31,8 +31,38 @@ export default function OrcamentoClientPage() {
   })
   const [resultado, setResultado] = useState<any>(null)
 
-  const { saveCalculation } = useFinanceCalculations()
+  const { saveCalculation, calculations } = useFinanceCalculations()
   const { user } = useFinanceAuth()
+
+  // Carregar orçamento salvo quando a página carrega
+  useEffect(() => {
+    if (user && calculations.length > 0) {
+      // Buscar o orçamento mais recente
+      const orcamentoRecente = calculations
+        .filter(calc => calc.type === "orcamento")
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+
+      if (orcamentoRecente && orcamentoRecente.input_data?.itens) {
+        console.log("📋 Carregando orçamento salvo:", orcamentoRecente.input_data.itens)
+        setItens(orcamentoRecente.input_data.itens)
+        
+        // Calcular resultado automaticamente
+        const receitas = orcamentoRecente.input_data.itens.filter((item: any) => item.tipo === "receita")
+        const despesas = orcamentoRecente.input_data.itens.filter((item: any) => item.tipo === "despesa")
+        const totalReceitas = receitas.reduce((acc: number, item: any) => acc + item.valor, 0)
+        const totalDespesas = despesas.reduce((acc: number, item: any) => acc + item.valor, 0)
+        const saldo = totalReceitas - totalDespesas
+
+        setResultado({
+          totalReceitas,
+          totalDespesas,
+          saldo,
+          receitas,
+          despesas
+        })
+      }
+    }
+  }, [user, calculations])
 
   const categoriasDespesas = [
     "Alimentação",
@@ -47,7 +77,7 @@ export default function OrcamentoClientPage() {
 
   const categoriasReceitas = ["Salário", "Freelance", "Investimentos", "Aluguel", "Outros"]
 
-  const adicionarItem = () => {
+  const adicionarItem = async () => {
     if (!novoItem.nome || novoItem.valor <= 0 || !novoItem.categoria) {
       toast.error("Preencha todos os campos corretamente")
       return
@@ -61,14 +91,76 @@ export default function OrcamentoClientPage() {
       tipo: novoItem.tipo,
     }
 
-    setItens([...itens, item])
+    const novosItens = [...itens, item]
+    setItens(novosItens)
     setNovoItem({ nome: "", valor: 0, categoria: "", tipo: "despesa" })
     toast.success("Item adicionado com sucesso!")
+
+    // Salvar automaticamente se o usuário estiver logado
+    if (user) {
+      try {
+        // Calcular resultado temporário para salvar
+        const receitas = novosItens.filter(item => item.tipo === "receita")
+        const despesas = novosItens.filter(item => item.tipo === "despesa")
+        const totalReceitas = receitas.reduce((acc, item) => acc + item.valor, 0)
+        const totalDespesas = despesas.reduce((acc, item) => acc + item.valor, 0)
+        const saldo = totalReceitas - totalDespesas
+
+        const resultadoTemp = {
+          totalReceitas,
+          totalDespesas,
+          saldo,
+          receitas,
+          despesas
+        }
+
+        await saveCalculation(
+          "orcamento",
+          `Orçamento - ${new Date().toLocaleDateString("pt-BR")}`,
+          { itens: novosItens },
+          resultadoTemp
+        )
+        console.log("✅ Orçamento salvo automaticamente")
+      } catch (error) {
+        console.error("❌ Erro ao salvar orçamento automaticamente:", error)
+      }
+    }
   }
 
-  const removerItem = (id: string) => {
-    setItens(itens.filter((item) => item.id !== id))
+  const removerItem = async (id: string) => {
+    const novosItens = itens.filter((item) => item.id !== id)
+    setItens(novosItens)
     toast.success("Item removido com sucesso!")
+
+    // Salvar automaticamente se o usuário estiver logado
+    if (user && novosItens.length > 0) {
+      try {
+        // Calcular resultado temporário para salvar
+        const receitas = novosItens.filter(item => item.tipo === "receita")
+        const despesas = novosItens.filter(item => item.tipo === "despesa")
+        const totalReceitas = receitas.reduce((acc, item) => acc + item.valor, 0)
+        const totalDespesas = despesas.reduce((acc, item) => acc + item.valor, 0)
+        const saldo = totalReceitas - totalDespesas
+
+        const resultadoTemp = {
+          totalReceitas,
+          totalDespesas,
+          saldo,
+          receitas,
+          despesas
+        }
+
+        await saveCalculation(
+          "orcamento",
+          `Orçamento - ${new Date().toLocaleDateString("pt-BR")}`,
+          { itens: novosItens },
+          resultadoTemp
+        )
+        console.log("✅ Orçamento atualizado automaticamente")
+      } catch (error) {
+        console.error("❌ Erro ao atualizar orçamento automaticamente:", error)
+      }
+    }
   }
 
   const calcularOrcamento = () => {
