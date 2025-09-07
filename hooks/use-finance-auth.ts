@@ -152,16 +152,35 @@ export function useFinanceAuth() {
   }
 
   const signOut = async () => {
+    console.log("🚪 Iniciando processo de logout...")
+    
     if (!isSupabaseConfigured()) {
-      console.warn("Supabase not configured")
+      console.warn("❌ Supabase not configured")
       return
     }
 
     try {
+      console.log("🔓 Chamando supabase.auth.signOut()...")
       const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      
+      if (error) {
+        console.error("❌ Erro no logout:", error)
+        throw error
+      }
+      
+      console.log("✅ Logout realizado com sucesso!")
+      
+      // Limpar estado local
+      setUser(null)
+      setFinanceUser(null)
+      
+      // Redirecionar para a página inicial
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'
+      }
+      
     } catch (error) {
-      console.error("Error signing out:", error)
+      console.error("❌ Erro no logout:", error)
       throw error
     }
   }

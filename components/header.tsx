@@ -33,9 +33,13 @@ export function Header() {
 
   const handleSignOut = async () => {
     try {
+      console.log("🔴 Usuário clicou em 'Sair'")
       await signOut()
+      console.log("✅ Logout concluído com sucesso")
     } catch (error) {
-      console.error("Erro ao fazer logout:", error)
+      console.error("❌ Erro ao fazer logout:", error)
+      // Mesmo com erro, limpar o estado local
+      window.location.href = '/'
     }
   }
 
