@@ -19,10 +19,12 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
     // Usar URL absoluta baseada no ambiente
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3003"
+
+    console.log('🔍 Buscando notícias de:', `${baseUrl}/api/news`)
 
     const response = await fetch(`${baseUrl}/api/news`, {
-      next: { revalidate: 7200 }, // Revalida a cada 2 horas
+      cache: "no-store", // Sem cache para desenvolvimento
       headers: {
         "User-Agent": "FinanceHub/1.0",
       },
@@ -35,6 +37,8 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
 
     const data = await response.json()
     const news = data.news || []
+    
+    console.log(`✅ Encontradas ${news.length} notícias na página`)
     
     // Transformar para o formato esperado
     return news.map((item: any) => ({
