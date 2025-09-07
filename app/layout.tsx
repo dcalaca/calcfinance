@@ -6,6 +6,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 // Adicionar import do Providers
 import { Providers } from "@/components/providers"
+// Configuração do console para desenvolvimento
+import "@/lib/console-config"
 
 const inter = Inter({ subsets: ["latin"] })
 

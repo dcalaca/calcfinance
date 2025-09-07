@@ -64,7 +64,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="FinanceHub" width={180} height={40} className="mx-auto mb-4" />
+          <Image 
+            src="/logo.png" 
+            alt="FinanceHub" 
+            width={180} 
+            height={40} 
+            className="mx-auto mb-4"
+            priority
+            style={{ width: "auto", height: "auto" }}
+          />
           <h1 className="text-2xl font-bold text-slate-900">Bem-vindo de volta</h1>
           <p className="text-slate-600">Entre em sua conta para continuar</p>
         </div>

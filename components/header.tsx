@@ -51,6 +51,8 @@ export function Header() {
                   width={120}
                   height={40}
                   className="h-10 w-auto"
+                  priority
+                  style={{ width: "auto", height: "auto" }}
                 />
               </Link>
             </div>
