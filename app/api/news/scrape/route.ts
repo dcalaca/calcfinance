@@ -64,7 +64,6 @@ async function fetchRealNews() {
           headers: {
             "User-Agent": "Mozilla/5.0 (compatible; FinanceHub/1.0)",
           },
-          timeout: 10000,
         })
 
         if (response.ok) {
