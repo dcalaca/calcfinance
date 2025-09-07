@@ -267,12 +267,12 @@ export default function ConversorMoedasClientPage() {
         dataConversao: new Date().toISOString(),
       }
 
-      saveCalculation({
-        type: "conversor_moedas",
-        title: `${valor} ${moedaOrigem} → ${valorConvertido.toFixed(2)} ${moedaDestino}`,
-        inputs: dadosCalculo,
-        result: dadosCalculo,
-      })
+      await saveCalculation(
+        "conversor_moedas",
+        `${valor} ${moedaOrigem} → ${valorConvertido.toFixed(2)} ${moedaDestino}`,
+        dadosCalculo,
+        dadosCalculo
+      )
     }
 
     toast.success("Conversão realizada com sucesso!")
