@@ -418,7 +418,7 @@ export default function MeuOrcamentoPage() {
             <p className="text-muted-foreground mb-4">
               Crie seu primeiro orçamento para começar a controlar suas finanças
             </p>
-            <Button onClick={() => router.push('/calculadoras/orcamento')}>
+            <Button onClick={() => setMostrarFormulario(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Criar Orçamento
             </Button>
@@ -432,7 +432,7 @@ export default function MeuOrcamentoPage() {
             <p className="text-muted-foreground mb-4">
               Crie seu primeiro orçamento para começar a controlar suas finanças
             </p>
-            <Button onClick={() => router.push('/calculadoras/orcamento')}>
+            <Button onClick={() => setMostrarFormulario(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Criar Orçamento
             </Button>
