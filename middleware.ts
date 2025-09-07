@@ -4,10 +4,6 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // TEMPORARIAMENTE DESABILITADO PARA DEBUG
-  console.log("🔧 Middleware - Rota:", pathname)
-  console.log("🔧 Middleware - Cookies disponíveis:", request.cookies.getAll().map(c => c.name))
-  
   // Rotas que precisam de autenticação
   const protectedRoutes = [
     '/calculadoras',
@@ -25,7 +21,10 @@ export function middleware(request: NextRequest) {
   )
   
   if (isProtectedRoute) {
-    console.log("🔧 Middleware - Rota protegida detectada:", pathname)
+    // Log para debug - descobrir nome do cookie
+    const allCookies = request.cookies.getAll()
+    console.log("🔧 Middleware - Rota:", pathname)
+    console.log("🔧 Middleware - Cookies disponíveis:", allCookies.map(c => c.name))
     
     // Verificar se há token de autenticação no cookie
     // O Supabase pode usar diferentes nomes de cookie
@@ -33,12 +32,22 @@ export function middleware(request: NextRequest) {
                               request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token.0') ||
                               request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token.1')
     
-    console.log("🔧 Middleware - Cookie encontrado:", !!supabaseAuthToken)
+    // Verificar se há qualquer cookie do Supabase
+    const hasSupabaseCookie = allCookies.some(cookie => 
+      cookie.name.includes('sb-') && cookie.name.includes('auth')
+    )
     
-    // TEMPORARIAMENTE PERMITINDO ACESSO PARA DEBUG
-    if (!supabaseAuthToken) {
-      console.log("⚠️ Middleware - Cookie não encontrado, mas permitindo acesso para debug")
-      // return NextResponse.redirect(loginUrl)
+    console.log("🔧 Middleware - Cookie específico encontrado:", !!supabaseAuthToken)
+    console.log("🔧 Middleware - Qualquer cookie Supabase:", hasSupabaseCookie)
+    
+    if (!supabaseAuthToken && !hasSupabaseCookie) {
+      console.log("❌ Middleware - Redirecionando para login")
+      // Redirecionar para login com parâmetro de retorno
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    } else {
+      console.log("✅ Middleware - Permitindo acesso")
     }
   }
   
