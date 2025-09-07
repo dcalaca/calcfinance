@@ -1,12 +1,11 @@
-import OrcamentoClientPage from "./OrcamentoClientPage"
+import { redirect } from 'next/navigation'
 
 export const metadata = {
-  title: "Calculadora de Orçamento Mensal | FinanceHub",
-  description:
-    "Organize suas finanças mensais e acompanhe gastos e receitas facilmente com nossa calculadora de orçamento.",
-  keywords: "orçamento mensal, controle de gastos, finanças pessoais, planejamento financeiro",
+  title: "Meu Orçamento | FinanceHub",
+  description: "Controle sua vida financeira de forma simples e eficiente",
 }
 
 export default function OrcamentoPage() {
-  return <OrcamentoClientPage />
+  // Redirecionar para a página de orçamento principal
+  redirect('/meu-orcamento')
 }
