@@ -37,12 +37,28 @@ export async function GET(request: NextRequest) {
       isActive: true
     })) || [];
 
-    // Filtrar apenas conteúdo claramente não financeiro
+    // Filtrar apenas notícias em português e conteúdo financeiro
     const filteredNews = news.filter(article => {
       const title = article.title.toLowerCase();
       const content = article.content?.toLowerCase() || '';
       
-      // Bloquear apenas conteúdo claramente não financeiro
+      // Filtrar idiomas não desejados (palavras específicas)
+      const englishWords = ['stocks', 'firm', 'scored', 'entry', 'america', 'watched', 'financial', 'club', 'tech', 's&p', '500'];
+      const spanishWords = ['doña', 'alejandra', 'tiene', 'años', 'deseo', 'ancestral', 'artesanía', 'perdure', 'porfirio', 'escandón', 'cristóbal', 'huichochitlán', 'comunidad', 'otomí', 'norte', 'toluca', 'todavía', 'posible', 'escuchar', 'sonid'];
+      const turkishWords = ['trump', 'venezuela', 'tehdit', 'uçaklarınızı', 'düşürürüz', 'abd', 'başkanı', 'donald', 'venezuela', 'savaş', 'uçağının', 'donanma', 'gemisine', 'yakın', 'uçuş', 'gerçekleştirmesine', 'tepki', 'haberturk', 'com', 'tr'];
+      
+      // Se contém palavras específicas em inglês, espanhol ou turco, rejeitar
+      if (englishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      if (spanishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      if (turkishWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
+      
+      // Bloquear conteúdo claramente não financeiro
       const nonFinancialWords = [
         'jogador', 'atleta', 'futebol', 'futebolista', 'seleção', 'raphinha', 'neymar',
         'novela', 'série', 'filme', 'cinema', 'teatro', 'tv', 'programa', 'reality',
@@ -55,7 +71,7 @@ export async function GET(request: NextRequest) {
         return false;
       }
       
-      // Aceitar todas as outras notícias
+      // Aceitar apenas notícias em português
       return true;
     }).slice(0, 20);
 
