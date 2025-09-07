@@ -58,7 +58,7 @@ export function useOrcamentosRefatorado() {
       console.log("📋 Dados dos orçamentos:", orcamentosData)
 
       // Buscar itens de todos os orçamentos
-      const orcamentoIds = orcamentosData?.map(o => o.id) || []
+      const orcamentoIds = orcamentosData?.map((o: OrcamentoComItens) => o.id) || []
       let itensData: OrcamentoItem[] = []
 
       console.log("🔍 Orçamento IDs para buscar itens:", orcamentoIds)
