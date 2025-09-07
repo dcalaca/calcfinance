@@ -47,9 +47,11 @@ export async function GET(request: NextRequest) {
       const brazilianSources = ['infomoney', 'valor', 'exame', 'cnn brasil', 'folha', 'estadão', 'g1', 'uol', 'globo', 'terra', 'metropoles', 'diario do centro do mundo'];
       const isBrazilianSource = brazilianSources.some(sourceName => source.includes(sourceName));
       
-      // Filtrar palavras em inglês comuns
+      // Filtrar palavras em inglês e espanhol
       const englishWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'];
+      const spanishWords = ['el', 'la', 'los', 'las', 'de', 'del', 'en', 'con', 'por', 'para', 'que', 'es', 'son', 'fue', 'será', 'tiene', 'tienen', 'puede', 'pueden', 'va', 'van', 'está', 'están', 'fue', 'fueron', 'mientras', 'mientras', 'denunció', 'situación', 'hijo', 'acusa', 'disneyland', 'parís', 'racismo', 'contra', 'extremo', 'encuentra', 'concentrado', 'selección'];
       const hasEnglishWords = englishWords.some(word => title.includes(` ${word} `) || title.startsWith(`${word} `) || title.endsWith(` ${word}`));
+      const hasSpanishWords = spanishWords.some(word => title.includes(` ${word} `) || title.startsWith(`${word} `) || title.endsWith(` ${word}`));
       
       // Priorizar notícias em português (palavras comuns em português)
       const portugueseWords = ['de', 'da', 'do', 'das', 'dos', 'com', 'para', 'por', 'em', 'na', 'no', 'nas', 'nos', 'que', 'uma', 'um', 'o', 'a', 'os', 'as', 'é', 'são', 'foi', 'será', 'tem', 'têm', 'pode', 'podem', 'vai', 'vão', 'está', 'estão', 'foi', 'foram', 'ter', 'fazer', 'dizer', 'ver', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer'];
@@ -58,8 +60,8 @@ export async function GET(request: NextRequest) {
       // Se for fonte brasileira, aceitar
       if (isBrazilianSource) return true;
       
-      // Se tiver palavras em inglês, rejeitar
-      if (hasEnglishWords) return false;
+      // Se tiver palavras em inglês ou espanhol, rejeitar
+      if (hasEnglishWords || hasSpanishWords) return false;
       
       // Se tiver palavras em português, aceitar
       return hasPortugueseWords;
@@ -78,7 +80,7 @@ function getCategoryFromTitle(title: string): string {
   const titleLower = title.toLowerCase();
   
   // Filtrar conteúdo não financeiro
-  const nonFinancialWords = ['novela', 'série', 'filme', 'show', 'música', 'futebol', 'esporte', 'celebridade', 'famoso', 'artista', 'ator', 'atriz', 'cantor', 'cantora', 'jogador', 'jogadora', 'telenovela', 'reality', 'bbb', 'a fazenda', 'casa', 'encontro', 'casamento', 'divórcio', 'filho', 'filha', 'família', 'política', 'eleição', 'presidente', 'governador', 'prefeito', 'deputado', 'senador', 'ministro', 'secretário', 'prefeitura', 'câmara', 'assembleia', 'congresso', 'senado', 'tribunal', 'justiça', 'lei', 'projeto', 'votação', 'plenário', 'sessão', 'comissão', 'relatório', 'parecer', 'emenda', 'substitutivo', 'proposta', 'medida', 'decreto', 'portaria', 'resolução', 'instrução', 'norma', 'regulamento', 'estatuto', 'código', 'constituição', 'carta', 'manifesto', 'declaração', 'pronunciamento', 'discurso', 'entrevista', 'coletiva', 'conferência', 'seminário', 'workshop', 'palestra', 'evento', 'feira', 'exposição', 'mostra', 'festival', 'concurso', 'competição', 'campeonato', 'torneio', 'olimpíada', 'copa', 'mundial', 'eurocopa', 'copa do mundo', 'copa américa', 'copa libertadores', 'brasileirão', 'série a', 'série b', 'série c', 'série d', 'primeira divisão', 'segunda divisão', 'terceira divisão', 'quarta divisão', 'estadual', 'municipal', 'regional', 'nacional', 'internacional', 'mundial', 'continental', 'intercontinental', 'transcontinental', 'transnacional', 'multinacional', 'global', 'universal', 'planetário', 'cosmopolita', 'internacionalista', 'globalista', 'mundialista', 'universalista', 'cosmopolita', 'internacionalista', 'globalista', 'mundialista', 'universalista'];
+  const nonFinancialWords = ['novela', 'série', 'filme', 'show', 'música', 'futebol', 'esporte', 'celebridade', 'famoso', 'artista', 'ator', 'atriz', 'cantor', 'cantora', 'jogador', 'jogadora', 'telenovela', 'reality', 'bbb', 'a fazenda', 'casa', 'encontro', 'casamento', 'divórcio', 'filho', 'filha', 'família', 'raphinha', 'disney', 'disneyland', 'paris', 'racismo', 'discriminação', 'seleção', 'brasileira', 'jogador', 'futebolista', 'atleta', 'esportista', 'craque', 'ídolo', 'estrela', 'astro', 'celebridade', 'famoso', 'artista', 'ator', 'atriz', 'cantor', 'cantora', 'músico', 'música', 'show', 'concerto', 'festival', 'evento', 'espetáculo', 'apresentação', 'performance', 'turnê', 'tour', 'gira', 'digressão', 'excursão', 'viagem', 'passeio', 'turismo', 'férias', 'descanso', 'lazer', 'diversão', 'entretenimento', 'diversão', 'lazer', 'entretenimento', 'diversão', 'lazer', 'entretenimento'];
   
   if (nonFinancialWords.some(word => titleLower.includes(word))) {
     return 'Economia'; // Classificar como Economia genérica para não aparecer
