@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Info } from "lucide-react"
+import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Info, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -23,6 +23,7 @@ const navigation = [
   { name: "Notícias", href: "/noticias", icon: TrendingUp },
   { name: "Educação", href: "/educacao", icon: BookOpen },
   { name: "Sobre", href: "/sobre", icon: Info },
+  { name: "Contato", href: "/contato", icon: Mail },
 ]
 
 export function Header() {
