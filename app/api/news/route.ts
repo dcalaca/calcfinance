@@ -115,8 +115,10 @@ export async function GET(request: NextRequest) {
         'empréstimo', 'municipal', 'financiamento', 'federal', 'empréstimo', 'federal'
       ];
       
-      // Aceitar se contém palavras financeiras OU se for de fonte brasileira confiável
-      return financialWords.some(word => title.includes(word) || content.includes(word)) || isBrazilianSource;
+      // Aceitar se contém palavras financeiras OU se for de fonte brasileira confiável OU se contém português
+      return financialWords.some(word => title.includes(word) || content.includes(word)) || 
+             isBrazilianSource || 
+             hasPortugueseWords;
     }).slice(0, 20); // Limitar a 20 notícias
 
     return NextResponse.json({ news: filteredNews });
