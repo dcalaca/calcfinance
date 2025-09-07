@@ -153,9 +153,16 @@ export function useFinanceAuth() {
 
   const signOut = async () => {
     console.log("🚪 Iniciando processo de logout...")
+    console.log("🔧 Usuário atual antes do logout:", user?.email)
     
     if (!isSupabaseConfigured()) {
       console.warn("❌ Supabase not configured")
+      // Mesmo sem Supabase, limpar estado local
+      setUser(null)
+      setFinanceUser(null)
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'
+      }
       return
     }
 
@@ -165,7 +172,13 @@ export function useFinanceAuth() {
       
       if (error) {
         console.error("❌ Erro no logout:", error)
-        throw error
+        // Mesmo com erro, limpar estado local
+        setUser(null)
+        setFinanceUser(null)
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'
+        }
+        return
       }
       
       console.log("✅ Logout realizado com sucesso!")
@@ -176,12 +189,18 @@ export function useFinanceAuth() {
       
       // Redirecionar para a página inicial
       if (typeof window !== 'undefined') {
+        console.log("🔄 Redirecionando para página inicial...")
         window.location.href = '/'
       }
       
     } catch (error) {
       console.error("❌ Erro no logout:", error)
-      throw error
+      // Mesmo com erro, limpar estado local
+      setUser(null)
+      setFinanceUser(null)
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'
+      }
     }
   }
 

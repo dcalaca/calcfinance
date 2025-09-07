@@ -4,6 +4,10 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  // TEMPORARIAMENTE DESABILITADO PARA DEBUG
+  console.log("🔧 Middleware - Rota:", pathname)
+  console.log("🔧 Middleware - Cookies disponíveis:", request.cookies.getAll().map(c => c.name))
+  
   // Rotas que precisam de autenticação
   const protectedRoutes = [
     '/calculadoras',
@@ -20,22 +24,20 @@ export function middleware(request: NextRequest) {
   )
   
   if (isProtectedRoute) {
+    console.log("🔧 Middleware - Rota protegida detectada:", pathname)
+    
     // Verificar se há token de autenticação no cookie
     // O Supabase pode usar diferentes nomes de cookie
     const supabaseAuthToken = request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token') ||
                               request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token.0') ||
                               request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token.1')
     
-    console.log("🔧 Middleware - Rota protegida:", pathname)
     console.log("🔧 Middleware - Cookie encontrado:", !!supabaseAuthToken)
-    console.log("🔧 Middleware - Cookies disponíveis:", request.cookies.getAll().map(c => c.name))
     
+    // TEMPORARIAMENTE PERMITINDO ACESSO PARA DEBUG
     if (!supabaseAuthToken) {
-      console.log("❌ Middleware - Redirecionando para login")
-      // Redirecionar para login com parâmetro de retorno
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
+      console.log("⚠️ Middleware - Cookie não encontrado, mas permitindo acesso para debug")
+      // return NextResponse.redirect(loginUrl)
     }
   }
   
