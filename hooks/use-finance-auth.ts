@@ -97,17 +97,30 @@ export function useFinanceAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
+    console.log("🔐 Iniciando processo de login...")
+    console.log("📧 Email:", email)
+    console.log("🔑 Supabase configurado:", isSupabaseConfigured())
+    
     if (!isSupabaseConfigured()) {
+      console.error("❌ Supabase não está configurado!")
       throw new Error("Supabase not configured")
     }
 
     try {
+      console.log("🚀 Chamando supabase.auth.signInWithPassword...")
       const { data, error }: AuthResponse = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      console.log("📊 Resposta do Supabase:", { data: data?.user?.id, error })
+
+      if (error) {
+        console.error("❌ Erro do Supabase:", error)
+        throw error
+      }
+
+      console.log("✅ Login bem-sucedido! Atualizando último login...")
 
       // Atualizar último login na tabela calc_users
       if (data.user) {
@@ -117,13 +130,16 @@ export function useFinanceAuth() {
           .eq('id', data.user.id)
 
         if (updateError) {
-          console.warn("Error updating last login:", updateError.message)
+          console.warn("⚠️ Erro ao atualizar último login:", updateError.message)
+        } else {
+          console.log("✅ Último login atualizado com sucesso!")
         }
       }
 
+      console.log("🎉 Login completado com sucesso!")
       return { data, error: null }
     } catch (error) {
-      console.error("Error signing in:", error)
+      console.error("💥 Erro durante o login:", error)
       throw error
     }
   }
