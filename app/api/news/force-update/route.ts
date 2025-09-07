@@ -5,8 +5,13 @@ export async function GET(request: NextRequest) {
     const apiKey = process.env.NEWS_API_KEY;
     
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'API key not configured',
+        message: 'Configure NEWS_API_KEY no Vercel Dashboard'
+      }, { status: 500 });
     }
+
+    console.log('🔄 Forçando atualização das notícias...');
 
     // Buscar notícias do Brasil sobre economia e finanças
     const response = await fetch(
@@ -19,10 +24,12 @@ export async function GET(request: NextRequest) {
     );
 
     if (!response.ok) {
-      throw new Error(`NewsAPI error: ${response.status}`);
+      throw new Error(`NewsAPI error: ${response.status} - ${response.statusText}`);
     }
 
     const data = await response.json();
+    
+    console.log(`✅ Encontradas ${data.articles?.length || 0} notícias`);
     
     // Transformar dados para o formato do nosso site
     const news = data.articles?.map((article: any) => ({
@@ -36,10 +43,21 @@ export async function GET(request: NextRequest) {
       isActive: true
     })) || [];
 
-    return NextResponse.json({ news });
+    return NextResponse.json({ 
+      success: true,
+      message: `Foram encontradas ${news.length} notícias brasileiras`,
+      news,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    console.error('Error fetching news:', error);
-    return NextResponse.json({ news: [] });
+    console.error('❌ Erro ao buscar notícias:', error);
+    
+    return NextResponse.json({ 
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro desconhecido',
+      news: [],
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
   }
 }
 
