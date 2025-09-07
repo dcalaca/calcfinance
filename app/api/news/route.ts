@@ -57,14 +57,41 @@ export async function GET(request: NextRequest) {
       const portugueseWords = ['de', 'da', 'do', 'das', 'dos', 'com', 'para', 'por', 'em', 'na', 'no', 'nas', 'nos', 'que', 'uma', 'um', 'o', 'a', 'os', 'as', 'é', 'são', 'foi', 'será', 'tem', 'têm', 'pode', 'podem', 'vai', 'vão', 'está', 'estão', 'foi', 'foram', 'ter', 'fazer', 'dizer', 'ver', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer'];
       const hasPortugueseWords = portugueseWords.some(word => title.includes(` ${word} `) || title.startsWith(`${word} `) || title.endsWith(` ${word}`));
       
-      // Se for fonte brasileira, aceitar
-      if (isBrazilianSource) return true;
+      // Filtrar conteúdo NÃO financeiro de forma agressiva
+      const nonFinancialWords = [
+        'jogador', 'atleta', 'futebol', 'futebolista', 'seleção', 'brasileira', 'raphinha', 'neymar',
+        'celebridade', 'famoso', 'artista', 'ator', 'atriz', 'cantor', 'cantora', 'músico', 'música',
+        'novela', 'série', 'filme', 'cinema', 'teatro', 'televisão', 'tv', 'programa', 'reality',
+        'caverna', 'encantada', 'sbt', 'disney', 'disneyland', 'paris', 'racismo', 'discriminação',
+        'parque', 'diversões', 'funcionário', 'abraço', 'hug', 'ignorado', 'ignorar', 'filho', 'criança',
+        'lula', 'bolsonaro', 'presidente', 'governador', 'prefeito', 'deputado', 'senador', 'ministro'
+      ];
+      
+      // Se contém qualquer palavra não financeira, rejeitar
+      if (nonFinancialWords.some(word => title.includes(word) || content.includes(word))) {
+        return false;
+      }
       
       // Se tiver palavras em inglês ou espanhol, rejeitar
       if (hasEnglishWords || hasSpanishWords) return false;
       
-      // Se tiver palavras em português, aceitar
-      return hasPortugueseWords;
+      // Apenas aceitar se contém palavras financeiras específicas
+      const financialWords = [
+        'dólar', 'moeda', 'câmbio', 'bolsa', 'ibovespa', 'ações', 'bitcoin', 'cripto', 'ethereum',
+        'selic', 'juros', 'copom', 'fii', 'fundos', 'imobiliário', 'investimento', 'investir',
+        'economia', 'econômico', 'financeiro', 'finanças', 'mercado', 'capital', 'renda', 'lucro',
+        'prejuízo', 'receita', 'despesa', 'orçamento', 'inflação', 'ipca', 'pib', 'crescimento',
+        'empresa', 'corporação', 'sociedade', 'acionista', 'dividendo', 'balanço', 'faturamento',
+        'vendas', 'comércio', 'exportação', 'importação', 'balança', 'comercial', 'superávit',
+        'déficit', 'dívida', 'crédito', 'financiamento', 'empréstimo', 'pagamento', 'cobrança',
+        'fusão', 'aquisição', 'incorporação', 'ipo', 'oferta', 'pública', 'privatização',
+        'startup', 'fintech', 'insurtech', 'proptech', 'edtech', 'healthtech', 'agritech',
+        'sustentabilidade', 'esg', 'governança', 'compliance', 'regulamentação', 'auditoria',
+        'risco', 'gestão', 'administração', 'gerenciamento', 'liderança', 'direção', 'presidência'
+      ];
+      
+      // Apenas aceitar se contém palavras financeiras específicas
+      return financialWords.some(word => title.includes(word) || content.includes(word));
     }).slice(0, 20); // Limitar a 20 notícias
 
     return NextResponse.json({ news: filteredNews });
