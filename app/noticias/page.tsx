@@ -22,7 +22,7 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
       : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 
     const response = await fetch(`${baseUrl}/api/news`, {
-      cache: "no-store",
+      next: { revalidate: 7200 }, // Revalida a cada 2 horas
       headers: {
         "User-Agent": "FinanceHub/1.0",
       },
@@ -33,8 +33,17 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
       throw new Error(`HTTP ${response.status}`)
     }
 
-    const news = await response.json()
-    return Array.isArray(news) ? news : []
+    const data = await response.json()
+    const news = data.news || []
+    
+    // Transformar para o formato esperado
+    return news.map((item: any) => ({
+      title: item.title,
+      link: item.url,
+      contentSnippet: item.content,
+      pubDate: item.publishedAt,
+      source: item.source,
+    }))
   } catch (error) {
     console.error("Erro ao buscar notícias da API:", error)
 

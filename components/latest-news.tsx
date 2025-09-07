@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -6,56 +5,36 @@ import { Clock, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-/**
- *  Criamos o supabaseClient como singleton para evitar múltiplas instâncias
- *  e garantimos que ele só existe no server (com variáveis seguras).
- */
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Variáveis SUPABASE_URL / SUPABASE_KEY não definidas.")
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-})
-
 type NewsItem = {
   id: string
   title: string
-  excerpt: string
+  content: string
   category: string
   source: string
-  source_url: string
-  image_url: string | null
-  published_at: string
+  url: string
+  publishedAt: string
+  isActive: boolean
 }
 
 /**
- * Busca as 6 notícias mais recentes.
- * Se a tabela ainda não existir, devolve [] sem estourar erro.
+ * Busca as 6 notícias mais recentes da API real.
  */
 async function getLatestNews(): Promise<NewsItem[]> {
-  const { data, error } = await supabase
-    .from("calc_news")
-    .select("*")
-    .eq("is_active", true)
-    .order("published_at", { ascending: false })
-    .limit(6)
-
-  // Tabela ainda não criada? – devolve vazio silenciosamente
-  if (error) {
-    if (error.code === "42P01") {
-      console.info('[LatestNews] Tabela "calc_news" não encontrada. Rode o script SQL antes de popular notícias.')
-      return []
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/news`, {
+      next: { revalidate: 7200 } // Revalida a cada 2 horas
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`)
     }
-    // Qualquer outro erro é logado como warning, mas não quebra
-    console.warn("[LatestNews] Erro ao buscar notícias:", error.message)
+    
+    const data = await response.json()
+    return data.news?.slice(0, 6) || []
+  } catch (error) {
+    console.warn("[LatestNews] Erro ao buscar notícias:", error)
     return []
   }
-
-  return data ?? []
 }
 
 function timeAgo(dateString: string) {
@@ -114,7 +93,7 @@ export async function LatestNews() {
                     <Badge className={categoryColor(n.category)}>{n.category}</Badge>
                     <span className="flex items-center text-xs text-slate-500 gap-1">
                       <Clock className="w-3 h-3" />
-                      {timeAgo(n.published_at)}
+                      {timeAgo(n.publishedAt)}
                     </span>
                   </div>
                   <CardTitle className="text-base leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
@@ -122,9 +101,9 @@ export async function LatestNews() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription className="line-clamp-3 mb-4">{n.excerpt}</CardDescription>
+                  <CardDescription className="line-clamp-3 mb-4">{n.content}</CardDescription>
                   <Button asChild variant="ghost" size="sm" className="p-0 h-auto">
-                    <Link href={n.source_url} target="_blank" rel="noopener noreferrer">
+                    <Link href={n.url} target="_blank" rel="noopener noreferrer">
                       Ler mais <ArrowRight className="w-4 h-4 ml-1 inline" />
                     </Link>
                   </Button>

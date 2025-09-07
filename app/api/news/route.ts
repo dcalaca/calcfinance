@@ -1,104 +1,77 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server';
 
-// Função para gerar notícias sempre atualizadas
-function generateFreshNews() {
-  const now = Date.now()
+export async function GET(request: NextRequest) {
+  try {
+    const apiKey = process.env.NEWS_API_KEY;
+    
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    }
 
-  return [
-    {
-      title: "Dólar fecha em alta de 0,8% cotado a R$ 5,87",
-      link: "https://g1.globo.com/economia/mercados/",
-      contentSnippet: "Moeda americana sobe com expectativas sobre decisões do Fed e cenário político brasileiro",
-      pubDate: new Date(now - 1 * 60 * 60 * 1000).toISOString(),
-      source: "G1 Economia",
-    },
-    {
-      title: "Ibovespa sobe 1,2% puxado por ações de bancos e mineradoras",
-      link: "https://exame.com/invest/mercados/",
-      contentSnippet: "Principal índice da bolsa brasileira fecha aos 129.850 pontos com volume de R$ 18 bilhões",
-      pubDate: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
-      source: "Exame",
-    },
-    {
-      title: "Bitcoin supera US$ 47.200 e acumula alta de 15% na semana",
-      link: "https://www.infomoney.com.br/mercados/criptomoedas/",
-      contentSnippet: "Criptomoeda é impulsionada por otimismo sobre ETFs e adoção institucional crescente",
-      pubDate: new Date(now - 3 * 60 * 60 * 1000).toISOString(),
-      source: "InfoMoney",
-    },
-    {
-      title: "Banco Central mantém Selic em 11,75% e sinaliza cautela",
-      link: "https://g1.globo.com/economia/noticia/",
-      contentSnippet:
-        "Copom decide por unanimidade manter taxa básica de juros inalterada pela terceira vez consecutiva",
-      pubDate: new Date(now - 4 * 60 * 60 * 1000).toISOString(),
-      source: "G1 Economia",
-    },
-    {
-      title: "Fundos imobiliários batem recorde com R$ 12,8 bi captados",
-      link: "https://exame.com/invest/fundos/",
-      contentSnippet: "Setor de FIIs cresce 28% no ano com busca por renda passiva e diversificação de carteira",
-      pubDate: new Date(now - 5 * 60 * 60 * 1000).toISOString(),
-      source: "Exame",
-    },
-    {
-      title: "Ethereum atinge US$ 2.980 com upgrade da rede em vista",
-      link: "https://www.infomoney.com.br/mercados/criptomoedas/",
-      contentSnippet:
-        "Segunda maior criptomoeda se valoriza com expectativas sobre melhorias técnicas e redução de taxas",
-      pubDate: new Date(now - 6 * 60 * 60 * 1000).toISOString(),
-      source: "InfoMoney",
-    },
-    {
-      title: "Petrobras anuncia dividendos de R$ 0,45 por ação",
-      link: "https://g1.globo.com/economia/negocios/",
-      contentSnippet: "Estatal distribui R$ 5,8 bilhões aos acionistas referente ao terceiro trimestre de 2024",
-      pubDate: new Date(now - 7 * 60 * 60 * 1000).toISOString(),
-      source: "G1 Economia",
-    },
-    {
-      title: "Vale sobe 3,2% após alta do minério de ferro na China",
-      link: "https://exame.com/invest/mercados/acoes/",
-      contentSnippet:
-        "Mineradora se beneficia da recuperação da demanda chinesa e expectativas de estímulos econômicos",
-      pubDate: new Date(now - 8 * 60 * 60 * 1000).toISOString(),
-      source: "Exame",
-    },
-    {
-      title: "Inflação desacelera para 4,87% em 12 meses, diz IBGE",
-      link: "https://g1.globo.com/economia/indicadores/",
-      contentSnippet: "IPCA registra alta de 0,39% em dezembro, abaixo das expectativas do mercado financeiro",
-      pubDate: new Date(now - 9 * 60 * 60 * 1000).toISOString(),
-      source: "G1 Economia",
-    },
-    {
-      title: "Tesouro Direto tem recorde de investidores em 2024",
-      link: "https://exame.com/invest/renda-fixa/",
-      contentSnippet:
-        "Plataforma registra 2,1 milhões de CPFs cadastrados, crescimento de 18% em relação ao ano anterior",
-      pubDate: new Date(now - 10 * 60 * 60 * 1000).toISOString(),
-      source: "Exame",
-    },
-    {
-      title: "Nubank anuncia expansão para México e Colômbia",
-      link: "https://www.infomoney.com.br/negocios/",
-      contentSnippet: "Fintech brasileira planeja investir US$ 500 milhões na expansão internacional em 2025",
-      pubDate: new Date(now - 11 * 60 * 60 * 1000).toISOString(),
-      source: "InfoMoney",
-    },
-    {
-      title: "PIX bate recorde com 42 bilhões de transações em 2024",
-      link: "https://g1.globo.com/economia/tecnologia/",
-      contentSnippet: "Sistema de pagamentos instantâneos do BC cresce 58% e movimenta R$ 18,5 trilhões no ano",
-      pubDate: new Date(now - 12 * 60 * 60 * 1000).toISOString(),
-      source: "G1 Economia",
-    },
-  ]
+    // Buscar notícias do Brasil sobre economia e finanças
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=economia+finanças+bolsa+selic+bitcoin&country=br&language=pt&sortBy=publishedAt&pageSize=20&apiKey=${apiKey}`,
+      {
+        headers: {
+          'User-Agent': 'CalcFinance/1.0'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`NewsAPI error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Transformar dados para o formato do nosso site
+    const news = data.articles?.map((article: any) => ({
+      id: article.url?.split('/').pop() || Math.random().toString(36),
+      title: article.title,
+      content: article.description,
+      source: article.source.name,
+      url: article.url,
+      publishedAt: article.publishedAt,
+      category: getCategoryFromTitle(article.title),
+      isActive: true
+    })) || [];
+
+    return NextResponse.json({ news });
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    
+    // Fallback para notícias mock em caso de erro
+    const fallbackNews = [
+      {
+        id: 'fallback-1',
+        title: 'Dólar fecha em alta de 0,7% cotado a R$ 5,88',
+        content: 'Moeda americana sobe com expectativas sobre decisões do Fed e cenário político brasileiro',
+        source: 'InfoMoney',
+        url: '#',
+        publishedAt: new Date().toISOString(),
+        category: 'Economia',
+        isActive: true
+      }
+    ];
+    
+    return NextResponse.json({ news: fallbackNews });
+  }
 }
 
-export async function GET() {
-  // Gera notícias sempre atualizadas com timestamps frescos
-  const freshNews = generateFreshNews()
-
-  return NextResponse.json(freshNews)
+function getCategoryFromTitle(title: string): string {
+  const titleLower = title.toLowerCase();
+  
+  if (titleLower.includes('dólar') || titleLower.includes('moeda') || titleLower.includes('câmbio')) {
+    return 'Economia';
+  } else if (titleLower.includes('bolsa') || titleLower.includes('ibovespa') || titleLower.includes('ações')) {
+    return 'Bolsa';
+  } else if (titleLower.includes('bitcoin') || titleLower.includes('cripto') || titleLower.includes('ethereum')) {
+    return 'Criptomoedas';
+  } else if (titleLower.includes('selic') || titleLower.includes('juros') || titleLower.includes('copom')) {
+    return 'Juros';
+  } else if (titleLower.includes('fii') || titleLower.includes('fundos') || titleLower.includes('imobiliário')) {
+    return 'Investimentos';
+  }
+  
+  return 'Economia';
 }
