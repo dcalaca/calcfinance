@@ -47,11 +47,13 @@ export async function GET(request: NextRequest) {
       const brazilianSources = ['infomoney', 'valor', 'exame', 'cnn brasil', 'folha', 'estadão', 'g1', 'uol', 'globo', 'terra', 'metropoles', 'diario do centro do mundo'];
       const isBrazilianSource = brazilianSources.some(sourceName => source.includes(sourceName));
       
-      // Filtrar palavras em inglês e espanhol
+      // Filtrar palavras em inglês, espanhol, turco e outros idiomas
       const englishWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them'];
       const spanishWords = ['el', 'la', 'los', 'las', 'de', 'del', 'en', 'con', 'por', 'para', 'que', 'es', 'son', 'fue', 'será', 'tiene', 'tienen', 'puede', 'pueden', 'va', 'van', 'está', 'están', 'fue', 'fueron', 'mientras', 'mientras', 'denunció', 'situación', 'hijo', 'acusa', 'disneyland', 'parís', 'racismo', 'contra', 'extremo', 'encuentra', 'concentrado', 'selección'];
+      const turkishWords = ['trump', 'venezuela', 'tehdit', 'uçaklarınızı', 'düşürürüz', 'abd', 'başkanı', 'donald', 'venezuela', 'savaş', 'uçağının', 'donanma', 'gemisine', 'yakın', 'uçuş', 'gerçekleştirmesine', 'tepki', 'haberturk', 'com', 'tr'];
       const hasEnglishWords = englishWords.some(word => title.includes(` ${word} `) || title.startsWith(`${word} `) || title.endsWith(` ${word}`));
       const hasSpanishWords = spanishWords.some(word => title.includes(` ${word} `) || title.startsWith(`${word} `) || title.endsWith(` ${word}`));
+      const hasTurkishWords = turkishWords.some(word => title.includes(word) || content.includes(word));
       
       // Priorizar notícias em português (palavras comuns em português)
       const portugueseWords = ['de', 'da', 'do', 'das', 'dos', 'com', 'para', 'por', 'em', 'na', 'no', 'nas', 'nos', 'que', 'uma', 'um', 'o', 'a', 'os', 'as', 'é', 'são', 'foi', 'será', 'tem', 'têm', 'pode', 'podem', 'vai', 'vão', 'está', 'estão', 'foi', 'foram', 'ter', 'fazer', 'dizer', 'ver', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer', 'saber', 'querer', 'poder', 'dever', 'vir', 'ir', 'dar', 'falar', 'trabalhar', 'viver', 'pensar', 'sentir', 'conhecer'];
@@ -72,8 +74,8 @@ export async function GET(request: NextRequest) {
         return false;
       }
       
-      // Se tiver palavras em inglês ou espanhol, rejeitar
-      if (hasEnglishWords || hasSpanishWords) return false;
+      // Se tiver palavras em inglês, espanhol ou turco, rejeitar
+      if (hasEnglishWords || hasSpanishWords || hasTurkishWords) return false;
       
       // Aceitar se contém palavras financeiras OU se for de fonte brasileira confiável
       const financialWords = [
