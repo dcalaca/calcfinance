@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -26,38 +25,23 @@ export function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     console.log("🔧 Middleware - Rota protegida detectada:", pathname)
     
-    // Criar cliente Supabase para verificar autenticação
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return request.cookies.get(name)?.value
-          },
-        },
-      }
+    // Verificar todos os cookies disponíveis
+    const allCookies = request.cookies.getAll()
+    console.log("🍪 Todos os cookies:", allCookies.map(c => c.name))
+    
+    // Verificar se há cookies do Supabase (qualquer um que comece com 'sb-')
+    const supabaseCookies = allCookies.filter(cookie => 
+      cookie.name.startsWith('sb-') || 
+      cookie.name.includes('supabase') ||
+      cookie.name.includes('session')
     )
     
-    // Verificar se o usuário está autenticado
-    const checkAuth = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        console.log("🔐 Middleware - Usuário encontrado:", user?.email || "Nenhum")
-        return !!user
-      } catch (error) {
-        console.error("❌ Middleware - Erro ao verificar autenticação:", error)
-        return false
-      }
-    }
+    console.log("🔐 Cookies do Supabase encontrados:", supabaseCookies.map(c => c.name))
     
-    // Verificar autenticação de forma síncrona usando cookies
-    const authToken = request.cookies.get('sb-kfsteismyqpekbaqwuez-auth-token')?.value
-    const hasAuthToken = !!authToken
+    // Verificar se há pelo menos um cookie do Supabase
+    const hasSupabaseCookie = supabaseCookies.length > 0
     
-    console.log("🔐 Middleware - Token de auth encontrado:", hasAuthToken)
-    
-    if (!hasAuthToken) {
+    if (!hasSupabaseCookie) {
       console.log("❌ Middleware - Usuário não autenticado, redirecionando para login")
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
