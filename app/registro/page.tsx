@@ -58,7 +58,7 @@ export default function RegisterPage() {
       const { error } = await signUp(formData.email, formData.password, formData.fullName)
 
       if (error) {
-        toast.error("Erro ao criar conta: " + error.message)
+        toast.error("Erro ao criar conta: " + String(error))
       } else {
         toast.success("Conta criada com sucesso! Verifique seu e-mail para confirmar.")
         router.push("/login")
