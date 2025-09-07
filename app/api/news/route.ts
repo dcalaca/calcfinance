@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       // Se tiver palavras em inglês ou espanhol, rejeitar
       if (hasEnglishWords || hasSpanishWords) return false;
       
-      // Apenas aceitar se contém palavras financeiras específicas
+      // Aceitar se contém palavras financeiras OU se for de fonte brasileira confiável
       const financialWords = [
         'dólar', 'moeda', 'câmbio', 'bolsa', 'ibovespa', 'ações', 'bitcoin', 'cripto', 'ethereum',
         'selic', 'juros', 'copom', 'fii', 'fundos', 'imobiliário', 'investimento', 'investir',
@@ -87,11 +87,34 @@ export async function GET(request: NextRequest) {
         'fusão', 'aquisição', 'incorporação', 'ipo', 'oferta', 'pública', 'privatização',
         'startup', 'fintech', 'insurtech', 'proptech', 'edtech', 'healthtech', 'agritech',
         'sustentabilidade', 'esg', 'governança', 'compliance', 'regulamentação', 'auditoria',
-        'risco', 'gestão', 'administração', 'gerenciamento', 'liderança', 'direção', 'presidência'
+        'risco', 'gestão', 'administração', 'gerenciamento', 'liderança', 'direção', 'presidência',
+        'banco', 'bancário', 'bancos', 'instituição', 'financeira', 'cooperativa', 'crédito',
+        'financiamento', 'empréstimo', 'consórcio', 'leasing', 'fundo', 'investimento',
+        'aplicação', 'aplicar', 'aplicações', 'rendimento', 'rentabilidade', 'lucratividade',
+        'patrimônio', 'patrimonial', 'patrimônio', 'líquido', 'bruto', 'margem', 'margem',
+        'operacional', 'líquida', 'bruta', 'ebitda', 'ebit', 'lucro', 'líquido', 'bruto',
+        'receita', 'líquida', 'bruta', 'faturamento', 'vendas', 'líquidas', 'brutas',
+        'custo', 'mercadorias', 'vendidas', 'cmv', 'produtos', 'vendidos', 'cpv',
+        'serviços', 'prestados', 'csp', 'despesas', 'operacionais', 'administrativas',
+        'comerciais', 'financeiras', 'receitas', 'financeiras', 'resultado', 'financeiro',
+        'operacional', 'antes', 'impostos', 'rait', 'juros', 'impostos', 'depreciação',
+        'amortização', 'exaustão', 'provisões', 'provisão', 'devedores', 'duvidosos',
+        'impostos', 'contingências', 'férias', '13º', 'salário', 'fgts', 'inss', 'ir',
+        'csll', 'pis', 'cofins', 'icms', 'ipi', 'iss', 'icms', 'st', 'substituição',
+        'tributária', 'diferença', 'tributária', 'compensação', 'tributária', 'redução',
+        'tributária', 'isenção', 'tributária', 'incentivo', 'fiscal', 'subvenção',
+        'governamental', 'subsídio', 'governamental', 'financiamento', 'governamental',
+        'empréstimo', 'governamental', 'financiamento', 'bancário', 'empréstimo', 'bancário',
+        'financiamento', 'privado', 'empréstimo', 'privado', 'financiamento', 'público',
+        'empréstimo', 'público', 'financiamento', 'internacional', 'empréstimo', 'internacional',
+        'financiamento', 'nacional', 'empréstimo', 'nacional', 'financiamento', 'regional',
+        'empréstimo', 'regional', 'financiamento', 'local', 'empréstimo', 'local',
+        'financiamento', 'estadual', 'empréstimo', 'estadual', 'financiamento', 'municipal',
+        'empréstimo', 'municipal', 'financiamento', 'federal', 'empréstimo', 'federal'
       ];
       
-      // Apenas aceitar se contém palavras financeiras específicas
-      return financialWords.some(word => title.includes(word) || content.includes(word));
+      // Aceitar se contém palavras financeiras OU se for de fonte brasileira confiável
+      return financialWords.some(word => title.includes(word) || content.includes(word)) || isBrazilianSource;
     }).slice(0, 20); // Limitar a 20 notícias
 
     return NextResponse.json({ news: filteredNews });
