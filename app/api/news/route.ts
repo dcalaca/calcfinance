@@ -28,12 +28,12 @@ export async function GET(request: NextRequest) {
     // Transformar dados para o formato do nosso site
     const news = data.articles?.map((article: any) => ({
       id: article.url?.split('/').pop() || Math.random().toString(36),
-      title: article.title,
-      content: article.description,
-      source: article.source.name,
-      url: article.url,
-      publishedAt: article.publishedAt,
-      category: getCategoryFromTitle(article.title),
+      title: article.title || 'Título não disponível',
+      content: article.description || 'Conteúdo não disponível',
+      source: article.source?.name || 'Fonte desconhecida',
+      url: article.url || '#',
+      publishedAt: article.publishedAt || new Date().toISOString(),
+      category: getCategoryFromTitle(article.title || ''),
       isActive: true
     })) || [];
 
@@ -62,6 +62,8 @@ export async function GET(request: NextRequest) {
 }
 
 function getCategoryFromTitle(title: string): string {
+  if (!title) return 'Economia';
+  
   const titleLower = title.toLowerCase();
   
   if (titleLower.includes('dólar') || titleLower.includes('moeda') || titleLower.includes('câmbio')) {
