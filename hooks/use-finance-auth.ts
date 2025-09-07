@@ -23,31 +23,25 @@ export function useFinanceAuth() {
     const timeoutId = setTimeout(() => {
       console.log("⏰ Timeout de segurança - forçando loading para false")
       setLoading(false)
-    }, 10000) // 10 segundos - mais tempo para o Supabase responder
+    }, 5000) // 5 segundos
 
-    // Get initial user
-    const getUser = async () => {
+    // Get initial user first
+    const getInitialUser = async () => {
       try {
-        console.log("🔍 Buscando usuário atual...")
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        console.log("👤 Usuário encontrado:", user ? "Sim" : "Não")
-        console.log("👤 Email do usuário:", user?.email)
+        const { data: { user } } = await supabase.auth.getUser()
+        console.log("🔍 Usuário inicial encontrado:", user?.email || "Nenhum")
         setUser(user)
-        
-        if (user) {
-          console.log("✅ Usuário inicial definido:", user.email)
-        }
-      } catch (error) {
-        console.error("❌ Erro ao buscar usuário:", error)
-      } finally {
+        setFinanceUser(user)
         setLoading(false)
-        clearTimeout(timeoutId) // Limpar timeout quando receber resposta
+        clearTimeout(timeoutId)
+      } catch (error) {
+        console.error("❌ Erro ao buscar usuário inicial:", error)
+        setLoading(false)
+        clearTimeout(timeoutId)
       }
     }
 
-    getUser()
+    getInitialUser()
 
     // Listen for auth changes
     const {
@@ -60,13 +54,7 @@ export function useFinanceAuth() {
       
       if (session?.user) {
         console.log("✅ Usuário definido:", session.user.email)
-        // Buscar dados do usuário na tabela calc_users
-        const { data: userData } = await supabase
-          .from('calc_users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        setFinanceUser(userData)
+        setFinanceUser(session.user) // Usar o usuário da sessão diretamente
       } else {
         console.log("❌ Nenhum usuário na sessão")
         setFinanceUser(null)

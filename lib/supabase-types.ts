@@ -85,12 +85,16 @@ export interface CalculationTemplate {
 
 export interface OrcamentoItem {
   id: string
+  orcamento_id: string
+  user_id: string
   nome: string
   valor: number
   categoria: string
   tipo: "receita" | "despesa"
-  data?: string
+  data: string
   observacoes?: string
+  created_at: string
+  updated_at: string
 }
 
 export interface Orcamento {
@@ -99,13 +103,16 @@ export interface Orcamento {
   mes_referencia: string // YYYY-MM-DD
   nome: string
   descricao?: string
+  status: "ativo" | "arquivado" | "excluido"
+  is_favorite: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface OrcamentoComItens extends Orcamento {
   receitas: OrcamentoItem[]
   despesas: OrcamentoItem[]
   total_receitas: number
   total_despesas: number
   saldo: number
-  status: "ativo" | "arquivado" | "excluido"
-  is_favorite: boolean
-  created_at: string
-  updated_at: string
 }

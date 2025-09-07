@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, DollarSign, Target, Car } from "lucide-react"
+import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Target, Car } from "lucide-react"
 import Link from "next/link"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter } from "next/navigation"
@@ -16,15 +16,16 @@ export default function CalculadorasPage() {
   console.log("🔧 CalculadorasPage - user:", user?.email)
   console.log("🔧 CalculadorasPage - loading:", loading)
 
-  useEffect(() => {
-    console.log("🔧 CalculadorasPage - useEffect executado")
-    console.log("🔧 CalculadorasPage - loading:", loading, "user:", user?.email)
-    
-    if (!loading && !user) {
-      console.log("❌ CalculadorasPage - Redirecionando para login")
-      router.push("/login")
-    }
-  }, [user, loading, router])
+  // Remover verificação de autenticação - deixar o middleware cuidar disso
+  // useEffect(() => {
+  //   console.log("🔧 CalculadorasPage - useEffect executado")
+  //   console.log("🔧 CalculadorasPage - loading:", loading, "user:", user?.email)
+  //   
+  //   if (!loading && !user) {
+  //     console.log("❌ CalculadorasPage - Redirecionando para login")
+  //     router.push("/login")
+  //   }
+  // }, [user, loading, router])
 
   if (loading) {
     return (
@@ -37,9 +38,10 @@ export default function CalculadorasPage() {
     )
   }
 
-  if (!user) {
-    return null
-  }
+  // Remover verificação de usuário - deixar o middleware cuidar disso
+  // if (!user) {
+  //   return null
+  // }
 
   const calculators = [
     {
@@ -105,14 +107,6 @@ export default function CalculadorasPage() {
       href: "/calculadoras/conversor-moedas",
       color: "text-yellow-600 bg-yellow-100",
       category: "Moedas",
-    },
-    {
-      title: "Orçamento Mensal",
-      description: "Organize suas finanças mensais com gráficos e relatórios",
-      icon: DollarSign,
-      href: "/calculadoras/orcamento",
-      color: "text-teal-600 bg-teal-100",
-      category: "Planejamento",
     },
   ]
 

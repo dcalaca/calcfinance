@@ -4,9 +4,7 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // TEMPORARIAMENTE DESABILITADO PARA TESTE
   console.log("🔧 Middleware - Rota:", pathname)
-  console.log("🔧 Middleware - Middleware executado!")
   
   // Rotas que precisam de autenticação
   const protectedRoutes = [
@@ -26,7 +24,31 @@ export function middleware(request: NextRequest) {
   
   if (isProtectedRoute) {
     console.log("🔧 Middleware - Rota protegida detectada:", pathname)
-    console.log("✅ Middleware - Permitindo acesso (desabilitado temporariamente)")
+    
+    // Verificar todos os cookies disponíveis
+    const allCookies = request.cookies.getAll()
+    console.log("🍪 Todos os cookies:", allCookies.map(c => c.name))
+    
+    // Verificar se há cookies do Supabase (qualquer um que comece com 'sb-')
+    const supabaseCookies = allCookies.filter(cookie => 
+      cookie.name.startsWith('sb-') || 
+      cookie.name.includes('supabase') ||
+      cookie.name.includes('session')
+    )
+    
+    console.log("🔐 Cookies do Supabase encontrados:", supabaseCookies.map(c => c.name))
+    
+    // Verificar se há pelo menos um cookie do Supabase
+    const hasSupabaseCookie = supabaseCookies.length > 0
+    
+    if (!hasSupabaseCookie) {
+      console.log("❌ Middleware - Usuário não autenticado, redirecionando para login")
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    
+    console.log("✅ Middleware - Usuário autenticado, permitindo acesso")
   }
   
   return NextResponse.next()

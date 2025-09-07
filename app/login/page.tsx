@@ -33,8 +33,10 @@ function LoginForm() {
 
   // Redirecionar se já estiver logado
   useEffect(() => {
+    console.log("🔄 useEffect - user:", !!user, "loading:", loading)
     if (user && !loading) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
+      console.log("🔄 useEffect - Redirecionando para:", redirectTo)
       router.push(redirectTo)
     }
   }, [user, loading, router, searchParams])
@@ -56,7 +58,13 @@ function LoginForm() {
         console.log("Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         const redirectTo = searchParams.get('redirect') || '/dashboard'
-        router.push(redirectTo)
+        console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
+        
+        // Aguardar um pouco para garantir que o estado foi atualizado
+        setTimeout(() => {
+          console.log("🔄 handleSubmit - Executando redirecionamento...")
+          router.push(redirectTo)
+        }, 100)
       }
     } catch (error) {
       console.error("Erro inesperado no login:", error)

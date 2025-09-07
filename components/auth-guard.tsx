@@ -76,22 +76,33 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-800 font-medium mb-2">
+                  🚀 Cadastro Super Simples!
+                </p>
+                <p className="text-green-700 text-sm">
+                  Apenas <strong>nome</strong> e <strong>email</strong> - sem complicações!
+                </p>
+              </div>
+              
               <p className="text-slate-600">
                 Crie sua conta gratuita e tenha acesso a todas as ferramentas financeiras
               </p>
+              
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild className="flex-1">
-                  <Link href="/login">
+                <Button asChild className="flex-1 bg-green-600 hover:bg-green-700">
+                  <Link href="/registro">
                     <User className="h-4 w-4 mr-2" />
-                    Entrar
+                    Criar Conta (Gratuito)
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1">
-                  <Link href="/registro">
-                    Criar Conta
+                  <Link href="/login">
+                    Já tenho conta
                   </Link>
                 </Button>
               </div>
+              
               <div className="pt-4 border-t">
                 <p className="text-sm text-slate-500">
                   ✨ Conta gratuita • Sem cartão de crédito • Acesso imediato

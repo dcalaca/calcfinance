@@ -6,26 +6,36 @@ import type { Orcamento, OrcamentoItem } from "@/lib/supabase-types"
 import { useFinanceAuth } from "./use-finance-auth"
 
 export function useOrcamentos() {
-  const { user } = useFinanceAuth()
+  const { user, financeUser, loading: authLoading } = useFinanceAuth()
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([])
   const [orcamentoAtual, setOrcamentoAtual] = useState<Orcamento | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (user) {
+    console.log("🔧 use-orcamentos - useEffect executado, user:", user?.email, "financeUser:", financeUser?.email, "authLoading:", authLoading)
+    if (user && !authLoading) {
+      console.log("🔧 use-orcamentos - Usuário encontrado, buscando orçamentos...")
       fetchOrcamentos()
-    } else {
+    } else if (!user && !authLoading) {
+      console.log("🔧 use-orcamentos - Nenhum usuário, limpando dados")
       setOrcamentos([])
       setOrcamentoAtual(null)
       setLoading(false)
+    } else {
+      console.log("🔧 use-orcamentos - Aguardando autenticação...")
     }
-  }, [user])
+  }, [user, financeUser, authLoading])
 
   const fetchOrcamentos = async () => {
-    if (!user) return
+    if (!user) {
+      console.log("❌ fetchOrcamentos - Nenhum usuário")
+      return
+    }
 
+    console.log("🔧 fetchOrcamentos - Iniciando busca...")
     setLoading(true)
     try {
+      console.log("🔍 Buscando orçamentos para usuário:", user.email, "ID:", user.id)
       const { data, error } = await supabase
         .from("calc_orcamentos")
         .select("*")
@@ -34,10 +44,13 @@ export function useOrcamentos() {
         .order("mes_referencia", { ascending: false })
 
       if (error) {
-        console.error("Erro ao buscar orçamentos:", error)
+        console.error("❌ Erro ao buscar orçamentos:", error)
+        setLoading(false)
         return
       }
 
+      console.log("✅ Orçamentos encontrados:", data?.length || 0)
+      console.log("📋 Dados dos orçamentos:", data)
       setOrcamentos(data || [])
       
       // Definir orçamento atual (mês atual ou mais recente)
@@ -61,6 +74,8 @@ export function useOrcamentos() {
     if (!user) throw new Error("Usuário não logado")
 
     try {
+      console.log("🔧 Criando orçamento:", { mesReferencia, nome, descricao, userId: user.id })
+      
       const { data, error } = await supabase
         .from("calc_orcamentos")
         .insert({
@@ -78,13 +93,17 @@ export function useOrcamentos() {
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error("❌ Erro ao criar orçamento:", error)
+        throw error
+      }
 
+      console.log("✅ Orçamento criado com sucesso:", data)
       setOrcamentos(prev => [data, ...prev])
       setOrcamentoAtual(data)
       return data
     } catch (error) {
-      console.error("Erro ao criar orçamento:", error)
+      console.error("❌ Erro ao criar orçamento:", error)
       throw error
     }
   }
