@@ -1,18 +1,28 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useFinanceCalculations } from "@/hooks/use-finance-calculations"
-import { Calculator, TrendingUp, Clock, Trash2, Eye } from "lucide-react"
+import { Calculator, TrendingUp, Clock, Trash2, Eye, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { supabase } from "@/lib/supabase"
+
+interface Calculation {
+  id: string
+  calculation_type: string
+  title: string
+  input_data: Record<string, any>
+  result_data: Record<string, any>
+  created_at: string
+}
 
 export default function DashboardPage() {
   const { user, financeUser, loading: authLoading } = useFinanceAuth()
-  const { calculations, loading: calcLoading, deleteCalculation } = useFinanceCalculations()
+  const [calculations, setCalculations] = useState<Calculation[]>([])
+  const [calcLoading, setCalcLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
@@ -21,10 +31,60 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router])
 
-  if (authLoading || calcLoading) {
+  useEffect(() => {
+    if (user) {
+      fetchCalculations()
+    }
+  }, [user])
+
+  const fetchCalculations = async () => {
+    if (!user) return
+
+    setCalcLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from("calc_calculations")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+
+      if (error) {
+        console.error("Erro ao buscar cálculos:", error)
+      } else {
+        setCalculations(data || [])
+      }
+    } catch (error) {
+      console.error("Erro ao buscar cálculos:", error)
+    } finally {
+      setCalcLoading(false)
+    }
+  }
+
+  const handleDeleteCalculation = async (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este cálculo?")) {
+      try {
+        const { error } = await supabase
+          .from("calc_calculations")
+          .delete()
+          .eq("id", id)
+          .eq("user_id", user?.id)
+
+        if (!error) {
+          setCalculations(prev => prev.filter(calc => calc.id !== id))
+        }
+      } catch (error) {
+        console.error("Erro ao excluir cálculo:", error)
+      }
+    }
+  }
+
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-slate-600">Verificando autenticação...</p>
+        </div>
       </div>
     )
   }
@@ -57,11 +117,7 @@ export default function DashboardPage() {
     return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
 
-  const handleDeleteCalculation = async (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este cálculo?")) {
-      await deleteCalculation(id)
-    }
-  }
+  // Removido - já está definido acima
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -166,7 +222,12 @@ export default function DashboardPage() {
               <CardDescription>Seus últimos cálculos salvos</CardDescription>
             </CardHeader>
             <CardContent>
-              {calculations.length === 0 ? (
+              {calcLoading ? (
+                <div className="text-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+                  <p className="text-slate-600">Carregando seus cálculos...</p>
+                </div>
+              ) : calculations.length === 0 ? (
                 <div className="text-center py-8">
                   <Calculator className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                   <p className="text-slate-600 mb-4">Você ainda não fez nenhum cálculo</p>
