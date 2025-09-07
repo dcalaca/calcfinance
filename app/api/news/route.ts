@@ -39,22 +39,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ news });
   } catch (error) {
     console.error('Error fetching news:', error);
-    
-    // Fallback para notícias mock em caso de erro
-    const fallbackNews = [
-      {
-        id: 'fallback-1',
-        title: 'Dólar fecha em alta de 0,7% cotado a R$ 5,88',
-        content: 'Moeda americana sobe com expectativas sobre decisões do Fed e cenário político brasileiro',
-        source: 'InfoMoney',
-        url: '#',
-        publishedAt: new Date().toISOString(),
-        category: 'Economia',
-        isActive: true
-      }
-    ];
-    
-    return NextResponse.json({ news: fallbackNews });
+    return NextResponse.json({ news: [] });
   }
 }
 

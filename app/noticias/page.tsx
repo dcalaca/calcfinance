@@ -46,52 +46,7 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
     }))
   } catch (error) {
     console.error("Erro ao buscar notícias da API:", error)
-
-    // Fallback com notícias simuladas mas com timestamps reais
-    return [
-      {
-        title: "Dólar fecha em alta de 0,7% cotado a R$ 5,88",
-        link: "https://www.infomoney.com.br/mercados/",
-        contentSnippet: "Moeda americana sobe com expectativas sobre decisões do Fed e cenário político brasileiro",
-        pubDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        source: "InfoMoney",
-      },
-      {
-        title: "Ibovespa sobe 1,2% puxado por ações de bancos",
-        link: "https://valorinveste.globo.com/",
-        contentSnippet: "Principal índice da bolsa brasileira fecha aos 130.200 pontos com volume de R$ 18 bilhões",
-        pubDate: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-        source: "Valor Investe",
-      },
-      {
-        title: "Bitcoin supera US$ 46.000 e acumula alta de 15% na semana",
-        link: "https://exame.com/",
-        contentSnippet: "Criptomoeda é impulsionada por otimismo sobre ETFs e adoção institucional crescente",
-        pubDate: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-        source: "Exame",
-      },
-      {
-        title: "Banco Central mantém Selic em 11,75% pela quinta vez",
-        link: "https://www.cnnbrasil.com.br/business/",
-        contentSnippet: "Copom decide por unanimidade manter taxa básica de juros inalterada",
-        pubDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        source: "CNN Brasil",
-      },
-      {
-        title: "Fundos imobiliários captam R$ 15 bi em 2024",
-        link: "https://www.infomoney.com.br/",
-        contentSnippet: "Setor de FIIs cresce 35% no ano com busca por renda passiva",
-        pubDate: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-        source: "InfoMoney",
-      },
-      {
-        title: "Ethereum atinge US$ 3.000 com upgrade da rede",
-        link: "https://valorinveste.globo.com/",
-        contentSnippet: "Segunda maior criptomoeda se valoriza com expectativas sobre melhorias técnicas",
-        pubDate: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
-        source: "Valor Investe",
-      },
-    ]
+    return []
   }
 }
 
@@ -167,8 +122,14 @@ export default async function NoticiasPage() {
         </div>
 
         {/* Grid de Notícias */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {news.map((article) => (
+        {news.length === 0 ? (
+          <div className="text-center py-20">
+            <h3 className="text-xl font-semibold text-slate-600 mb-2">Carregando notícias...</h3>
+            <p className="text-slate-500">As notícias estão sendo atualizadas em tempo real</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {news.map((article) => (
             <Card key={article.id} className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between mb-2">
@@ -197,7 +158,8 @@ export default async function NoticiasPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Informações sobre as fontes */}
         <div className="mt-16 bg-slate-50 rounded-lg p-6">
