@@ -27,7 +27,7 @@ export default function EsqueciSenhaPage() {
       const { error } = await resetPassword(email)
 
       if (error) {
-        toast.error("Erro ao enviar e-mail: " + (error instanceof Error ? error.message : String(error)))
+        toast.error("Erro ao enviar e-mail: " + String(error))
       } else {
         setEmailSent(true)
         toast.success("E-mail de recuperação enviado!")
