@@ -42,13 +42,13 @@ export default function OrcamentoClientPage() {
         .filter(calc => calc.type === "orcamento")
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
 
-      if (orcamentoRecente && orcamentoRecente.input_data?.itens) {
-        console.log("📋 Carregando orçamento salvo:", orcamentoRecente.input_data.itens)
-        setItens(orcamentoRecente.input_data.itens)
+      if (orcamentoRecente && orcamentoRecente.inputs?.itens) {
+        console.log("📋 Carregando orçamento salvo:", orcamentoRecente.inputs.itens)
+        setItens(orcamentoRecente.inputs.itens)
         
         // Calcular resultado automaticamente
-        const receitas = orcamentoRecente.input_data.itens.filter((item: any) => item.tipo === "receita")
-        const despesas = orcamentoRecente.input_data.itens.filter((item: any) => item.tipo === "despesa")
+        const receitas = orcamentoRecente.inputs.itens.filter((item: any) => item.tipo === "receita")
+        const despesas = orcamentoRecente.inputs.itens.filter((item: any) => item.tipo === "despesa")
         const totalReceitas = receitas.reduce((acc: number, item: any) => acc + item.valor, 0)
         const totalDespesas = despesas.reduce((acc: number, item: any) => acc + item.valor, 0)
         const saldo = totalReceitas - totalDespesas
