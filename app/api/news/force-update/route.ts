@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Buscar notícias do Brasil sobre economia e finanças
     const searchQuery = encodeURIComponent('economia OR financas OR bolsa OR selic OR bitcoin OR dolar OR ibovespa OR brasil');
     const response = await fetch(
-      `https://newsapi.org/v2/everything?q=${searchQuery}&language=pt&sortBy=publishedAt&pageSize=20&apiKey=${apiKey}`,
+      `https://newsapi.org/v2/everything?q=${searchQuery}&sortBy=publishedAt&pageSize=20&apiKey=${apiKey}`,
       {
         headers: {
           'User-Agent': 'CalcFinance/1.0'
@@ -44,10 +44,27 @@ export async function GET(request: NextRequest) {
       isActive: true
     })) || [];
 
+    // Filtrar notícias em português e priorizar fontes brasileiras
+    const filteredNews = news.filter(article => {
+      const title = article.title.toLowerCase();
+      const content = article.content?.toLowerCase() || '';
+      const source = article.source.toLowerCase();
+      
+      // Priorizar fontes brasileiras conhecidas
+      const brazilianSources = ['infomoney', 'valor', 'exame', 'cnn brasil', 'folha', 'estadão', 'g1', 'uol', 'globo'];
+      const isBrazilianSource = brazilianSources.some(sourceName => source.includes(sourceName));
+      
+      // Priorizar notícias em português (palavras comuns em português)
+      const portugueseWords = ['de', 'da', 'do', 'das', 'dos', 'com', 'para', 'por', 'em', 'na', 'no', 'nas', 'nos', 'que', 'uma', 'um', 'o', 'a', 'os', 'as'];
+      const hasPortugueseWords = portugueseWords.some(word => title.includes(word) || content.includes(word));
+      
+      return isBrazilianSource || hasPortugueseWords;
+    }).slice(0, 20); // Limitar a 20 notícias
+
     return NextResponse.json({ 
       success: true,
-      message: `Foram encontradas ${news.length} notícias brasileiras`,
-      news,
+      message: `Foram encontradas ${filteredNews.length} notícias brasileiras`,
+      news: filteredNews,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
