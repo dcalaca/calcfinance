@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     })) || [];
 
     // Filtrar apenas notícias em português e conteúdo financeiro
-    const filteredNews = news.filter(article => {
+    const filteredNews = news.filter((article: any) => {
       const title = article.title.toLowerCase();
       const content = article.content?.toLowerCase() || '';
       
