@@ -1,5 +1,10 @@
 import FinanciamentoVeicularClientPage from "./FinanciamentoVeicularClientPage"
+import { AuthGuard } from "@/components/auth-guard"
 
 export default function FinanciamentoVeicularPage() {
-  return <FinanciamentoVeicularClientPage />
+  return (
+    <AuthGuard>
+      <FinanciamentoVeicularClientPage />
+    </AuthGuard>
+  )
 }

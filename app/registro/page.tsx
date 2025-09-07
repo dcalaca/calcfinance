@@ -11,7 +11,7 @@ import { Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 export default function RegisterPage() {
@@ -26,14 +26,16 @@ export default function RegisterPage() {
 
   const { signUp, user, loading } = useFinanceAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Redirecionar se já estiver logado
   useEffect(() => {
     if (user && !loading) {
-      router.push("/dashboard")
+      const redirectTo = searchParams.get('redirect') || '/dashboard'
+      router.push(redirectTo)
     }
-  }, [user, loading, router])
+  }, [user, loading, router, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

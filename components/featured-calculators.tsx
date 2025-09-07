@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent } from "lucide-react"
+import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Lock } from "lucide-react"
 import Link from "next/link"
 
 export function FeaturedCalculators() {
@@ -56,9 +56,18 @@ export function FeaturedCalculators() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
             Calculadoras Mais Populares
           </h2>
-          <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto mb-4">
             Ferramentas práticas para suas decisões financeiras do dia a dia
           </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center gap-2 text-blue-700 font-medium">
+              <Lock className="h-5 w-5" />
+              <span>Login obrigatório para usar as calculadoras</span>
+            </div>
+            <p className="text-sm text-blue-600 mt-2">
+              Crie sua conta gratuita e tenha acesso a todas as ferramentas
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">

@@ -14,7 +14,7 @@ import Image from "next/image"
 
 // Atualizar as importações
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 export default function LoginPage() {
@@ -27,14 +27,16 @@ export default function LoginPage() {
   // Dentro do componente, após const [formData, setFormData] = useState({...})
   const { signIn, user, loading } = useFinanceAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Redirecionar se já estiver logado
   useEffect(() => {
     if (user && !loading) {
-      router.push("/dashboard")
+      const redirectTo = searchParams.get('redirect') || '/dashboard'
+      router.push(redirectTo)
     }
-  }, [user, loading, router])
+  }, [user, loading, router, searchParams])
 
   // Atualizar a função handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +50,8 @@ export default function LoginPage() {
         toast.error("Erro ao fazer login: " + error.message)
       } else {
         toast.success("Login realizado com sucesso!")
-        router.push("/dashboard")
+        const redirectTo = searchParams.get('redirect') || '/dashboard'
+        router.push(redirectTo)
       }
     } catch (error) {
       toast.error("Erro inesperado ao fazer login")

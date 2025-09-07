@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, DollarSign, Target, Car } from "lucide-react"
 import Link from "next/link"
+import { AuthGuard } from "@/components/auth-guard"
 
 export default function CalculadorasPage() {
   const [activeCategory, setActiveCategory] = useState("Todos")
@@ -91,8 +92,9 @@ export default function CalculadorasPage() {
     activeCategory === "Todos" ? calculators : calculators.filter((calc) => calc.category === activeCategory)
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+    <AuthGuard>
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Calculadoras Financeiras</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
@@ -182,7 +184,8 @@ export default function CalculadorasPage() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   )
 }

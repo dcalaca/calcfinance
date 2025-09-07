@@ -1,4 +1,5 @@
 import JurosCompostosClientPage from "./JurosCompostosClientPage"
+import { AuthGuard } from "@/components/auth-guard"
 
 export const metadata = {
   title: "Calculadora de Juros Compostos | FinanceHub",
@@ -13,5 +14,9 @@ export const metadata = {
 }
 
 export default function JurosCompostosPage() {
-  return <JurosCompostosClientPage />
+  return (
+    <AuthGuard>
+      <JurosCompostosClientPage />
+    </AuthGuard>
+  )
 }

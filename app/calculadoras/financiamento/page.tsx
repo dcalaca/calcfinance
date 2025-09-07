@@ -1,4 +1,5 @@
 import FinanciamentoClientPage from "./FinanciamentoClientPage"
+import { AuthGuard } from "@/components/auth-guard"
 
 export const metadata = {
   title: "Simulador de Financiamento Imobiliário | FinanceHub",
@@ -13,5 +14,9 @@ export const metadata = {
 }
 
 export default function FinanciamentoPage() {
-  return <FinanciamentoClientPage />
+  return (
+    <AuthGuard>
+      <FinanciamentoClientPage />
+    </AuthGuard>
+  )
 }
