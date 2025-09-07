@@ -68,12 +68,12 @@ async function fetchRealNews() {
 
         if (response.ok) {
           const xmlText = await response.text()
-          const items = xmlText.match(/<item[^>]*>(.*?)<\/item>/gs) || []
+          const items = xmlText.match(/<item[^>]*>([\s\S]*?)<\/item>/g) || []
 
           const sourceNews = items.slice(0, 4).map((item, index) => {
-            const titleMatch = item.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s)
+            const titleMatch = item.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)
             const linkMatch = item.match(/<link[^>]*>(.*?)<\/link>/)
-            const descMatch = item.match(/<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s)
+            const descMatch = item.match(/<description[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/)
             const pubDateMatch = item.match(/<pubDate[^>]*>(.*?)<\/pubDate>/)
 
             const title = titleMatch ? titleMatch[1].replace(/<[^>]*>/g, "").trim() : `Notícia Financeira ${index + 1}`
