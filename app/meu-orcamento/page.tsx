@@ -131,7 +131,7 @@ export default function MeuOrcamentoPage() {
         const mesItem = new Date(mesReferencia)
         if (mesOrcamento.getMonth() !== mesItem.getMonth() || mesOrcamento.getFullYear() !== mesItem.getFullYear()) {
           console.log("⚠️ Orçamento encontrado não é do mês correto, criando novo...")
-          orcamentoParaUsar = null
+          orcamentoParaUsar = undefined
         }
       }
       
