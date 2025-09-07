@@ -28,17 +28,23 @@ export default function CalculationDetailPage() {
   useEffect(() => {
     const fetchCalculation = async () => {
       try {
+        console.log('🔍 Buscando cálculo:', params.id)
         const response = await fetch(`/api/calculations/${params.id}`)
         
+        console.log('📡 Resposta da API:', response.status, response.statusText)
+        
         if (!response.ok) {
-          setError('Cálculo não encontrado')
+          const errorData = await response.json()
+          console.error('❌ Erro da API:', errorData)
+          setError(`Erro ${response.status}: ${errorData.error || 'Cálculo não encontrado'}`)
           return
         }
         
         const data = await response.json()
+        console.log('✅ Dados recebidos:', data)
         setCalculation(data)
       } catch (error) {
-        console.error('Erro ao buscar cálculo:', error)
+        console.error('💥 Erro ao buscar cálculo:', error)
         setError('Erro ao carregar cálculo')
       } finally {
         setLoading(false)
