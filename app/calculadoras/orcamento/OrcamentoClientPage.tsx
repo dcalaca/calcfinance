@@ -141,12 +141,12 @@ export default function OrcamentoClientPage() {
     }
 
     try {
-      await saveCalculation({
-        type: "orcamento",
-        title: `Orçamento - ${new Date().toLocaleDateString("pt-BR")}`,
-        inputs: { itens },
-        result: resultado,
-      })
+      await saveCalculation(
+        "orcamento",
+        `Orçamento - ${new Date().toLocaleDateString("pt-BR")}`,
+        { itens },
+        resultado
+      )
       toast.success("Orçamento salvo com sucesso!")
     } catch (error) {
       toast.error("Erro ao salvar orçamento")
