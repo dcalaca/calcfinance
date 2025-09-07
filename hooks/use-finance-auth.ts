@@ -10,7 +10,11 @@ export function useFinanceAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log("🔧 Hook de autenticação iniciado")
+    console.log("🔧 Supabase configurado:", isSupabaseConfigured())
+    
     if (!isSupabaseConfigured()) {
+      console.log("❌ Supabase não configurado, definindo loading como false")
       setLoading(false)
       return
     }
@@ -18,12 +22,14 @@ export function useFinanceAuth() {
     // Get initial user
     const getUser = async () => {
       try {
+        console.log("🔍 Buscando usuário atual...")
         const {
           data: { user },
         } = await supabase.auth.getUser()
+        console.log("👤 Usuário encontrado:", user ? "Sim" : "Não")
         setUser(user)
       } catch (error) {
-        console.error("Error getting user:", error)
+        console.error("❌ Erro ao buscar usuário:", error)
       } finally {
         setLoading(false)
       }
@@ -35,6 +41,7 @@ export function useFinanceAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+      console.log("🔄 Mudança de estado de autenticação:", event, session?.user ? "Usuário logado" : "Usuário deslogado")
       setUser(session?.user ?? null)
       if (session?.user) {
         // Buscar dados do usuário na tabela calc_users
