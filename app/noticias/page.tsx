@@ -20,9 +20,7 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
     // Usar URL absoluta baseada no ambiente
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3003"
-
-    console.log('🔍 Buscando notícias de:', `${baseUrl}/api/news`)
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 
     const response = await fetch(`${baseUrl}/api/news`, {
       cache: "no-store", // Sem cache - sempre buscar notícias frescas
@@ -33,14 +31,11 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
     })
 
     if (!response.ok) {
-      console.error(`API retornou status ${response.status}`)
       throw new Error(`HTTP ${response.status}`)
     }
 
     const data = await response.json()
     const news = data.news || []
-    
-    console.log(`✅ Encontradas ${news.length} notícias na página`)
     
     // Transformar para o formato esperado
     return news.map((item: any) => ({
@@ -61,35 +56,35 @@ function getFallbackNews(): NewsItem[] {
   return [
     {
       title: "Taxa Selic mantida em 10,50% ao ano pelo Copom",
-      link: "#",
+      link: "https://www.bcb.gov.br/",
       contentSnippet: "Comitê de Política Monetária decidiu manter a taxa básica de juros em 10,50% ao ano, conforme esperado pelo mercado.",
       pubDate: new Date().toISOString(),
       source: "Banco Central"
     },
     {
       title: "Dólar fecha em alta de 0,8% e vai a R$ 5,45",
-      link: "#",
+      link: "https://valor.globo.com/",
       contentSnippet: "Moeda americana subiu frente ao real em meio a expectativas de inflação e incertezas globais.",
       pubDate: new Date().toISOString(),
       source: "Valor Econômico"
     },
     {
       title: "IBOVESPA recua 1,2% com pressão externa",
-      link: "#",
+      link: "https://www.infomoney.com.br/",
       contentSnippet: "Principal índice da bolsa brasileira fechou em queda influenciado por dados econômicos internacionais.",
       pubDate: new Date().toISOString(),
       source: "InfoMoney"
     },
     {
       title: "Inflação acumula alta de 4,5% no ano",
-      link: "#",
+      link: "https://www.ibge.gov.br/",
       contentSnippet: "IPCA-15 mostra inflação em linha com as metas do governo para 2025.",
       pubDate: new Date().toISOString(),
       source: "IBGE"
     },
     {
       title: "Bitcoin supera US$ 70 mil em alta de 3%",
-      link: "#",
+      link: "https://www.coindesk.com/",
       contentSnippet: "Criptomoeda principal registra valorização significativa em meio a adoção institucional.",
       pubDate: new Date().toISOString(),
       source: "CoinDesk"
