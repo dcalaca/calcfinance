@@ -1,13 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, DollarSign, Target, Car } from "lucide-react"
 import Link from "next/link"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 
 export default function CalculadorasPage() {
   const [activeCategory, setActiveCategory] = useState("Todos")
@@ -208,7 +207,6 @@ export default function CalculadorasPage() {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   )
