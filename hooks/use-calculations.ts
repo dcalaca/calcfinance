@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, type Calculation } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
+import { type FinanceCalculation } from "@/lib/supabase-types"
 import { useAuth } from "./use-auth"
 
 export function useCalculations() {
   const { user } = useAuth()
-  const [calculations, setCalculations] = useState<Calculation[]>([])
+  const [calculations, setCalculations] = useState<FinanceCalculation[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function useCalculations() {
   }
 
   const saveCalculation = async (
-    type: Calculation["type"],
+    type: FinanceCalculation["type"],
     title: string,
     inputs: Record<string, any>,
     results: Record<string, any>,
