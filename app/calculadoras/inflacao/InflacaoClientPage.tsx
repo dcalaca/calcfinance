@@ -24,7 +24,7 @@ export default function InflacaoClientPage() {
   const { saveCalculation } = useFinanceCalculations()
   const { user } = useFinanceAuth()
 
-  const calcularInflacao = () => {
+  const calcularInflacao = async () => {
     if (valorInicial <= 0 || taxaInflacao < 0 || periodo <= 0) {
       toast.error("Preencha todos os campos com valores válidos")
       return
@@ -71,12 +71,12 @@ export default function InflacaoClientPage() {
 
     // Salvar cálculo se usuário estiver logado
     if (user) {
-      saveCalculation({
-        type: "inflacao",
-        title: `Inflação ${taxaInflacao}% - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valorInicial)}`,
-        inputs: { valorInicial, taxaInflacao, periodo, tipoPeriodo },
-        result: resultadoCalculo,
-      })
+      await saveCalculation(
+        "inflacao",
+        `Inflação ${taxaInflacao}% - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valorInicial)}`,
+        { valorInicial, taxaInflacao, periodo, tipoPeriodo },
+        resultadoCalculo
+      )
     }
   }
 
