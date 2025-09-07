@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
     console.log('🔄 Forçando atualização das notícias...');
 
     // Buscar notícias do Brasil sobre economia e finanças
-    const searchQuery = encodeURIComponent('economia financas bolsa selic bitcoin dolar ibovespa');
+    const searchQuery = encodeURIComponent('economia financas bolsa selic bitcoin dolar ibovespa brasil');
     const response = await fetch(
-      `https://newsapi.org/v2/everything?q=${searchQuery}&country=br&language=pt&sortBy=publishedAt&pageSize=20&apiKey=${apiKey}`,
+      `https://newsapi.org/v2/everything?q=${searchQuery}&language=pt&sortBy=publishedAt&pageSize=20&apiKey=${apiKey}`,
       {
         headers: {
           'User-Agent': 'CalcFinance/1.0'

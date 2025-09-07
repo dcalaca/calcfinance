@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     // Teste simples com uma busca básica
     const response = await fetch(
-      `https://newsapi.org/v2/everything?q=bitcoin&country=br&language=pt&pageSize=5&apiKey=${apiKey}`,
+      `https://newsapi.org/v2/everything?q=bitcoin brasil&language=pt&pageSize=5&apiKey=${apiKey}`,
       {
         headers: {
           'User-Agent': 'CalcFinance/1.0'
