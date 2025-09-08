@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Eye, Users, TrendingUp, Globe } from "lucide-react"
+import { RefreshCw, Eye, Users, TrendingUp, Globe, Shield, AlertTriangle } from "lucide-react"
+import { useUser } from "@/hooks/use-finance-auth"
+import Link from "next/link"
 
 interface AnalyticsData {
   totalVisits: number
@@ -24,9 +26,13 @@ interface VisitRecord {
 }
 
 export default function AnalyticsPage() {
+  const { user, loading: userLoading } = useUser()
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [recentVisits, setRecentVisits] = useState<VisitRecord[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Verificar se o usuário tem permissão (apenas dcalaca@gmail.com)
+  const isAuthorized = user?.email === 'dcalaca@gmail.com'
 
   const fetchAnalytics = async () => {
     try {
@@ -53,12 +59,14 @@ export default function AnalyticsPage() {
   }
 
   useEffect(() => {
-    fetchAnalytics()
-    
-    // Atualizar a cada 10 segundos
-    const interval = setInterval(fetchAnalytics, 10000)
-    return () => clearInterval(interval)
-  }, [])
+    if (isAuthorized) {
+      fetchAnalytics()
+      
+      // Atualizar a cada 10 segundos
+      const interval = setInterval(fetchAnalytics, 10000)
+      return () => clearInterval(interval)
+    }
+  }, [isAuthorized])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('pt-BR')
@@ -70,13 +78,82 @@ export default function AnalyticsPage() {
     return '❓'
   }
 
+  // Tela de carregamento
+  if (userLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p>Carregando...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Tela de acesso negado
+  if (!isAuthorized) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-10 h-10 text-red-600" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2 text-red-600">Acesso Restrito</h1>
+            <p className="text-muted-foreground mb-6">
+              Esta página é restrita apenas para administradores do sistema.
+            </p>
+          </div>
+          
+          <Card className="p-6">
+            <CardContent>
+              <div className="flex items-center gap-3 mb-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-orange-600" />
+                <div className="text-left">
+                  <p className="font-medium text-orange-800">Acesso Negado</p>
+                  <p className="text-sm text-orange-700">
+                    Você não tem permissão para visualizar os dados de analytics.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Button asChild className="w-full">
+                  <Link href="/dashboard">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Voltar ao Dashboard
+                  </Link>
+                </Button>
+                
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    <Globe className="w-4 h-4 mr-2" />
+                    Ir para o Início
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Analytics do Site</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <Shield className="w-8 h-8 text-green-600" />
+          <h1 className="text-3xl font-bold">Analytics do Site</h1>
+        </div>
         <p className="text-muted-foreground">
           Acompanhe em tempo real os acessos ao seu site
         </p>
+        <div className="mt-2 text-sm text-green-600 font-medium">
+          🔒 Acesso autorizado para: {user?.email}
+        </div>
       </div>
 
       {/* Botão de atualização */}

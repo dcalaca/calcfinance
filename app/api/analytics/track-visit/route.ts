@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,6 +48,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    // Verificar se o usuário está autenticado e é autorizado
+    const supabaseAuth = createRouteHandlerClient({ cookies })
+    const { data: { user } } = await supabaseAuth.auth.getUser()
+    
+    if (!user || user.email !== 'dcalaca@gmail.com') {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    }
+
     // Buscar estatísticas gerais
     const { data: totalVisits, error: totalError } = await supabase
       .from('site_analytics')
