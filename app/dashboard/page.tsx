@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { Calculator, TrendingUp, Clock, Trash2, Eye, Loader2 } from "lucide-react"
+import { Calculator, TrendingUp, Clock, Trash2, Eye, Loader2, DollarSign } from "lucide-react"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 
@@ -121,7 +121,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -179,14 +179,48 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
+          {/* Destaque do Orçamento - Mobile First */}
+          <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-700">
+                <DollarSign className="w-6 h-6" />
+                Controle Financeiro
+              </CardTitle>
+              <CardDescription className="text-green-600">
+                Gerencie seu orçamento e veja projeções de investimento
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Botão principal do orçamento - destaque no mobile */}
+                <Button asChild className="h-24 flex-col bg-green-600 hover:bg-green-700 text-white shadow-lg">
+                  <Link href="/meu-orcamento">
+                    <DollarSign className="w-8 h-8 mb-2" />
+                    <span className="text-lg font-semibold">Meu Orçamento</span>
+                    <span className="text-sm opacity-90">Controle suas finanças</span>
+                  </Link>
+                </Button>
+                
+                {/* Simulador de investimento */}
+                <Button asChild variant="outline" className="h-24 flex-col border-blue-300 hover:bg-blue-50">
+                  <Link href="/calculadoras/investimentos">
+                    <TrendingUp className="w-8 h-8 mb-2 text-blue-600" />
+                    <span className="text-lg font-semibold text-blue-700">Investimentos</span>
+                    <span className="text-sm text-blue-600">Simule seus ganhos</span>
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions - Secundário */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
+              <CardTitle>Outras Calculadoras</CardTitle>
               <CardDescription>Acesse rapidamente suas calculadoras favoritas</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
                   <Link href="/calculadoras/juros-compostos">
                     <Calculator className="w-6 h-6 mb-2" />
@@ -206,9 +240,9 @@ export default function DashboardPage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
-                  <Link href="/calculadoras/orcamento">
+                  <Link href="/calculadoras/aposentadoria">
                     <Calculator className="w-6 h-6 mb-2" />
-                    Orçamento
+                    Aposentadoria
                   </Link>
                 </Button>
               </div>

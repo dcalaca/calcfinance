@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Info, Mail, DollarSign } from "lucide-react"
+import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Mail, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -19,10 +19,10 @@ import { useFinanceAuth } from "@/hooks/use-finance-auth"
 
 const navigation = [
   { name: "Início", href: "/", icon: Home },
+  { name: "Orçamento", href: "/meu-orcamento", icon: DollarSign, highlight: true },
   { name: "Calculadoras", href: "/calculadoras", icon: Calculator },
   { name: "Notícias", href: "/noticias", icon: TrendingUp },
   { name: "Educação", href: "/educacao", icon: BookOpen },
-  { name: "Sobre", href: "/sobre", icon: Info },
   { name: "Contato", href: "/contato", icon: Mail },
 ]
 
@@ -189,6 +189,14 @@ export function Header() {
                             <TrendingUp className="h-5 w-5" />
                             <span>Histórico</span>
                           </Link>
+                          <Link
+                            href="/meu-orcamento"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-green-700 hover:text-green-600 hover:bg-green-50 bg-green-50"
+                          >
+                            <DollarSign className="h-5 w-5" />
+                            <span>Meu Orçamento</span>
+                          </Link>
                           <button
                             onClick={() => {
                               handleSignOut()
@@ -232,12 +240,19 @@ export function Header() {
         <div className="flex justify-around items-center py-2">
           {navigation.map((item) => {
             const Icon = item.icon
+            const isHighlight = item.highlight
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-md transition-colors ${
-                  pathname === item.href ? "text-blue-600" : "text-gray-600 hover:text-blue-600"
+                  pathname === item.href 
+                    ? isHighlight 
+                      ? "text-green-600 bg-green-50" 
+                      : "text-blue-600"
+                    : isHighlight
+                      ? "text-green-700 hover:text-green-600 hover:bg-green-50"
+                      : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <Icon className="h-5 w-5" />

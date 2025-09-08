@@ -22,11 +22,14 @@ import {
   Trash2,
   Edit,
   PieChart,
-  BarChart3
+  BarChart3,
+  User
 } from "lucide-react"
 import { toast } from "sonner"
 import { CurrencyInput } from "@/components/ui/currency-input"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
+import { InvestmentProjection } from "@/components/investment-projection"
+import Link from "next/link"
 
 export default function MeuOrcamentoPage() {
   const { user, loading: authLoading } = useFinanceAuth()
@@ -81,6 +84,50 @@ export default function MeuOrcamentoPage() {
     )
   }
 
+  // Se não estiver logado, mostrar mensagem amigável
+  if (!user) {
+    return (
+      <div className="container mx-auto py-8 px-4 pb-20 md:pb-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Meu Orçamento</h1>
+            <p className="text-muted-foreground">
+              Controle sua vida financeira de forma simples e eficiente
+            </p>
+          </div>
+          
+          <Card className="p-8">
+            <CardContent>
+              <div className="mb-6">
+                <DollarSign className="w-16 h-16 mx-auto mb-4 text-blue-600" />
+                <h2 className="text-2xl font-bold mb-2">Acesso Restrito</h2>
+                <p className="text-muted-foreground mb-6">
+                  Para usar o sistema de orçamento, você precisa estar logado.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <Button asChild className="w-full">
+                  <Link href="/login">
+                    <User className="w-4 h-4 mr-2" />
+                    Entrar na Conta
+                  </Link>
+                </Button>
+                
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/registro">
+                    <User className="w-4 h-4 mr-2" />
+                    Criar Conta
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   // Remover verificação de usuário - deixar o middleware cuidar disso
   // if (!user) {
   //   return null
@@ -96,6 +143,11 @@ export default function MeuOrcamentoPage() {
   ]
 
   const handleAdicionarItem = async () => {
+    if (!user) {
+      toast.error("Favor entrar ou se cadastrar para usufruir do site")
+      return
+    }
+
     if (!novoItem.nome || novoItem.valor <= 0 || !novoItem.categoria) {
       toast.error("Preencha todos os campos obrigatórios")
       return
@@ -366,8 +418,18 @@ export default function MeuOrcamentoPage() {
     })
   }
 
+  // Calcular sobra mensal para projeção de investimento
+  const calcularSobraMensal = () => {
+    const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
+    const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
+    return totalReceitas - totalDespesas
+  }
+
+  const sobraMensal = calcularSobraMensal()
+  const temSobra = sobraMensal > 0
+
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 pb-20 md:pb-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Meu Orçamento</h1>
         <p className="text-muted-foreground">
@@ -452,7 +514,7 @@ export default function MeuOrcamentoPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Resumo do Orçamento */}
           <div className="lg:col-span-1">
             <Card>
@@ -498,6 +560,37 @@ export default function MeuOrcamentoPage() {
                       {formatarMoeda(receitasFiltradas.reduce((total, item) => total + item.valor, 0) - despesasFiltradas.reduce((total, item) => total + item.valor, 0))}
                     </span>
                   </div>
+                  
+                  {/* Mensagem motivacional para sobra */}
+                  {temSobra ? (
+                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-green-600" />
+                        <div>
+                          <p className="text-sm font-medium text-green-800">
+                            🎉 Parabéns! Você tem sobra de {formatarMoeda(sobraMensal)}
+                          </p>
+                          <p className="text-xs text-green-700 mt-1">
+                            Veja abaixo como investir esse valor pode multiplicar seu patrimônio!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <TrendingDown className="w-5 h-5 text-orange-600" />
+                        <div>
+                          <p className="text-sm font-medium text-orange-800">
+                            💡 Dica: Tente economizar para ter sobra no orçamento
+                          </p>
+                          <p className="text-xs text-orange-700 mt-1">
+                            Com sobra mensal, você pode investir e multiplicar seu patrimônio!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -546,6 +639,13 @@ export default function MeuOrcamentoPage() {
               </Card>
             )}
 
+            {/* Projeção de Investimento - só mostra se há sobra */}
+            {temSobra && (
+              <InvestmentProjection 
+                monthlySurplus={sobraMensal} 
+              />
+            )}
+
             {/* Botão para adicionar item */}
             <Card className="mt-4">
               <CardContent className="p-4">
@@ -562,7 +662,7 @@ export default function MeuOrcamentoPage() {
           </div>
 
           {/* Lista de Itens */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
                 <Tabs defaultValue="receitas" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="receitas" className="flex items-center gap-2">

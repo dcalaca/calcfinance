@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Lock, Star, BarChart3, DollarSign } from "lucide-react"
+import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Lock } from "lucide-react"
 import Link from "next/link"
 
 export function FeaturedCalculators() {
@@ -70,38 +70,6 @@ export function FeaturedCalculators() {
           </div>
         </div>
 
-        {/* Destaque para Orçamento Pessoal */}
-        <div className="mb-12">
-          <Card className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 group">
-            <CardContent className="p-8">
-              <div className="flex flex-col lg:flex-row items-center gap-6">
-                <div className="flex-shrink-0">
-                  <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <BarChart3 className="w-10 h-10 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1 text-center lg:text-left">
-                  <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                    <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                    <span className="text-yellow-200 font-semibold text-sm uppercase tracking-wide">DESTAQUE</span>
-                  </div>
-                  <h3 className="text-2xl lg:text-3xl font-bold mb-3">Meu Orçamento Pessoal</h3>
-                  <p className="text-indigo-100 text-lg mb-6 max-w-2xl">
-                    Controle completo das suas finanças com gráficos interativos, categorização automática e análise mensal detalhada
-                  </p>
-                  <div className="flex justify-center lg:justify-start">
-                    <Button asChild size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold px-8 py-3">
-                      <Link href="/meu-orcamento" className="flex items-center gap-2">
-                        <DollarSign className="w-5 h-5" />
-                        Acessar Meu Orçamento
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
           {calculators.map((calc) => {

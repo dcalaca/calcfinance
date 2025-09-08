@@ -135,7 +135,7 @@ export function useOrcamentosRefatorado() {
   }
 
   const criarOrcamento = async (mesReferencia: string, nome: string, descricao?: string) => {
-    if (!user) throw new Error("Usuário não logado")
+    if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
 
     try {
       console.log("🔧 Criando orçamento:", { mesReferencia, nome, descricao, userId: user.id })
@@ -179,7 +179,7 @@ export function useOrcamentosRefatorado() {
   }
 
   const adicionarItem = async (orcamentoId: string, item: Omit<OrcamentoItem, 'id' | 'orcamento_id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) throw new Error("Usuário não logado")
+    if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
 
     try {
       console.log("🔧 Adicionando item:", { orcamentoId, item, userId: user.id })
@@ -231,7 +231,7 @@ export function useOrcamentosRefatorado() {
   }
 
   const removerItem = async (orcamentoId: string, itemId: string, tipo: "receita" | "despesa") => {
-    if (!user) throw new Error("Usuário não logado")
+    if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
 
     try {
       console.log("🔧 Removendo item:", { orcamentoId, itemId, tipo, userId: user.id })
@@ -277,7 +277,7 @@ export function useOrcamentosRefatorado() {
   }
 
   const atualizarOrcamento = async (id: string, updates: Partial<Orcamento>) => {
-    if (!user) throw new Error("Usuário não logado")
+    if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
 
     try {
       const { data, error } = await supabase
