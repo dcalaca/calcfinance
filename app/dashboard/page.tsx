@@ -9,6 +9,7 @@ import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { Calculator, TrendingUp, Clock, Trash2, Eye, Loader2, DollarSign } from "lucide-react"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 
 interface Calculation {
   id: string
@@ -249,8 +250,11 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
+          {/* Analytics Dashboard */}
+          <AnalyticsDashboard />
+
           {/* Recent Calculations */}
-          <Card>
+          <Card className="mt-8">
             <CardHeader>
               <CardTitle>Cálculos Recentes</CardTitle>
               <CardDescription>Seus últimos cálculos salvos</CardDescription>

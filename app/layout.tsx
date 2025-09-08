@@ -6,6 +6,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 // Adicionar import do Providers
 import { Providers } from "@/components/providers"
+import { AnalyticsProvider } from "@/components/analytics-provider"
 // Configuração do console para desenvolvimento
 import "@/lib/console-config"
 
@@ -27,9 +28,11 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={inter.className}>
         <Providers>
-          <Header />
-          {children}
-          <Footer />
+          <AnalyticsProvider>
+            <Header />
+            {children}
+            <Footer />
+          </AnalyticsProvider>
         </Providers>
       </body>
     </html>
