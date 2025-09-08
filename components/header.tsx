@@ -119,6 +119,12 @@ export function Header() {
                         Meu Orçamento
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/analytics" className="flex items-center">
+                        <TrendingUp className="mr-2 h-4 w-4" />
+                        Analytics
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
