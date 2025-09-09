@@ -12,8 +12,8 @@ export function Footer() {
           {/* Logo e Descrição */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Image
-              src="/logo.png"
-              alt="FinanceHub"
+              src="/logooriginal.png"
+              alt="CalcFy"
               width={180}
               height={40}
               className="mb-4 brightness-0 invert h-8 w-auto"
@@ -131,7 +131,7 @@ export function Footer() {
 
         <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-400 text-sm text-center md:text-left">
-            © 2024 FinanceHub. Todos os direitos reservados.
+            © 2024 CalcFy. Todos os direitos reservados.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
             <Link href="/termos" className="text-slate-400 hover:text-white text-sm transition-colors text-center">
