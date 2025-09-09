@@ -429,7 +429,7 @@ export default function MeuOrcamentoPage() {
   const temSobra = sobraMensal > 0
 
   return (
-    <div className="container mx-auto py-8 px-4 pb-20 md:pb-8">
+    <div className="w-full py-8 px-4 pb-20 md:pb-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Meu Orçamento</h1>
         <p className="text-muted-foreground">
@@ -514,9 +514,9 @@ export default function MeuOrcamentoPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
           {/* Resumo do Orçamento */}
-          <div className="lg:col-span-1">
+          <div className="xl:col-span-1">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -662,7 +662,7 @@ export default function MeuOrcamentoPage() {
           </div>
 
           {/* Lista de Itens */}
-          <div className="xl:col-span-2">
+          <div className="xl:col-span-3">
                 <Tabs defaultValue="receitas" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="receitas" className="flex items-center gap-2">
@@ -676,137 +676,145 @@ export default function MeuOrcamentoPage() {
                   </TabsList>
 
               <TabsContent value="receitas" className="space-y-4">
-                {receitasFiltradas.length === 0 ? (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">
-                        {filtroItem ? "Nenhuma receita encontrada" : "Nenhuma receita adicionada"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  receitasFiltradas.map((item) => (
-                    <Card key={item.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.nome}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="secondary">{item.categoria}</Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
-                              </span>
-                              {!filtroMes && (() => {
-                                const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-                                console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
-                                console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
-                                
-                                if (!orcamento) {
-                                  console.log("⚠️ Orçamento não encontrado para item:", item.nome)
-                                  return (
-                                    <Badge variant="destructive" className="text-xs">
-                                      Orçamento não encontrado
-                                    </Badge>
-                                  )
-                                }
-                                
-                                console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
-                                return orcamento?.mes_referencia && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {formatarMes(orcamento.mes_referencia)}
-                                  </Badge>
-                                )
-                              })()}
-                            </div>
-                            {item.observacoes && (
-                              <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-green-600">
-                              {formatarMoeda(item.valor)}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoverItem(item.id, "receita")}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
+                <div className="max-h-[600px] overflow-y-auto pr-2">
+                  {receitasFiltradas.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-8 text-center">
+                        <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground">
+                          {filtroItem ? "Nenhuma receita encontrada" : "Nenhuma receita adicionada"}
+                        </p>
                       </CardContent>
                     </Card>
-                  ))
-                )}
+                  ) : (
+                    <div className="space-y-4">
+                      {receitasFiltradas.map((item) => (
+                        <Card key={item.id}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium">{item.nome}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="secondary">{item.categoria}</Badge>
+                                  <span className="text-sm text-muted-foreground">
+                                    {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
+                                  </span>
+                                  {!filtroMes && (() => {
+                                    const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
+                                    console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
+                                    console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
+                                    
+                                    if (!orcamento) {
+                                      console.log("⚠️ Orçamento não encontrado para item:", item.nome)
+                                      return (
+                                        <Badge variant="destructive" className="text-xs">
+                                          Orçamento não encontrado
+                                        </Badge>
+                                      )
+                                    }
+                                    
+                                    console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
+                                    return orcamento?.mes_referencia && (
+                                      <Badge variant="outline" className="text-xs">
+                                        {formatarMes(orcamento.mes_referencia)}
+                                      </Badge>
+                                    )
+                                  })()}
+                                </div>
+                                {item.observacoes && (
+                                  <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-green-600">
+                                  {formatarMoeda(item.valor)}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRemoverItem(item.id, "receita")}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="despesas" className="space-y-4">
-                {despesasFiltradas.length === 0 ? (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <TrendingDown className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">
-                        {filtroItem ? "Nenhuma despesa encontrada" : "Nenhuma despesa adicionada"}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  despesasFiltradas.map((item) => (
-                    <Card key={item.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.nome}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="secondary">{item.categoria}</Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
-                              </span>
-                              {!filtroMes && (() => {
-                                const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-                                console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
-                                console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
-                                
-                                if (!orcamento) {
-                                  console.log("⚠️ Orçamento não encontrado para item:", item.nome)
-                                  return (
-                                    <Badge variant="destructive" className="text-xs">
-                                      Orçamento não encontrado
-                                    </Badge>
-                                  )
-                                }
-                                
-                                console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
-                                return orcamento?.mes_referencia && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {formatarMes(orcamento.mes_referencia)}
-                                  </Badge>
-                                )
-                              })()}
-                            </div>
-                            {item.observacoes && (
-                              <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-red-600">
-                              {formatarMoeda(item.valor)}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRemoverItem(item.id, "despesa")}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
+                <div className="max-h-[600px] overflow-y-auto pr-2">
+                  {despesasFiltradas.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-8 text-center">
+                        <TrendingDown className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground">
+                          {filtroItem ? "Nenhuma despesa encontrada" : "Nenhuma despesa adicionada"}
+                        </p>
                       </CardContent>
                     </Card>
-                  ))
-                )}
+                  ) : (
+                    <div className="space-y-4">
+                      {despesasFiltradas.map((item) => (
+                        <Card key={item.id}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium">{item.nome}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="secondary">{item.categoria}</Badge>
+                                  <span className="text-sm text-muted-foreground">
+                                    {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
+                                  </span>
+                                  {!filtroMes && (() => {
+                                    const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
+                                    console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
+                                    console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
+                                    
+                                    if (!orcamento) {
+                                      console.log("⚠️ Orçamento não encontrado para item:", item.nome)
+                                      return (
+                                        <Badge variant="destructive" className="text-xs">
+                                          Orçamento não encontrado
+                                        </Badge>
+                                      )
+                                    }
+                                    
+                                    console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
+                                    return orcamento?.mes_referencia && (
+                                      <Badge variant="outline" className="text-xs">
+                                        {formatarMes(orcamento.mes_referencia)}
+                                      </Badge>
+                                    )
+                                  })()}
+                                </div>
+                                {item.observacoes && (
+                                  <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-red-600">
+                                  {formatarMoeda(item.valor)}
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRemoverItem(item.id, "despesa")}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
