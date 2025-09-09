@@ -9,7 +9,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { RefreshCw, Eye, Users, TrendingUp, Globe, Shield, AlertTriangle, Filter, Calendar as CalendarIcon, Download, Search } from "lucide-react"
-import { useUser } from "@/hooks/use-finance-auth"
+import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -48,7 +48,7 @@ interface FilterOptions {
 }
 
 export default function AnalyticsPage() {
-  const { user, loading: userLoading } = useUser()
+  const { user, loading: userLoading } = useFinanceAuth()
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [recentVisits, setRecentVisits] = useState<VisitRecord[]>([])
   const [loading, setLoading] = useState(true)
