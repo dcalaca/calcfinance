@@ -30,7 +30,15 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Obter informações de localização baseadas no IP
-    let locationData = {
+    let locationData: {
+      country: string | null,
+      city: string | null,
+      region: string | null,
+      timezone: string | null,
+      isp: string | null,
+      latitude: number | null,
+      longitude: number | null
+    } = {
       country: country || null,
       city: city || null,
       region: null,
