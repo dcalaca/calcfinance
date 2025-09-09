@@ -49,7 +49,7 @@ export function useAnalytics() {
 
         console.log('📤 Enviando dados para API:', visitData)
 
-        // Enviar dados para a API
+        // Enviar dados para a API (apenas POST para salvar visita)
         const response = await fetch('/api/analytics/track-visit', {
           method: 'POST',
           headers: {

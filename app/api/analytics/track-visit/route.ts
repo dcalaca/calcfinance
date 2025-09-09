@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     console.log('🔗 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
     console.log('🔑 Supabase Key configurada:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
-    // Inserir dados de acesso no Supabase
+    // Inserir dados de acesso no Supabase (sem autenticação necessária)
     const { data, error } = await supabase
       .from('site_analytics')
       .insert({
