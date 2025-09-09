@@ -11,9 +11,11 @@ export async function POST(request: NextRequest) {
     const ip = request.ip || 
                request.headers.get('x-forwarded-for')?.split(',')[0] || 
                request.headers.get('x-real-ip') || 
-               'unknown'
+               request.headers.get('x-forwarded') ||
+               '127.0.0.1' // IP local para desenvolvimento
     
     console.log('🌐 IP capturado:', ip)
+    console.log('🌐 Headers disponíveis:', Object.fromEntries(request.headers.entries()))
     
     const { 
       page, 
@@ -38,26 +40,44 @@ export async function POST(request: NextRequest) {
       longitude: null
     }
 
-    // Se não temos localização do frontend, tentar obter via IP
-    if (!country && !city && ip !== 'unknown') {
+    // Tentar obter localização via IP (mesmo se já temos do frontend)
+    if (ip && ip !== 'unknown') {
       try {
         console.log('🔍 Buscando localização via IP...')
-        const geoResponse = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,timezone,isp,lat,lon`)
-        if (geoResponse.ok) {
-          const geoData = await geoResponse.json()
-          if (geoData.status === 'success') {
-            locationData = {
-              country: geoData.country || null,
-              city: geoData.city || null,
-              region: geoData.regionName || null,
-              timezone: geoData.timezone || null,
-              isp: geoData.isp || null,
-              latitude: geoData.lat || null,
-              longitude: geoData.lon || null
+        
+        // Para desenvolvimento local, usar dados simulados
+        if (ip === '127.0.0.1' || ip === '::1') {
+          console.log('🏠 Modo desenvolvimento - usando dados simulados')
+          locationData = {
+            country: locationData.country || 'Brasil',
+            city: locationData.city || 'São Paulo',
+            region: locationData.region || 'São Paulo',
+            timezone: locationData.timezone || 'America/Sao_Paulo',
+            isp: locationData.isp || 'Desenvolvimento Local',
+            latitude: locationData.latitude || -23.5505,
+            longitude: locationData.longitude || -46.6333
+          }
+        } else {
+          // Para IPs reais, consultar API
+          const geoResponse = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,timezone,isp,lat,lon`)
+          if (geoResponse.ok) {
+            const geoData = await geoResponse.json()
+            if (geoData.status === 'success') {
+              // Usar dados do IP se não temos do frontend, ou complementar
+              locationData = {
+                country: locationData.country || geoData.country || null,
+                city: locationData.city || geoData.city || null,
+                region: locationData.region || geoData.regionName || null,
+                timezone: locationData.timezone || geoData.timezone || null,
+                isp: locationData.isp || geoData.isp || null,
+                latitude: locationData.latitude || geoData.lat || null,
+                longitude: locationData.longitude || geoData.lon || null
+              }
             }
-            console.log('📍 Localização obtida:', locationData)
           }
         }
+        
+        console.log('📍 Localização obtida:', locationData)
       } catch (geoError) {
         console.log('⚠️ Erro ao obter localização via IP:', geoError)
       }
