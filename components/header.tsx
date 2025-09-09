@@ -54,11 +54,11 @@ export function Header() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/calcfy-logo-header.svg"
+                  src="/logooriginal.png"
                   alt="CalcFy"
-                  width={80}
-                  height={32}
-                  className="h-8 w-auto"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
                 />
               </Link>
             </div>

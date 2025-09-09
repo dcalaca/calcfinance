@@ -18,9 +18,9 @@ export const metadata: Metadata = {
   generator: 'v0.app',
   metadataBase: new URL('https://calcfy.me'),
   icons: {
-    icon: '/calcfy-favicon.svg',
-    shortcut: '/calcfy-favicon.svg',
-    apple: '/calcfy-favicon.svg',
+    icon: '/logoresumo.png',
+    shortcut: '/logoresumo.png',
+    apple: '/logoresumo.png',
   },
   openGraph: {
     title: "CalcFy - Controle sua vida financeira com inteligência",
