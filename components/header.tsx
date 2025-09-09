@@ -54,8 +54,8 @@ export function Header() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/logo.png"
-                  alt="FinanceHub"
+                  src="/calcfy-logo-header.svg"
+                  alt="CalcFy"
                   width={80}
                   height={32}
                   className="h-8 w-auto"

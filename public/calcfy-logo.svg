@@ -1,0 +1,15 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- calc -->
+  <text x="0" y="28" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#1A3A5C">calc</text>
+  
+  <!-- fy (cursive) -->
+  <g transform="translate(60, 0)">
+    <!-- f -->
+    <path d="M0 6 Q2 2 6 4 Q8 6 8 10 Q8 14 6 16 Q4 18 2 16 Q0 14 0 10 Q0 6 2 4 Q4 2 6 4" stroke="#34C78C" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- y -->
+    <path d="M12 6 Q16 10 20 14 Q24 18 28 14 Q32 10 36 14 Q40 18 44 14" stroke="#34C78C" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- .me -->
+  <text x="0" y="38" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#1A3A5C">.me</text>
+</svg>

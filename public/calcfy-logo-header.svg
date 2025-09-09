@@ -1,0 +1,10 @@
+<svg width="80" height="32" viewBox="0 0 80 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- calc text -->
+  <text x="0" y="20" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="18" font-weight="700" fill="#1A3A5C">calc</text>
+  
+  <!-- fy cursive text -->
+  <text x="38" y="20" font-family="Brush Script MT, cursive" font-size="20" font-weight="400" fill="#34C78C">fy</text>
+  
+  <!-- .me text -->
+  <text x="0" y="30" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#1A3A5C">.me</text>
+</svg>
