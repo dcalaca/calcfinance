@@ -5,7 +5,10 @@ import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📥 Recebendo dados de analytics...')
     const body = await request.json()
+    console.log('📊 Dados recebidos:', body)
+    
     const { 
       page, 
       referrer, 
@@ -17,6 +20,10 @@ export async function POST(request: NextRequest) {
       device,
       browser
     } = body
+
+    console.log('💾 Inserindo dados no Supabase...')
+    console.log('🔗 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('🔑 Supabase Key configurada:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
     // Inserir dados de acesso no Supabase
     const { data, error } = await supabase
@@ -35,14 +42,15 @@ export async function POST(request: NextRequest) {
       })
 
     if (error) {
-      console.error('Erro ao salvar analytics:', error)
-      return NextResponse.json({ error: 'Erro ao salvar dados' }, { status: 500 })
+      console.error('❌ Erro ao salvar analytics:', error)
+      return NextResponse.json({ error: 'Erro ao salvar dados', details: error.message }, { status: 500 })
     }
 
+    console.log('✅ Dados salvos com sucesso:', data)
     return NextResponse.json({ success: true, data })
   } catch (error) {
-    console.error('Erro na API de analytics:', error)
-    return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
+    console.error('💥 Erro na API de analytics:', error)
+    return NextResponse.json({ error: 'Erro interno', details: error.message }, { status: 500 })
   }
 }
 

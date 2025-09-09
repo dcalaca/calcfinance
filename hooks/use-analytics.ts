@@ -9,12 +9,18 @@ export function useAnalytics() {
   useEffect(() => {
     const trackVisit = async () => {
       try {
+        console.log('🔍 Iniciando rastreamento de visita...')
+        console.log('📍 Página atual:', pathname)
+        
         // Gerar ID único para a sessão
         const sessionId = sessionStorage.getItem('sessionId') || 
           Math.random().toString(36).substring(2) + Date.now().toString(36)
         
         if (!sessionStorage.getItem('sessionId')) {
           sessionStorage.setItem('sessionId', sessionId)
+          console.log('🆔 Nova sessão criada:', sessionId)
+        } else {
+          console.log('🆔 Sessão existente:', sessionId)
         }
 
         // Detectar informações do dispositivo
@@ -41,8 +47,10 @@ export function useAnalytics() {
           city: null
         }
 
+        console.log('📤 Enviando dados para API:', visitData)
+
         // Enviar dados para a API
-        await fetch('/api/analytics/track-visit', {
+        const response = await fetch('/api/analytics/track-visit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -50,9 +58,16 @@ export function useAnalytics() {
           body: JSON.stringify(visitData)
         })
 
-        console.log('📊 Visita registrada:', visitData)
+        if (response.ok) {
+          const result = await response.json()
+          console.log('✅ Visita registrada com sucesso:', result)
+        } else {
+          console.error('❌ Erro na API:', response.status, response.statusText)
+          const errorText = await response.text()
+          console.error('❌ Detalhes do erro:', errorText)
+        }
       } catch (error) {
-        console.error('Erro ao rastrear visita:', error)
+        console.error('💥 Erro ao rastrear visita:', error)
       }
     }
 
