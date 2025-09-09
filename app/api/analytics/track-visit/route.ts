@@ -126,7 +126,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('💥 Erro na API de analytics:', error)
-    return NextResponse.json({ error: 'Erro interno', details: error.message }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Erro interno', 
+      details: error instanceof Error ? error.message : 'Erro desconhecido' 
+    }, { status: 500 })
   }
 }
 
@@ -223,6 +226,9 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Erro ao buscar analytics:', error)
-    return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Erro ao buscar dados',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    }, { status: 500 })
   }
 }
