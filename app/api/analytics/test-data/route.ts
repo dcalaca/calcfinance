@@ -23,6 +23,8 @@ export async function GET() {
     })
   } catch (error) {
     console.error('💥 Erro no teste:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Erro desconhecido' 
+    }, { status: 500 })
   }
 }
