@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { RefreshCw, Eye, Users, TrendingUp, Globe, Shield, AlertTriangle, Filter, Calendar as CalendarIcon, Download, Search } from "lucide-react"
+import { RefreshCw, Eye, Users, TrendingUp, Globe, Shield, AlertTriangle, Filter, Calendar as CalendarIcon, Download, Search, Clock, MapPin, Smartphone, Laptop, Tablet, Monitor } from "lucide-react"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -53,6 +54,7 @@ export default function AnalyticsPage() {
   const [recentVisits, setRecentVisits] = useState<VisitRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedVisit, setSelectedVisit] = useState<VisitRecord | null>(null)
   const [filters, setFilters] = useState<FilterOptions>({
     dateFrom: null,
     dateTo: null,
@@ -65,6 +67,21 @@ export default function AnalyticsPage() {
 
   // Verificar se o usuário tem permissão (apenas dcalaca@gmail.com)
   const isAuthorized = user?.email === 'dcalaca@gmail.com'
+
+  // Função para obter ícone do dispositivo
+  const getDeviceIcon = (device: string | null) => {
+    if (!device) return <Monitor className="h-4 w-4" />
+    switch (device.toLowerCase()) {
+      case 'mobile':
+        return <Smartphone className="h-4 w-4" />
+      case 'tablet':
+        return <Tablet className="h-4 w-4" />
+      case 'desktop':
+        return <Laptop className="h-4 w-4" />
+      default:
+        return <Monitor className="h-4 w-4" />
+    }
+  }
 
   const fetchAnalytics = async () => {
     try {
@@ -567,23 +584,176 @@ export default function AnalyticsPage() {
           ) : recentVisits.length > 0 ? (
             <div className="space-y-3">
               {recentVisits.map((visit) => (
-                <div key={visit.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{getDeviceIcon(visit.device)}</span>
-                    <div>
-                      <div className="font-medium">{visit.page}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {visit.browser} • {visit.device}
+                <Dialog key={visit.id}>
+                  <DialogTrigger asChild>
+                    <div 
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => setSelectedVisit(visit)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{getDeviceIcon(visit.device)}</span>
+                        <div>
+                          <div className="font-medium">{visit.page}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {visit.browser} • {visit.device}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium">{formatDate(visit.created_at)}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {visit.session_id.substring(0, 8)}...
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{formatDate(visit.created_at)}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {visit.session_id.substring(0, 8)}...
-                    </div>
-                  </div>
-                </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Eye className="h-5 w-5" />
+                        Detalhes da Visita
+                      </DialogTitle>
+                      <DialogDescription>
+                        Informações completas sobre esta visita ao site
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    {selectedVisit && (
+                      <div className="space-y-6">
+                        {/* Informações Básicas */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                Página Acessada
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="font-mono text-sm bg-gray-100 p-2 rounded">
+                                {selectedVisit.page}
+                              </p>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <Clock className="h-4 w-4" />
+                                Data e Hora
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm">
+                                {format(new Date(selectedVisit.created_at), "dd/MM/yyyy 'às' HH:mm:ss", { locale: ptBR })}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(new Date(selectedVisit.created_at), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Dispositivo e Navegador */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                {getDeviceIcon(selectedVisit.device)}
+                                Dispositivo
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <Badge variant="outline" className="text-sm">
+                                {selectedVisit.device || 'Desconhecido'}
+                              </Badge>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <Monitor className="h-4 w-4" />
+                                Navegador
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <Badge variant="outline" className="text-sm">
+                                {selectedVisit.browser || 'Desconhecido'}
+                              </Badge>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Localização */}
+                        {(selectedVisit.country || selectedVisit.city) && (
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <MapPin className="h-4 w-4" />
+                                Localização
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                {selectedVisit.country && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">País:</span>
+                                    <Badge variant="secondary">{selectedVisit.country}</Badge>
+                                  </div>
+                                )}
+                                {selectedVisit.city && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Cidade:</span>
+                                    <Badge variant="secondary">{selectedVisit.city}</Badge>
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* Session ID */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium">Session ID</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="font-mono text-xs bg-gray-100 p-2 rounded break-all">
+                              {selectedVisit.session_id}
+                            </p>
+                          </CardContent>
+                        </Card>
+
+                        {/* Referrer */}
+                        {selectedVisit.referrer && (
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium">Página de Origem</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="font-mono text-sm bg-gray-100 p-2 rounded break-all">
+                                {selectedVisit.referrer}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* User Agent */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-sm font-medium">User Agent</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="font-mono text-xs bg-gray-100 p-2 rounded break-all">
+                              {selectedVisit.user_agent}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
               ))}
             </div>
           ) : (
