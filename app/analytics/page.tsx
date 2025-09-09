@@ -184,6 +184,55 @@ export default function AnalyticsPage() {
     )
   }
 
+  // Se não estiver logado, mostrar mensagem para fazer login
+  if (!user) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-10 h-10 text-blue-600" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Analytics do Site</h1>
+            <p className="text-muted-foreground mb-6">
+              Faça login para visualizar os dados de analytics
+            </p>
+          </div>
+          
+          <Card className="p-6">
+            <CardContent>
+              <div className="flex items-center gap-3 mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <Shield className="w-6 h-6 text-blue-600" />
+                <div className="text-left">
+                  <p className="font-medium text-blue-800">Login Necessário</p>
+                  <p className="text-sm text-blue-700">
+                    Você precisa estar logado para visualizar os dados de analytics.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Button asChild className="w-full">
+                  <Link href="/login">
+                    <User className="w-4 h-4 mr-2" />
+                    Fazer Login
+                  </Link>
+                </Button>
+                
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    <Globe className="w-4 h-4 mr-2" />
+                    Ir para o Início
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   // Tela de acesso negado
   if (!isAuthorized) {
     return (
