@@ -112,22 +112,32 @@ export async function GET(request: NextRequest) {
       query = query.or(`page.ilike.%${search}%,country.ilike.%${search}%,city.ilike.%${search}%`)
     }
 
+    console.log('🔍 Buscando dados filtrados...')
     // Buscar dados filtrados
     const { data: filteredVisits, error: filteredError } = await query
+    console.log('📊 Dados filtrados:', filteredVisits?.length || 0, 'registros')
+    console.log('❌ Erro filtrados:', filteredError)
 
+    console.log('🔍 Buscando visitas de hoje...')
     // Buscar visitas de hoje (sem filtros de data)
     const { data: todayVisits, error: todayError } = await supabase
       .from('site_analytics')
       .select('*', { count: 'exact' })
       .gte('created_at', new Date().toISOString().split('T')[0])
+    console.log('📊 Visitas hoje:', todayVisits?.length || 0, 'registros')
+    console.log('❌ Erro hoje:', todayError)
 
+    console.log('🔍 Buscando páginas populares...')
     // Buscar páginas mais visitadas (últimos 7 dias)
     const { data: topPages, error: pagesError } = await supabase
       .from('site_analytics')
       .select('page')
       .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+    console.log('📊 Páginas populares:', topPages?.length || 0, 'registros')
+    console.log('❌ Erro páginas:', pagesError)
 
     if (filteredError || todayError || pagesError) {
+      console.error('💥 Erro ao buscar dados:', { filteredError, todayError, pagesError })
       throw new Error('Erro ao buscar dados')
     }
 

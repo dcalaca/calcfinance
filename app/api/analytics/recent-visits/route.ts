@@ -61,16 +61,21 @@ export async function GET(request: NextRequest) {
       query = query.or(`page.ilike.%${search}%,country.ilike.%${search}%,city.ilike.%${search}%`)
     }
 
+    console.log('🔍 Buscando visitas recentes...')
     // Buscar as últimas 20 visitas (aumentado para mostrar mais dados filtrados)
     const { data, error } = await query
       .order('created_at', { ascending: false })
       .limit(20)
 
+    console.log('📊 Visitas recentes encontradas:', data?.length || 0, 'registros')
+    console.log('❌ Erro visitas recentes:', error)
+
     if (error) {
-      console.error('Erro ao buscar visitas recentes:', error)
-      return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 })
+      console.error('💥 Erro ao buscar visitas recentes:', error)
+      return NextResponse.json({ error: 'Erro ao buscar dados', details: error.message }, { status: 500 })
     }
 
+    console.log('✅ Retornando visitas recentes:', data)
     return NextResponse.json(data || [])
   } catch (error) {
     console.error('Erro na API de visitas recentes:', error)
