@@ -435,6 +435,10 @@ export default function MeuOrcamentoPage() {
         <p className="text-muted-foreground">
           Controle sua vida financeira de forma simples e eficiente
         </p>
+        {/* Debug info */}
+        <div className="text-xs text-gray-500 mt-2">
+          Debug: User: {user?.email || 'Não logado'} | Orçamentos: {orcamentos.length} | Receitas: {receitasFiltradas.length} | Despesas: {despesasFiltradas.length}
+        </div>
       </div>
 
       {/* Filtros */}
@@ -499,24 +503,25 @@ export default function MeuOrcamentoPage() {
             </Button>
           </CardContent>
         </Card>
-      ) : orcamentos.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum orçamento encontrado</h3>
-            <p className="text-muted-foreground mb-4">
-              Crie seu primeiro orçamento para começar a controlar suas finanças
-            </p>
-            <Button onClick={() => setMostrarFormulario(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Orçamento
-            </Button>
-          </CardContent>
-        </Card>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
           {/* Resumo do Orçamento */}
           <div className="xl:col-span-1">
+            {orcamentos.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2">Nenhum orçamento encontrado</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Crie seu primeiro orçamento para começar a controlar suas finanças
+                  </p>
+                  <Button onClick={() => setMostrarFormulario(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Orçamento
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -659,6 +664,7 @@ export default function MeuOrcamentoPage() {
                 </Button>
               </CardContent>
             </Card>
+            )}
           </div>
 
           {/* Lista de Itens */}
