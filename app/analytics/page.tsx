@@ -131,12 +131,6 @@ export default function AnalyticsPage() {
     return new Date(dateString).toLocaleString('pt-BR')
   }
 
-  const getDeviceIcon = (device: string | null) => {
-    if (device === 'mobile') return '📱'
-    if (device === 'desktop') return '💻'
-    return '❓'
-  }
-
   const clearFilters = () => {
     setFilters({
       dateFrom: null,
