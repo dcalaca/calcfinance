@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,44 +54,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔐 Verificando autenticação...')
-    
-    // Verificar se o usuário está autenticado e é autorizado
-    const cookieStore = cookies()
-    console.log('🍪 Cookies disponíveis:', cookieStore.getAll().map(c => c.name))
-    
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            const cookie = cookieStore.get(name)?.value
-            console.log(`🍪 Cookie ${name}:`, cookie ? 'presente' : 'ausente')
-            return cookie
-          },
-          set(name: string, value: string, options: any) {
-            console.log(`🍪 Setando cookie ${name}`)
-            cookieStore.set(name, value, options)
-          },
-          remove(name: string, options: any) {
-            console.log(`🍪 Removendo cookie ${name}`)
-            cookieStore.delete(name)
-          },
-        },
-      }
-    )
-    
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-    console.log('👤 Usuário encontrado:', user?.email || 'Nenhum')
-    console.log('❌ Erro de auth:', authError)
-    
-    if (!user || user.email !== 'dcalaca@gmail.com') {
-      console.log('🚫 Acesso negado - usuário não autorizado')
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
-    }
-    
-    console.log('✅ Usuário autorizado:', user.email)
+    console.log('📊 Buscando dados de analytics (sem autenticação)...')
 
     // Extrair parâmetros de filtro da URL
     const { searchParams } = new URL(request.url)
