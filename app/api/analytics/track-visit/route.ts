@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Verificar se o usuário está autenticado e é autorizado
     const supabaseAuth = createRouteHandlerClient({ cookies })
@@ -56,22 +56,58 @@ export async function GET() {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    // Buscar estatísticas gerais
-    const { data: totalVisits, error: totalError } = await supabase
-      .from('site_analytics')
-      .select('*', { count: 'exact' })
+    // Extrair parâmetros de filtro da URL
+    const { searchParams } = new URL(request.url)
+    const dateFrom = searchParams.get('dateFrom')
+    const dateTo = searchParams.get('dateTo')
+    const device = searchParams.get('device')
+    const browser = searchParams.get('browser')
+    const page = searchParams.get('page')
+    const country = searchParams.get('country')
+    const search = searchParams.get('search')
 
+    // Construir query base
+    let query = supabase.from('site_analytics').select('*', { count: 'exact' })
+
+    // Aplicar filtros
+    if (dateFrom) {
+      query = query.gte('created_at', new Date(dateFrom).toISOString())
+    }
+    if (dateTo) {
+      query = query.lte('created_at', new Date(dateTo).toISOString())
+    }
+    if (device && device !== 'all') {
+      query = query.eq('device', device)
+    }
+    if (browser && browser !== 'all') {
+      query = query.eq('browser', browser)
+    }
+    if (page && page !== 'all') {
+      query = query.eq('page', page)
+    }
+    if (country && country !== 'all') {
+      query = query.eq('country', country)
+    }
+    if (search) {
+      query = query.or(`page.ilike.%${search}%,country.ilike.%${search}%,city.ilike.%${search}%`)
+    }
+
+    // Buscar dados filtrados
+    const { data: filteredVisits, error: filteredError } = await query
+
+    // Buscar visitas de hoje (sem filtros de data)
     const { data: todayVisits, error: todayError } = await supabase
       .from('site_analytics')
       .select('*', { count: 'exact' })
       .gte('created_at', new Date().toISOString().split('T')[0])
 
+    // Buscar páginas mais visitadas (últimos 7 dias)
     const { data: topPages, error: pagesError } = await supabase
       .from('site_analytics')
       .select('page')
       .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
 
-    if (totalError || todayError || pagesError) {
+    if (filteredError || todayError || pagesError) {
       throw new Error('Erro ao buscar dados')
     }
 
@@ -86,10 +122,16 @@ export async function GET() {
       .slice(0, 5)
       .map(([page, count]) => ({ page, visits: count }))
 
+    // Calcular sessões únicas
+    const uniqueSessions = new Set(filteredVisits?.map((visit: any) => visit.session_id)).size
+
     return NextResponse.json({
-      totalVisits: totalVisits?.length || 0,
+      totalVisits: filteredVisits?.length || 0,
+      filteredVisits: filteredVisits?.length || 0,
       todayVisits: todayVisits?.length || 0,
-      topPages: topPagesList
+      uniqueSessions,
+      topPages: topPagesList,
+      avgSessionDuration: 0 // TODO: Implementar cálculo de duração de sessão
     })
   } catch (error) {
     console.error('Erro ao buscar analytics:', error)
