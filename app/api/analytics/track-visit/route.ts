@@ -7,6 +7,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('📊 Dados recebidos:', body)
     
+    // Capturar IP do visitante
+    const ip = request.ip || 
+               request.headers.get('x-forwarded-for')?.split(',')[0] || 
+               request.headers.get('x-real-ip') || 
+               'unknown'
+    
+    console.log('🌐 IP capturado:', ip)
+    
     const { 
       page, 
       referrer, 
@@ -18,6 +26,42 @@ export async function POST(request: NextRequest) {
       device,
       browser
     } = body
+
+    // Obter informações de localização baseadas no IP
+    let locationData = {
+      country: country || null,
+      city: city || null,
+      region: null,
+      timezone: null,
+      isp: null,
+      latitude: null,
+      longitude: null
+    }
+
+    // Se não temos localização do frontend, tentar obter via IP
+    if (!country && !city && ip !== 'unknown') {
+      try {
+        console.log('🔍 Buscando localização via IP...')
+        const geoResponse = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,timezone,isp,lat,lon`)
+        if (geoResponse.ok) {
+          const geoData = await geoResponse.json()
+          if (geoData.status === 'success') {
+            locationData = {
+              country: geoData.country || null,
+              city: geoData.city || null,
+              region: geoData.regionName || null,
+              timezone: geoData.timezone || null,
+              isp: geoData.isp || null,
+              latitude: geoData.lat || null,
+              longitude: geoData.lon || null
+            }
+            console.log('📍 Localização obtida:', locationData)
+          }
+        }
+      } catch (geoError) {
+        console.log('⚠️ Erro ao obter localização via IP:', geoError)
+      }
+    }
 
     console.log('💾 Inserindo dados no Supabase...')
     console.log('🔗 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
@@ -32,10 +76,16 @@ export async function POST(request: NextRequest) {
         user_agent: userAgent || null,
         timestamp: timestamp || new Date().toISOString(),
         session_id: sessionId || null,
-        country: country || null,
-        city: city || null,
+        country: locationData.country,
+        city: locationData.city,
+        region: locationData.region,
+        timezone: locationData.timezone,
+        isp: locationData.isp,
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
         device: device || null,
         browser: browser || null,
+        ip_address: ip !== 'unknown' ? ip : null,
         created_at: new Date().toISOString()
       })
 

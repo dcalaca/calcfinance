@@ -35,6 +35,12 @@ interface VisitRecord {
   browser: string | null
   country: string | null
   city: string | null
+  region: string | null
+  timezone: string | null
+  isp: string | null
+  latitude: number | null
+  longitude: number | null
+  ip_address: string | null
   created_at: string
 }
 
@@ -680,7 +686,7 @@ export default function AnalyticsPage() {
                         </div>
 
                         {/* Localização */}
-                        {(selectedVisit.country || selectedVisit.city) && (
+                        {(selectedVisit.country || selectedVisit.city || selectedVisit.region) && (
                           <Card>
                             <CardHeader className="pb-3">
                               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -696,10 +702,62 @@ export default function AnalyticsPage() {
                                     <Badge variant="secondary">{selectedVisit.country}</Badge>
                                   </div>
                                 )}
+                                {selectedVisit.region && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Região:</span>
+                                    <Badge variant="outline">{selectedVisit.region}</Badge>
+                                  </div>
+                                )}
                                 {selectedVisit.city && (
                                   <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium">Cidade:</span>
                                     <Badge variant="secondary">{selectedVisit.city}</Badge>
+                                  </div>
+                                )}
+                                {selectedVisit.timezone && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Fuso Horário:</span>
+                                    <Badge variant="outline">{selectedVisit.timezone}</Badge>
+                                  </div>
+                                )}
+                                {(selectedVisit.latitude && selectedVisit.longitude) && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Coordenadas:</span>
+                                    <Badge variant="outline">
+                                      {selectedVisit.latitude.toFixed(4)}, {selectedVisit.longitude.toFixed(4)}
+                                    </Badge>
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* IP e ISP */}
+                        {(selectedVisit.ip_address || selectedVisit.isp) && (
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <Globe className="h-4 w-4" />
+                                Rede e Conectividade
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                {selectedVisit.ip_address && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">IP:</span>
+                                    <Badge variant="outline" className="font-mono text-xs">
+                                      {selectedVisit.ip_address}
+                                    </Badge>
+                                  </div>
+                                )}
+                                {selectedVisit.isp && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">ISP:</span>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {selectedVisit.isp}
+                                    </Badge>
                                   </div>
                                 )}
                               </div>
