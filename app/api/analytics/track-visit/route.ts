@@ -72,6 +72,14 @@ export async function GET(request: NextRequest) {
             console.log(`🍪 Cookie ${name}:`, cookie ? 'presente' : 'ausente')
             return cookie
           },
+          set(name: string, value: string, options: any) {
+            console.log(`🍪 Setando cookie ${name}`)
+            cookieStore.set(name, value, options)
+          },
+          remove(name: string, options: any) {
+            console.log(`🍪 Removendo cookie ${name}`)
+            cookieStore.delete(name)
+          },
         },
       }
     )
