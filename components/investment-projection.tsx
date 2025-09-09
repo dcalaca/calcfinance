@@ -116,42 +116,38 @@ export function InvestmentProjection({ monthlySurplus, annualReturn = 12 }: Inve
             </Select>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+          <div className="space-y-4">
             {projections.map((projection) => (
-              <Card key={projection.years} className="bg-white">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    {projection.years} {projection.years === 1 ? 'Ano' : 'Anos'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <Card key={projection.years} className="bg-white w-full">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Calendar className="w-5 h-5" />
+                      {projection.years} {projection.years === 1 ? 'Ano' : 'Anos'}
+                    </CardTitle>
+                    <span className="text-sm text-gray-500 font-medium">
+                      {formatCurrency(projection.monthlyAmount)}/mês
+                    </span>
+                  </div>
+                  
                   <div className="space-y-3">
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm text-gray-600 flex-shrink-0">Total Investido:</span>
-                      <span className="font-semibold text-gray-800 text-sm text-right ml-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Total Investido:</span>
+                      <span className="font-semibold text-gray-800 text-sm">
                         {formatCurrency(projection.totalInvested)}
                       </span>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm text-gray-600 flex-shrink-0">Valor Final:</span>
-                      <span className="font-bold text-green-600 text-base text-right ml-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Valor Final:</span>
+                      <span className="font-bold text-green-600 text-sm">
                         {formatCurrency(projection.totalValue)}
                       </span>
                     </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-sm text-gray-600 flex-shrink-0">Ganhos:</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs ml-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Ganhos:</span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
                         {formatCurrency(projection.totalGains)}
                       </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="pt-3 border-t">
-                    <div className="text-center">
-                      <span className="text-xs text-gray-500">
-                        {formatCurrency(projection.monthlyAmount)}/mês
-                      </span>
                     </div>
                   </div>
                 </CardContent>
