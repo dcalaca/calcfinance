@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Phone, MapPin, Clock, Users, Handshake, MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
+import { ContactForm } from "@/components/contact-form"
 
 export default function ContatoPage() {
   return (
@@ -130,68 +131,7 @@ export default function ContatoPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="nome" className="block text-sm font-medium text-slate-700 mb-2">
-                        Nome Completo
-                      </label>
-                      <input
-                        type="text"
-                        id="nome"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Seu nome completo"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                        E-mail
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="seu@email.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="assunto" className="block text-sm font-medium text-slate-700 mb-2">
-                      Assunto
-                    </label>
-                    <select
-                      id="assunto"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Selecione um assunto</option>
-                      <option value="parceria">Proposta de Parceria</option>
-                      <option value="suporte">Suporte Técnico</option>
-                      <option value="sugestao">Sugestão de Melhoria</option>
-                      <option value="bug">Reportar Bug</option>
-                      <option value="outro">Outro</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="mensagem" className="block text-sm font-medium text-slate-700 mb-2">
-                      Mensagem
-                    </label>
-                    <textarea
-                      id="mensagem"
-                      rows={6}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Descreva sua mensagem aqui..."
-                    ></textarea>
-                  </div>
-
-                  <Button asChild className="w-full">
-                    <Link href="mailto:dcalaca@gmail.com">
-                      <Send className="h-4 w-4 mr-2" />
-                      Enviar Mensagem
-                    </Link>
-                  </Button>
-                </form>
+                <ContactForm />
               </CardContent>
             </Card>
 
