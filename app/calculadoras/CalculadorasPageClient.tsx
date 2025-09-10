@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Target, Car } from "lucide-react"
 import Link from "next/link"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
