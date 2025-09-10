@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+// Cliente com service role para bypass RLS
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,8 +36,8 @@ export async function POST(request: NextRequest) {
     
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
-    // Inserir mensagem no banco
-    const { data, error } = await supabase
+    // Inserir mensagem no banco (usando service role para bypass RLS)
+    const { data, error } = await supabaseAdmin
       .from('contact_messages')
       .insert([
         {
@@ -89,7 +95,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar mensagens
-    const { data: messages, error } = await supabase
+    const { data: messages, error } = await supabaseAdmin
       .from('contact_messages')
       .select('*')
       .order('created_at', { ascending: false })
