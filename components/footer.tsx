@@ -13,10 +13,11 @@ export function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Image
               src="/logooriginal.png"
-              alt="CalcFy"
+              alt="CalcFy - Calculadoras Financeiras Gratuitas e Educação Financeira"
               width={180}
               height={40}
               className="mb-4 brightness-0 invert h-8 w-auto"
+              style={{ width: "auto", height: "auto" }}
             />
             <p className="text-slate-300 mb-6 text-sm sm:text-base leading-relaxed">
               Sua plataforma completa para decisões financeiras inteligentes.

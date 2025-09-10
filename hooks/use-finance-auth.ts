@@ -31,7 +31,26 @@ export function useFinanceAuth() {
         const { data: { user } } = await supabase.auth.getUser()
         console.log("🔍 Usuário inicial encontrado:", user?.email || "Nenhum")
         setUser(user)
-        setFinanceUser(user)
+        
+        if (user) {
+          // Buscar dados completos do usuário na tabela calc_users
+          const { data: userProfile, error: profileError } = await supabase
+            .from('calc_users')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+          
+          if (profileError) {
+            console.warn("⚠️ Erro ao buscar perfil do usuário:", profileError.message)
+            setFinanceUser(user)
+          } else {
+            console.log("✅ Perfil do usuário encontrado:", userProfile)
+            setFinanceUser({ ...user, ...userProfile })
+          }
+        } else {
+          setFinanceUser(null)
+        }
+        
         setLoading(false)
         clearTimeout(timeoutId)
       } catch (error) {
@@ -54,7 +73,21 @@ export function useFinanceAuth() {
       
       if (session?.user) {
         console.log("✅ Usuário definido:", session.user.email)
-        setFinanceUser(session.user) // Usar o usuário da sessão diretamente
+        
+        // Buscar dados completos do usuário na tabela calc_users
+        const { data: userProfile, error: profileError } = await supabase
+          .from('calc_users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+        
+        if (profileError) {
+          console.warn("⚠️ Erro ao buscar perfil do usuário:", profileError.message)
+          setFinanceUser(session.user)
+        } else {
+          console.log("✅ Perfil do usuário encontrado:", userProfile)
+          setFinanceUser({ ...session.user, ...userProfile })
+        }
       } else {
         console.log("❌ Nenhum usuário na sessão")
         setFinanceUser(null)

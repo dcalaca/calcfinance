@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Mail, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ const navigation = [
   { name: "Início", href: "/", icon: Home },
   { name: "Orçamento", href: "/meu-orcamento", icon: DollarSign, highlight: true },
   { name: "Calculadoras", href: "/calculadoras", icon: Calculator },
+  { name: "Blog", href: "/blog", icon: BookOpen },
   { name: "Notícias", href: "/noticias", icon: TrendingUp },
   { name: "Educação", href: "/educacao", icon: BookOpen },
   { name: "Contato", href: "/contato", icon: Mail },
@@ -55,7 +56,7 @@ export function Header() {
               <Link href="/" className="flex items-center">
                 <Image
                   src="/logooriginal.png"
-                  alt="CalcFy"
+                  alt="CalcFy - Calculadoras Financeiras Gratuitas"
                   width={120}
                   height={40}
                   className="h-10 w-auto"
@@ -158,6 +159,12 @@ export function Header() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetHeader>
+                    <SheetTitle>Menu de Navegação</SheetTitle>
+                    <SheetDescription>
+                      Acesse todas as funcionalidades do CalcFy
+                    </SheetDescription>
+                  </SheetHeader>
                   <div className="flex flex-col space-y-4 mt-4">
                     {navigation.map((item) => {
                       const Icon = item.icon
@@ -208,6 +215,16 @@ export function Header() {
                             <DollarSign className="h-5 w-5" />
                             <span>Meu Orçamento</span>
                           </Link>
+                          {isAuthorizedForAnalytics && (
+                            <Link
+                              href="/analytics"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                            >
+                              <TrendingUp className="h-5 w-5" />
+                              <span>Analytics</span>
+                            </Link>
+                          )}
                           <button
                             onClick={() => {
                               handleSignOut()
@@ -248,29 +265,31 @@ export function Header() {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-        <div className="flex justify-around items-center py-2">
-          {navigation.map((item) => {
-            const Icon = item.icon
-            const isHighlight = item.highlight
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-md transition-colors ${
-                  pathname === item.href 
-                    ? isHighlight 
-                      ? "text-green-600 bg-green-50" 
-                      : "text-blue-600"
-                    : isHighlight
-                      ? "text-green-700 hover:text-green-600 hover:bg-green-50"
-                      : "text-gray-600 hover:text-blue-600"
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{item.name}</span>
-              </Link>
-            )
-          })}
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex items-center py-2 min-w-max px-2">
+            {navigation.map((item) => {
+              const Icon = item.icon
+              const isHighlight = item.highlight
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-md transition-colors flex-shrink-0 ${
+                    pathname === item.href 
+                      ? isHighlight 
+                        ? "text-green-600 bg-green-50" 
+                        : "text-blue-600"
+                      : isHighlight
+                        ? "text-green-700 hover:text-green-600 hover:bg-green-50"
+                        : "text-gray-600 hover:text-blue-600"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-xs font-medium whitespace-nowrap">{item.name}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
     </>

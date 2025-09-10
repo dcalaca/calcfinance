@@ -13,7 +13,16 @@ const nextConfig = {
     // Otimizações de imagem
     formats: ['image/webp', 'image/avif'],
     // Domínios permitidos para otimização
-    domains: [],
+    domains: ['images.unsplash.com'],
+    // Configurações adicionais para domínios externos
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   
   // Configurações de compilação
