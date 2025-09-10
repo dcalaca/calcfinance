@@ -218,12 +218,34 @@ export default function MeuOrcamentoPage() {
   }
 
   const handleRemoverItem = async (itemId: string, tipo: "receita" | "despesa") => {
-    if (!orcamentoAtualFiltrado) return
+    console.log("🔧 handleRemoverItem - Iniciando remoção:", { itemId, tipo, orcamentoAtualFiltrado: orcamentoAtualFiltrado?.id })
+    
+    // Encontrar o orçamento que contém o item
+    let orcamentoParaRemover = orcamentoAtualFiltrado
+    
+    if (!orcamentoParaRemover) {
+      // Se não há orçamento filtrado, buscar o orçamento que contém o item
+      orcamentoParaRemover = orcamentos.find(orcamento => {
+        const itens = [...orcamento.receitas, ...orcamento.despesas]
+        return itens.some(item => item.id === itemId)
+      })
+      
+      console.log("🔍 handleRemoverItem - Orçamento encontrado pelo item:", orcamentoParaRemover?.id)
+    }
+    
+    if (!orcamentoParaRemover) {
+      console.log("❌ handleRemoverItem - Nenhum orçamento encontrado para o item")
+      toast.error("Orçamento não encontrado para este item")
+      return
+    }
 
     try {
-      await removerItem(orcamentoAtualFiltrado.id, itemId, tipo)
+      console.log("🚀 handleRemoverItem - Chamando removerItem...")
+      await removerItem(orcamentoParaRemover.id, itemId, tipo)
+      console.log("✅ handleRemoverItem - Item removido com sucesso")
       toast.success("Item removido com sucesso!")
     } catch (error) {
+      console.error("❌ handleRemoverItem - Erro ao remover item:", error)
       toast.error("Erro ao remover item")
     }
   }
