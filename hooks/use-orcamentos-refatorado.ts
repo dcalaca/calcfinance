@@ -83,43 +83,6 @@ export function useOrcamentosRefatorado() {
     }
   }
 
-  // Memoizar fetchOrcamentos para evitar loops infinitos
-  const fetchOrcamentosMemo = useCallback(fetchOrcamentos, [user])
-
-  useEffect(() => {
-    console.log("🔄 useEffect: user:", !!user, "authLoading:", authLoading)
-    
-    if (user && !authLoading) {
-      // Primeiro, tentar carregar do cache local
-      console.log("💾 useEffect: Tentando carregar do cache...")
-      const cachedOrcamentos = loadOrcamentosFromCache(user.id)
-      if (cachedOrcamentos) {
-        console.log("💾 useEffect: Cache encontrado, carregando dados...")
-        setOrcamentos(cachedOrcamentos.orcamentos)
-        setOrcamentoAtual(cachedOrcamentos.orcamentoAtual)
-        setLoading(false)
-        
-        // Validar no servidor em background (sem bloquear a UI)
-        // Usar setTimeout para evitar loop infinito
-        setTimeout(() => {
-          console.log("🔄 useEffect: Validando no servidor em background...")
-          fetchOrcamentosMemo()
-        }, 100)
-        return
-      }
-      
-      // Se não há cache, fazer busca completa no servidor
-      console.log("🔄 useEffect: Sem cache, buscando no servidor...")
-      fetchOrcamentosMemo()
-    } else if (!user && !authLoading) {
-      console.log("🚫 useEffect: Usuário não logado, limpando dados...")
-      setOrcamentos([])
-      setOrcamentoAtual(null)
-      clearOrcamentosCache()
-      setLoading(false)
-    }
-  }, [user, financeUser, authLoading, fetchOrcamentosMemo])
-
   const fetchOrcamentos = async () => {
     if (!user) {
       console.log("🚫 fetchOrcamentos: Usuário não encontrado")
@@ -229,6 +192,43 @@ export function useOrcamentosRefatorado() {
       setLoading(false)
     }
   }
+
+  // Memoizar fetchOrcamentos para evitar loops infinitos
+  const fetchOrcamentosMemo = useCallback(fetchOrcamentos, [user])
+
+  useEffect(() => {
+    console.log("🔄 useEffect: user:", !!user, "authLoading:", authLoading)
+    
+    if (user && !authLoading) {
+      // Primeiro, tentar carregar do cache local
+      console.log("💾 useEffect: Tentando carregar do cache...")
+      const cachedOrcamentos = loadOrcamentosFromCache(user.id)
+      if (cachedOrcamentos) {
+        console.log("💾 useEffect: Cache encontrado, carregando dados...")
+        setOrcamentos(cachedOrcamentos.orcamentos)
+        setOrcamentoAtual(cachedOrcamentos.orcamentoAtual)
+        setLoading(false)
+        
+        // Validar no servidor em background (sem bloquear a UI)
+        // Usar setTimeout para evitar loop infinito
+        setTimeout(() => {
+          console.log("🔄 useEffect: Validando no servidor em background...")
+          fetchOrcamentosMemo()
+        }, 100)
+        return
+      }
+      
+      // Se não há cache, fazer busca completa no servidor
+      console.log("🔄 useEffect: Sem cache, buscando no servidor...")
+      fetchOrcamentosMemo()
+    } else if (!user && !authLoading) {
+      console.log("🚫 useEffect: Usuário não logado, limpando dados...")
+      setOrcamentos([])
+      setOrcamentoAtual(null)
+      clearOrcamentosCache()
+      setLoading(false)
+    }
+  }, [user, financeUser, authLoading, fetchOrcamentosMemo])
 
   const criarOrcamento = async (mesReferencia: string, nome: string, descricao?: string) => {
     if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
