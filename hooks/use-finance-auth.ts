@@ -4,10 +4,80 @@ import { useState, useEffect } from "react"
 import type { User, AuthResponse } from "@supabase/supabase-js"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
+// Chaves para localStorage
+const AUTH_CACHE_KEY = 'calcfy_auth_cache'
+const AUTH_TIMESTAMP_KEY = 'calcfy_auth_timestamp'
+
+// Tempo de cache em milissegundos (30 minutos)
+const CACHE_DURATION = 30 * 60 * 1000
+
+interface AuthCache {
+  user: User | null
+  financeUser: any
+  timestamp: number
+}
+
 export function useFinanceAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [financeUser, setFinanceUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
+  // Função para salvar no cache local
+  const saveToCache = (user: User | null, financeUser: any) => {
+    if (typeof window === 'undefined') return
+    
+    const cache: AuthCache = {
+      user,
+      financeUser,
+      timestamp: Date.now()
+    }
+    
+    try {
+      localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(cache))
+      console.log("💾 Estado de autenticação salvo no cache local")
+    } catch (error) {
+      console.warn("⚠️ Erro ao salvar no cache local:", error)
+    }
+  }
+
+  // Função para carregar do cache local
+  const loadFromCache = (): AuthCache | null => {
+    if (typeof window === 'undefined') return null
+    
+    try {
+      const cached = localStorage.getItem(AUTH_CACHE_KEY)
+      if (!cached) return null
+      
+      const cache: AuthCache = JSON.parse(cached)
+      const now = Date.now()
+      
+      // Verificar se o cache ainda é válido
+      if (now - cache.timestamp > CACHE_DURATION) {
+        console.log("⏰ Cache expirado, removendo...")
+        localStorage.removeItem(AUTH_CACHE_KEY)
+        return null
+      }
+      
+      console.log("✅ Cache válido encontrado, carregando...")
+      return cache
+    } catch (error) {
+      console.warn("⚠️ Erro ao carregar cache local:", error)
+      return null
+    }
+  }
+
+  // Função para limpar o cache
+  const clearCache = () => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      localStorage.removeItem(AUTH_CACHE_KEY)
+      localStorage.removeItem(AUTH_TIMESTAMP_KEY)
+      console.log("🗑️ Cache local limpo")
+    } catch (error) {
+      console.warn("⚠️ Erro ao limpar cache local:", error)
+    }
+  }
 
   useEffect(() => {
     console.log("🔧 Hook de autenticação iniciado")
@@ -19,50 +89,63 @@ export function useFinanceAuth() {
       return
     }
 
-    // Timeout de segurança para evitar loading infinito
-    const timeoutId = setTimeout(() => {
-      console.log("⏰ Timeout de segurança - forçando loading para false")
+    // Primeiro, tentar carregar do cache local
+    const cachedAuth = loadFromCache()
+    if (cachedAuth) {
+      console.log("🚀 Carregando do cache local:", cachedAuth.user?.email || "Nenhum")
+      setUser(cachedAuth.user)
+      setFinanceUser(cachedAuth.financeUser)
       setLoading(false)
-    }, 5000) // 5 segundos
-
-    // Get initial user first
-    const getInitialUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        console.log("🔍 Usuário inicial encontrado:", user?.email || "Nenhum")
-        setUser(user)
-        
-        if (user) {
-          // Buscar dados completos do usuário na tabela calc_users
-          const { data: userProfile, error: profileError } = await supabase
-            .from('calc_users')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-          
-          if (profileError) {
-            console.warn("⚠️ Erro ao buscar perfil do usuário:", profileError.message)
-            setFinanceUser(user)
-          } else {
-            console.log("✅ Perfil do usuário encontrado:", userProfile)
-            setFinanceUser({ ...user, ...userProfile })
-          }
-        } else {
-          setFinanceUser(null)
-        }
-        
-        setLoading(false)
-        clearTimeout(timeoutId)
-      } catch (error) {
-        console.error("❌ Erro ao buscar usuário inicial:", error)
-        setLoading(false)
-        clearTimeout(timeoutId)
-      }
+      
+      // Validar no servidor em background (sem bloquear a UI)
+      validateWithServer()
+      return
     }
 
-    getInitialUser()
+    // Se não há cache, fazer validação completa no servidor
+    validateWithServer()
+  }, [])
 
-    // Listen for auth changes
+  // Função para validar com o servidor (sem bloquear a UI)
+  const validateWithServer = async () => {
+    try {
+      console.log("🔍 Validando autenticação com servidor...")
+      const { data: { user } } = await supabase.auth.getUser()
+      console.log("🔍 Usuário do servidor:", user?.email || "Nenhum")
+      
+      if (user) {
+        // Buscar dados completos do usuário na tabela calc_users
+        const { data: userProfile, error: profileError } = await supabase
+          .from('calc_users')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        const financeUserData = profileError ? user : { ...user, ...userProfile }
+        
+        // Atualizar estado e cache
+        setUser(user)
+        setFinanceUser(financeUserData)
+        saveToCache(user, financeUserData)
+        
+        console.log("✅ Validação do servidor concluída")
+      } else {
+        // Usuário não está logado no servidor
+        setUser(null)
+        setFinanceUser(null)
+        clearCache()
+        console.log("❌ Usuário não encontrado no servidor")
+      }
+    } catch (error) {
+      console.error("❌ Erro na validação do servidor:", error)
+      // Em caso de erro, manter o cache local se existir
+    }
+  }
+
+  // Listen for auth changes
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
@@ -81,24 +164,20 @@ export function useFinanceAuth() {
           .eq('id', session.user.id)
           .single()
         
-        if (profileError) {
-          console.warn("⚠️ Erro ao buscar perfil do usuário:", profileError.message)
-          setFinanceUser(session.user)
-        } else {
-          console.log("✅ Perfil do usuário encontrado:", userProfile)
-          setFinanceUser({ ...session.user, ...userProfile })
-        }
+        const financeUserData = profileError ? session.user : { ...session.user, ...userProfile }
+        
+        setFinanceUser(financeUserData)
+        saveToCache(session.user, financeUserData)
       } else {
         console.log("❌ Nenhum usuário na sessão")
         setFinanceUser(null)
+        clearCache()
       }
       
       setLoading(false)
-      clearTimeout(timeoutId) // Limpar timeout quando receber resposta
     })
 
     return () => {
-      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [])
@@ -203,6 +282,7 @@ export function useFinanceAuth() {
       // Mesmo sem Supabase, limpar estado local
       setUser(null)
       setFinanceUser(null)
+      clearCache()
       if (typeof window !== 'undefined') {
         window.location.href = '/'
       }
@@ -225,6 +305,7 @@ export function useFinanceAuth() {
         // Mesmo com erro, limpar estado local
         setUser(null)
         setFinanceUser(null)
+        clearCache()
         if (typeof window !== 'undefined') {
           window.location.href = '/'
         }
@@ -233,9 +314,10 @@ export function useFinanceAuth() {
       
       console.log("✅ Logout realizado com sucesso!")
       
-      // Limpar estado local
+      // Limpar estado local e cache
       setUser(null)
       setFinanceUser(null)
+      clearCache()
       
       // Redirecionar para a página inicial
       if (typeof window !== 'undefined') {
@@ -248,6 +330,7 @@ export function useFinanceAuth() {
       // Mesmo com erro, limpar estado local
       setUser(null)
       setFinanceUser(null)
+      clearCache()
       if (typeof window !== 'undefined') {
         console.log("🔄 Redirecionando mesmo com erro...")
         window.location.href = '/'
