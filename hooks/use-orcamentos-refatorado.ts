@@ -5,21 +5,109 @@ import { supabase } from "@/lib/supabase"
 import type { Orcamento, OrcamentoItem, OrcamentoComItens } from "@/lib/supabase-types"
 import { useFinanceAuth } from "./use-finance-auth"
 
+// Chaves para cache local
+const ORCAMENTOS_CACHE_KEY = 'calcfy_orcamentos_cache'
+const ORCAMENTOS_TIMESTAMP_KEY = 'calcfy_orcamentos_timestamp'
+
+// Tempo de cache em milissegundos (5 minutos)
+const CACHE_DURATION = 5 * 60 * 1000
+
+interface OrcamentosCache {
+  orcamentos: OrcamentoComItens[]
+  orcamentoAtual: OrcamentoComItens | null
+  timestamp: number
+  userId: string
+}
+
 export function useOrcamentosRefatorado() {
   const { user, financeUser, loading: authLoading } = useFinanceAuth()
   const [orcamentos, setOrcamentos] = useState<OrcamentoComItens[]>([])
   const [orcamentoAtual, setOrcamentoAtual] = useState<OrcamentoComItens | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Função para salvar no cache local
+  const saveOrcamentosToCache = (orcamentos: OrcamentoComItens[], orcamentoAtual: OrcamentoComItens | null, userId: string) => {
+    if (typeof window === 'undefined') return
+    
+    const cache: OrcamentosCache = {
+      orcamentos,
+      orcamentoAtual,
+      timestamp: Date.now(),
+      userId
+    }
+    
+    try {
+      localStorage.setItem(ORCAMENTOS_CACHE_KEY, JSON.stringify(cache))
+      console.log("💾 Orçamentos salvos no cache local")
+    } catch (error) {
+      console.warn("⚠️ Erro ao salvar orçamentos no cache local:", error)
+    }
+  }
+
+  // Função para carregar do cache local
+  const loadOrcamentosFromCache = (userId: string): OrcamentosCache | null => {
+    if (typeof window === 'undefined') return null
+    
+    try {
+      const cached = localStorage.getItem(ORCAMENTOS_CACHE_KEY)
+      if (!cached) return null
+      
+      const cache: OrcamentosCache = JSON.parse(cached)
+      const now = Date.now()
+      
+      // Verificar se o cache ainda é válido e é do usuário correto
+      if (now - cache.timestamp > CACHE_DURATION || cache.userId !== userId) {
+        console.log("⏰ Cache de orçamentos expirado ou usuário diferente, removendo...")
+        localStorage.removeItem(ORCAMENTOS_CACHE_KEY)
+        return null
+      }
+      
+      console.log("✅ Cache de orçamentos válido encontrado, carregando...")
+      return cache
+    } catch (error) {
+      console.warn("⚠️ Erro ao carregar cache de orçamentos:", error)
+      return null
+    }
+  }
+
+  // Função para limpar o cache de orçamentos
+  const clearOrcamentosCache = () => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      localStorage.removeItem(ORCAMENTOS_CACHE_KEY)
+      localStorage.removeItem(ORCAMENTOS_TIMESTAMP_KEY)
+      console.log("🗑️ Cache de orçamentos limpo")
+    } catch (error) {
+      console.warn("⚠️ Erro ao limpar cache de orçamentos:", error)
+    }
+  }
+
   useEffect(() => {
     console.log("🔧 use-orcamentos-refatorado - useEffect executado, user:", user?.email, "financeUser:", financeUser?.email, "authLoading:", authLoading)
     if (user && !authLoading) {
-      console.log("🔧 use-orcamentos-refatorado - Usuário encontrado, buscando orçamentos...")
+      console.log("🔧 use-orcamentos-refatorado - Usuário encontrado, verificando cache...")
+      
+      // Primeiro, tentar carregar do cache local
+      const cachedOrcamentos = loadOrcamentosFromCache(user.id)
+      if (cachedOrcamentos) {
+        console.log("🚀 Carregando orçamentos do cache local")
+        setOrcamentos(cachedOrcamentos.orcamentos)
+        setOrcamentoAtual(cachedOrcamentos.orcamentoAtual)
+        setLoading(false)
+        
+        // Validar no servidor em background (sem bloquear a UI)
+        fetchOrcamentos()
+        return
+      }
+      
+      // Se não há cache, fazer busca completa no servidor
       fetchOrcamentos()
     } else if (!user && !authLoading) {
       console.log("🔧 use-orcamentos-refatorado - Nenhum usuário, limpando dados")
       setOrcamentos([])
       setOrcamentoAtual(null)
+      clearOrcamentosCache()
       setLoading(false)
     } else {
       console.log("🔧 use-orcamentos-refatorado - Aguardando autenticação...")
@@ -32,55 +120,42 @@ export function useOrcamentosRefatorado() {
       return
     }
 
-    console.log("🔧 fetchOrcamentos - Iniciando busca LIMPA do Supabase...")
+    console.log("🔧 fetchOrcamentos - Iniciando busca otimizada...")
     setLoading(true)
     
-    // Limpar estado antes de buscar
-    setOrcamentos([])
-    setOrcamentoAtual(null)
-    
     try {
-      // Buscar orçamentos com cache desabilitado
-      const { data: orcamentosData, error: orcamentosError } = await supabase
-        .from("calc_orcamentos")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("status", "ativo")
-        .order("mes_referencia", { ascending: false })
+      // Buscar orçamentos e itens em paralelo para melhor performance
+      const [orcamentosResult, itensResult] = await Promise.all([
+        supabase
+          .from("calc_orcamentos")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("status", "ativo")
+          .order("mes_referencia", { ascending: false }),
+        
+        supabase
+          .from("calc_orcamento_itens")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("data", { ascending: false })
+      ])
 
-      if (orcamentosError) {
-        console.error("❌ Erro ao buscar orçamentos:", orcamentosError)
+      if (orcamentosResult.error) {
+        console.error("❌ Erro ao buscar orçamentos:", orcamentosResult.error)
         setLoading(false)
         return
       }
 
-      console.log("✅ Orçamentos encontrados:", orcamentosData?.length || 0)
-      console.log("📋 Dados dos orçamentos:", orcamentosData)
-
-      // Buscar itens de todos os orçamentos
-      const orcamentoIds = orcamentosData?.map((o: OrcamentoComItens) => o.id) || []
-      let itensData: OrcamentoItem[] = []
-
-      console.log("🔍 Orçamento IDs para buscar itens:", orcamentoIds)
-
-      if (orcamentoIds.length > 0) {
-        const { data: itens, error: itensError } = await supabase
-          .from("calc_orcamento_itens")
-          .select("*")
-          .in("orcamento_id", orcamentoIds)
-          .order("data", { ascending: false })
-
-        if (itensError) {
-          console.error("❌ Erro ao buscar itens:", itensError)
-          console.error("❌ Detalhes do erro:", itensError.message)
-        } else {
-          itensData = itens || []
-          console.log("📋 Dados dos itens:", itens)
-        }
-      } else {
-        console.log("⚠️ Nenhum orçamento encontrado, não buscando itens")
+      if (itensResult.error) {
+        console.error("❌ Erro ao buscar itens:", itensResult.error)
+        setLoading(false)
+        return
       }
 
+      const orcamentosData = orcamentosResult.data || []
+      const itensData = itensResult.data || []
+
+      console.log("✅ Orçamentos encontrados:", orcamentosData.length)
       console.log("✅ Itens encontrados:", itensData.length)
 
       // Combinar orçamentos com seus itens e calcular totais
@@ -115,18 +190,21 @@ export function useOrcamentosRefatorado() {
       })
 
       console.log("📋 Dados dos orçamentos com itens:", orcamentosComItens)
-      setOrcamentos(orcamentosComItens)
       
       // Definir orçamento atual (mês atual ou mais recente)
       const hoje = new Date()
       const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-01`
       
       const orcamentoMesAtual = orcamentosComItens.find(o => o.mes_referencia === mesAtual)
-      if (orcamentoMesAtual) {
-        setOrcamentoAtual(orcamentoMesAtual)
-      } else if (orcamentosComItens.length > 0) {
-        setOrcamentoAtual(orcamentosComItens[0]) // Mais recente
-      }
+      const orcamentoAtualNovo = orcamentoMesAtual || (orcamentosComItens.length > 0 ? orcamentosComItens[0] : null)
+      
+      // Atualizar estado
+      setOrcamentos(orcamentosComItens)
+      setOrcamentoAtual(orcamentoAtualNovo)
+      
+      // Salvar no cache local
+      saveOrcamentosToCache(orcamentosComItens, orcamentoAtualNovo, user.id)
+      
     } catch (error) {
       console.error("Erro ao buscar orçamentos:", error)
     } finally {
@@ -171,6 +249,10 @@ export function useOrcamentosRefatorado() {
       
       setOrcamentos(prev => [novoOrcamento, ...prev])
       setOrcamentoAtual(novoOrcamento)
+      
+      // Limpar cache para forçar atualização
+      clearOrcamentosCache()
+      
       return novoOrcamento
     } catch (error) {
       console.error("❌ Erro ao criar orçamento:", error)
@@ -223,6 +305,9 @@ export function useOrcamentosRefatorado() {
         return orcamento
       }))
 
+      // Limpar cache para forçar atualização
+      clearOrcamentosCache()
+
       return data
     } catch (error) {
       console.error("❌ Erro ao adicionar item:", error)
@@ -269,6 +354,9 @@ export function useOrcamentosRefatorado() {
         }
         return orcamento
       }))
+
+      // Limpar cache para forçar atualização
+      clearOrcamentosCache()
 
     } catch (error) {
       console.error("❌ Erro ao remover item:", error)
