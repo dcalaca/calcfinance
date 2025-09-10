@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -326,15 +326,13 @@ export default function MeuOrcamentoPage() {
     return true
   })
 
-  // Orçamento atual baseado no filtro de mês - memoizado
-  const orcamentoAtualFiltrado = useMemo(() => {
-    return filtroMes 
-      ? orcamentos.find(o => o.mes_referencia === filtroMes) || orcamentoAtual
-      : null // Quando "Todos os meses", não há orçamento específico
-  }, [filtroMes, orcamentos, orcamentoAtual])
+  // Orçamento atual baseado no filtro de mês
+  const orcamentoAtualFiltrado = filtroMes 
+    ? orcamentos.find(o => o.mes_referencia === filtroMes) || orcamentoAtual
+    : null // Quando "Todos os meses", não há orçamento específico
 
-  // Receitas filtradas - memoizado
-  const receitasFiltradas = useMemo(() => {
+  // Receitas filtradas
+  const receitasFiltradas = (() => {
     if (filtroMes) {
       return (orcamentoAtualFiltrado?.receitas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
@@ -348,10 +346,10 @@ export default function MeuOrcamentoPage() {
         return true
       })
     }
-  }, [filtroMes, orcamentoAtualFiltrado, filtroItem, tipoFiltro, orcamentos])
+  })()
 
-  // Despesas filtradas - memoizado
-  const despesasFiltradas = useMemo(() => {
+  // Despesas filtradas
+  const despesasFiltradas = (() => {
     if (filtroMes) {
       return (orcamentoAtualFiltrado?.despesas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
@@ -365,7 +363,7 @@ export default function MeuOrcamentoPage() {
         return true
       })
     }
-  }, [filtroMes, orcamentoAtualFiltrado, filtroItem, tipoFiltro, orcamentos])
+  })()
 
   // Debug logs removidos para melhor performance
 
@@ -410,12 +408,10 @@ export default function MeuOrcamentoPage() {
     })
   }
 
-  // Calcular sobra mensal para projeção de investimento - memoizado
-  const sobraMensal = useMemo(() => {
-    const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
-    const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
-    return totalReceitas - totalDespesas
-  }, [receitasFiltradas, despesasFiltradas])
+  // Calcular sobra mensal para projeção de investimento
+  const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
+  const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
+  const sobraMensal = totalReceitas - totalDespesas
 
   const temSobra = sobraMensal > 0
 
