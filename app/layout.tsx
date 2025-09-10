@@ -92,16 +92,32 @@ export default function RootLayout({
       <head>
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-J6CGK8KT80"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-J6CGK8KT80');
-            `,
-          }}
-        />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', 'G-J6CGK8KT80');
+                    `,
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      // Clear old caches and force fresh load
+                      if ('caches' in window) {
+                        caches.keys().then(function(names) {
+                          names.forEach(function(name) {
+                            if (name.startsWith('calcfy-v1')) {
+                              caches.delete(name);
+                            }
+                          });
+                        });
+                      }
+                    `,
+                  }}
+                />
         <StructuredData />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b82f6" />

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calcfy-v1'
+const CACHE_NAME = 'calcfy-v2'
 const urlsToCache = [
   '/',
   '/manifest.json'
@@ -32,6 +32,16 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
     return
+  }
+
+  // Skip Next.js chunks and static assets - let them load fresh
+  const url = new URL(event.request.url)
+  if (url.pathname.startsWith('/_next/static/') || 
+      url.pathname.startsWith('/_next/') ||
+      url.pathname.includes('.js') ||
+      url.pathname.includes('.css') ||
+      url.pathname.includes('.map')) {
+    return // Let the browser handle these directly
   }
 
   event.respondWith(
