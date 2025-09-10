@@ -221,15 +221,16 @@ export default function MeuOrcamentoPage() {
     console.log("🔧 handleRemoverItem - Iniciando remoção:", { itemId, tipo, orcamentoAtualFiltrado: orcamentoAtualFiltrado?.id })
     
     // Encontrar o orçamento que contém o item
-    let orcamentoParaRemover = orcamentoAtualFiltrado
+    let orcamentoParaRemover: OrcamentoComItens | null = orcamentoAtualFiltrado
     
     if (!orcamentoParaRemover) {
       // Se não há orçamento filtrado, buscar o orçamento que contém o item
-      orcamentoParaRemover = orcamentos.find(orcamento => {
+      const orcamentoEncontrado = orcamentos.find(orcamento => {
         const itens = [...orcamento.receitas, ...orcamento.despesas]
         return itens.some(item => item.id === itemId)
       })
       
+      orcamentoParaRemover = orcamentoEncontrado || null
       console.log("🔍 handleRemoverItem - Orçamento encontrado pelo item:", orcamentoParaRemover?.id)
     }
     
