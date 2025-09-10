@@ -411,13 +411,12 @@ export default function MeuOrcamentoPage() {
   }
 
   // Calcular sobra mensal para projeção de investimento - memoizado
-  const calcularSobraMensal = useMemo(() => {
+  const sobraMensal = useMemo(() => {
     const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
     const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
     return totalReceitas - totalDespesas
   }, [receitasFiltradas, despesasFiltradas])
 
-  const sobraMensal = calcularSobraMensal
   const temSobra = sobraMensal > 0
 
   return (
