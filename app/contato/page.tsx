@@ -4,6 +4,15 @@ import { Badge } from "@/components/ui/badge"
 import { Mail, Phone, MapPin, Clock, Users, Handshake, MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
 import { ContactForm } from "@/components/contact-form"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Contato - CalcFy",
+  description: "Entre em contato conosco para dúvidas, sugestões ou parcerias. Estamos aqui para ajudar com suas necessidades financeiras.",
+  alternates: {
+    canonical: 'https://calcfy.me/contato'
+  }
+}
 
 export default function ContatoPage() {
   return (

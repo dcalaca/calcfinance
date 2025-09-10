@@ -7,6 +7,15 @@ import { Calculator, PiggyBank, TrendingUp, Home, Coins, Percent, Target, Car } 
 import Link from "next/link"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter } from "next/navigation"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Calculadoras Financeiras Gratuitas - CalcFy",
+  description: "Acesse nossas calculadoras financeiras gratuitas: juros compostos, financiamento, aposentadoria, investimentos e muito mais.",
+  alternates: {
+    canonical: 'https://calcfy.me/calculadoras'
+  }
+}
 
 export default function CalculadorasPage() {
   const [activeCategory, setActiveCategory] = useState("Todos")

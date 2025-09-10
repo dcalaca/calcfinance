@@ -6,6 +6,15 @@ import { Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Notícias Financeiras - CalcFy",
+  description: "Acompanhe as últimas notícias do mercado financeiro, economia e investimentos em tempo real.",
+  alternates: {
+    canonical: 'https://calcfy.me/noticias'
+  }
+}
 
 interface NewsItem {
   title: string

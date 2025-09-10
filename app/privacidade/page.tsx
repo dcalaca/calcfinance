@@ -1,4 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Política de Privacidade - CalcFy",
+  description: "Conheça nossa política de privacidade e como protegemos seus dados pessoais no CalcFy.",
+  alternates: {
+    canonical: 'https://calcfy.me/privacidade'
+  }
+}
 
 export default function PrivacidadePage() {
   return (

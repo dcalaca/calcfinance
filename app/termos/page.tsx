@@ -1,4 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Termos de Uso - CalcFy",
+  description: "Leia os termos de uso do CalcFy, nossa plataforma de calculadoras financeiras gratuitas e educação financeira.",
+  alternates: {
+    canonical: 'https://calcfy.me/termos'
+  }
+}
 
 export default function TermosPage() {
   return (

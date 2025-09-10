@@ -1,6 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calculator, Target, Users, Award, Heart, Zap } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Sobre o CalcFy - Calculadoras Financeiras Gratuitas",
+  description: "Conheça o CalcFy, sua plataforma completa para decisões financeiras inteligentes com calculadoras gratuitas e educação financeira.",
+  alternates: {
+    canonical: 'https://calcfy.me/sobre'
+  }
+}
 
 export default function SobrePage() {
   return (
