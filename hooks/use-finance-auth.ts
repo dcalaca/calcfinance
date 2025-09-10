@@ -71,9 +71,22 @@ export function useFinanceAuth() {
     if (typeof window === 'undefined') return
     
     try {
+      // Limpar todos os itens relacionados à autenticação
       localStorage.removeItem(AUTH_CACHE_KEY)
       localStorage.removeItem(AUTH_TIMESTAMP_KEY)
-      console.log("🗑️ Cache local limpo")
+      
+      // Limpar outros possíveis caches de autenticação
+      const keysToRemove = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && (key.includes('auth') || key.includes('user') || key.includes('session'))) {
+          keysToRemove.push(key)
+        }
+      }
+      
+      keysToRemove.forEach(key => localStorage.removeItem(key))
+      
+      console.log("🗑️ Cache local limpo completamente")
     } catch (error) {
       console.warn("⚠️ Erro ao limpar cache local:", error)
     }
@@ -151,6 +164,16 @@ export function useFinanceAuth() {
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       console.log("🔄 Mudança de estado de autenticação:", event, session?.user ? "Usuário logado" : "Usuário deslogado")
       console.log("👤 Usuário da sessão:", session?.user?.email)
+      
+      // Se for um evento de SIGNED_OUT, garantir que o estado seja limpo
+      if (event === 'SIGNED_OUT') {
+        console.log("🚪 Evento SIGNED_OUT detectado, limpando estado...")
+        setUser(null)
+        setFinanceUser(null)
+        clearCache()
+        setLoading(false)
+        return
+      }
       
       setUser(session?.user ?? null)
       
@@ -277,12 +300,13 @@ export function useFinanceAuth() {
     console.log("🚪 Iniciando processo de logout...")
     console.log("🔧 Usuário atual antes do logout:", user?.email)
     
+    // PRIMEIRO: Limpar estado local IMEDIATAMENTE para evitar relogin
+    setUser(null)
+    setFinanceUser(null)
+    clearCache()
+    
     if (!isSupabaseConfigured()) {
       console.warn("❌ Supabase not configured")
-      // Mesmo sem Supabase, limpar estado local
-      setUser(null)
-      setFinanceUser(null)
-      clearCache()
       if (typeof window !== 'undefined') {
         window.location.href = '/'
       }
@@ -302,10 +326,7 @@ export function useFinanceAuth() {
       
       if (error) {
         console.error("❌ Erro no logout:", error)
-        // Mesmo com erro, limpar estado local
-        setUser(null)
-        setFinanceUser(null)
-        clearCache()
+        // Estado já foi limpo acima, apenas redirecionar
         if (typeof window !== 'undefined') {
           window.location.href = '/'
         }
@@ -313,11 +334,6 @@ export function useFinanceAuth() {
       }
       
       console.log("✅ Logout realizado com sucesso!")
-      
-      // Limpar estado local e cache
-      setUser(null)
-      setFinanceUser(null)
-      clearCache()
       
       // Redirecionar para a página inicial
       if (typeof window !== 'undefined') {
@@ -327,10 +343,7 @@ export function useFinanceAuth() {
       
     } catch (error) {
       console.error("❌ Erro no logout:", error)
-      // Mesmo com erro, limpar estado local
-      setUser(null)
-      setFinanceUser(null)
-      clearCache()
+      // Estado já foi limpo acima, apenas redirecionar
       if (typeof window !== 'undefined') {
         console.log("🔄 Redirecionando mesmo com erro...")
         window.location.href = '/'
