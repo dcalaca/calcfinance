@@ -799,23 +799,6 @@ export default function MeuOrcamentoPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="nome">Nome *</Label>
-                <Input
-                  id="nome"
-                  value={novoItem.nome}
-                  onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
-                  placeholder="Ex: Salário, Aluguel, Supermercado"
-                />
-              </div>
-              <div>
-                <Label htmlFor="valor">Valor *</Label>
-                <CurrencyInput
-                  value={novoItem.valor}
-                  onChange={(value) => setNovoItem({ ...novoItem, valor: value })}
-                  placeholder="0,00"
-                />
-              </div>
-              <div>
                 <Label htmlFor="tipo">Tipo *</Label>
                 <Select
                   value={novoItem.tipo}
@@ -850,6 +833,23 @@ export default function MeuOrcamentoPage() {
                     }
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label htmlFor="nome">Nome *</Label>
+                <Input
+                  id="nome"
+                  value={novoItem.nome}
+                  onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
+                  placeholder="Ex: Salário, Aluguel, Supermercado"
+                />
+              </div>
+              <div>
+                <Label htmlFor="valor">Valor *</Label>
+                <CurrencyInput
+                  value={novoItem.valor}
+                  onChange={(value) => setNovoItem({ ...novoItem, valor: value })}
+                  placeholder="0,00"
+                />
               </div>
               <div>
                 <Label htmlFor="data">Data</Label>
