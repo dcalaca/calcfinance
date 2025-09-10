@@ -51,6 +51,7 @@ interface FilterOptions {
   browser: string
   page: string
   country: string
+  referrer: string
   searchTerm: string
 }
 
@@ -68,6 +69,7 @@ export default function AnalyticsPage() {
     browser: 'all',
     page: 'all',
     country: 'all',
+    referrer: 'all',
     searchTerm: ''
   })
 
@@ -101,6 +103,7 @@ export default function AnalyticsPage() {
       if (filters.browser !== 'all') params.append('browser', filters.browser)
       if (filters.page !== 'all') params.append('page', filters.page)
       if (filters.country !== 'all') params.append('country', filters.country)
+      if (filters.referrer !== 'all') params.append('referrer', filters.referrer)
       if (filters.searchTerm) params.append('search', filters.searchTerm)
       
       // Buscar estatísticas gerais com filtros
@@ -126,10 +129,6 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (isAuthorized) {
       fetchAnalytics()
-      
-      // Atualizar a cada 10 segundos
-      const interval = setInterval(fetchAnalytics, 10000)
-      return () => clearInterval(interval)
     }
   }, [isAuthorized])
 
@@ -145,6 +144,7 @@ export default function AnalyticsPage() {
       browser: 'all',
       page: 'all',
       country: 'all',
+      referrer: 'all',
       searchTerm: ''
     })
   }
@@ -183,6 +183,7 @@ export default function AnalyticsPage() {
     if (filters.browser !== 'all') count++
     if (filters.page !== 'all') count++
     if (filters.country !== 'all') count++
+    if (filters.referrer !== 'all') count++
     if (filters.searchTerm) count++
     return count
   }
@@ -450,6 +451,27 @@ export default function AnalyticsPage() {
                     <SelectItem value="/calculadoras">Calculadoras</SelectItem>
                     <SelectItem value="/noticias">Notícias</SelectItem>
                     <SelectItem value="/educacao">Educação</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro de Página de Origem */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Página de Origem</label>
+                <Select value={filters.referrer} onValueChange={(value) => setFilters(prev => ({ ...prev, referrer: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="google.com">Google</SelectItem>
+                    <SelectItem value="facebook.com">Facebook</SelectItem>
+                    <SelectItem value="instagram.com">Instagram</SelectItem>
+                    <SelectItem value="linkedin.com">LinkedIn</SelectItem>
+                    <SelectItem value="twitter.com">Twitter</SelectItem>
+                    <SelectItem value="youtube.com">YouTube</SelectItem>
+                    <SelectItem value="direct">Acesso Direto</SelectItem>
+                    <SelectItem value="other">Outros</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
