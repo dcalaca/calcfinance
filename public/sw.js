@@ -1,10 +1,6 @@
 const CACHE_NAME = 'calcfy-v1'
 const urlsToCache = [
   '/',
-  '/calculadoras',
-  '/blog',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json'
 ]
 
@@ -14,20 +10,48 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache')
-        return cache.addAll(urlsToCache)
+        // Cache only essential resources that definitely exist
+        return Promise.all(
+          urlsToCache.map(url => {
+            return cache.add(url).catch(err => {
+              console.log('Failed to cache:', url, err)
+              // Don't fail the entire cache operation if one URL fails
+              return Promise.resolve()
+            })
+          })
+        )
+      })
+      .catch(err => {
+        console.log('Cache installation failed:', err)
       })
   )
 })
 
 // Fetch event - serve from cache
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         // Return cached version or fetch from network
-        return response || fetch(event.request)
-      }
-    )
+        if (response) {
+          return response
+        }
+        
+        return fetch(event.request).catch(err => {
+          console.log('Fetch failed:', event.request.url, err)
+          // Return a basic offline page or let the browser handle it
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' })
+        })
+      })
+      .catch(err => {
+        console.log('Cache match failed:', err)
+        return fetch(event.request)
+      })
   )
 })
 
