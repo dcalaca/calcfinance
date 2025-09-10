@@ -160,15 +160,15 @@ export function useOrcamentosRefatorado() {
 
       // Combinar orçamentos com seus itens e calcular totais
       const orcamentosComItens: OrcamentoComItens[] = (orcamentosData || []).map((orcamento: OrcamentoComItens) => {
-        const receitas = itensData.filter(item => 
+        const receitas = itensData.filter((item: OrcamentoItem) => 
           item.orcamento_id === orcamento.id && item.tipo === "receita"
         )
-        const despesas = itensData.filter(item => 
+        const despesas = itensData.filter((item: OrcamentoItem) => 
           item.orcamento_id === orcamento.id && item.tipo === "despesa"
         )
 
-        const totalReceitas = receitas.reduce((total, item) => total + Number(item.valor), 0)
-        const totalDespesas = despesas.reduce((total, item) => total + Number(item.valor), 0)
+        const totalReceitas = receitas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
+        const totalDespesas = despesas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
         const saldo = totalReceitas - totalDespesas
 
         console.log(`📊 Orçamento ${orcamento.mes_referencia}:`, {

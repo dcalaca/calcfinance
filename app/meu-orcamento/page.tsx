@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useOrcamentosRefatorado } from "@/hooks/use-orcamentos-refatorado"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter } from "next/navigation"
+import type { OrcamentoComItens } from "@/lib/supabase-types"
 import { 
   Plus, 
   Calendar, 
