@@ -46,11 +46,7 @@ export default function MeuOrcamentoPage() {
     fetchOrcamentos
   } = useOrcamentosRefatorado()
 
-  console.log("🔧 MeuOrcamentoPage - user:", user?.email)
-  console.log("🔧 MeuOrcamentoPage - orcamentos:", orcamentos.length)
-  console.log("🔧 MeuOrcamentoPage - orcamentoAtual:", orcamentoAtual)
-  console.log("🔧 MeuOrcamentoPage - loading:", loading)
-  console.log("🔧 MeuOrcamentoPage - orcamentos detalhados:", orcamentos)
+  // Debug logs removidos para melhor performance
 
   const [novoItem, setNovoItem] = useState({
     nome: "",
@@ -168,22 +164,15 @@ export default function MeuOrcamentoPage() {
       const dataItem = new Date(novoItem.data + 'T00:00:00') // Forçar timezone local
       const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
       
-      console.log("🔧 handleAdicionarItem - dataItem:", dataItem)
-      console.log("🔧 handleAdicionarItem - dataItem.getMonth():", dataItem.getMonth())
-      console.log("🔧 handleAdicionarItem - dataItem.getMonth() + 1:", dataItem.getMonth() + 1)
-      console.log("🔧 handleAdicionarItem - mesReferencia calculado:", mesReferencia)
-      console.log("🔧 handleAdicionarItem - orcamentos disponíveis:", orcamentos.map(o => ({ id: o.id, mes: o.mes_referencia, nome: o.nome })))
+      // Debug logs removidos para melhor performance
       
       // Buscar orçamento existente para o mês ou criar um novo
       let orcamentoParaUsar = orcamentos.find(o => o.mes_referencia === mesReferencia)
-      console.log("🔧 handleAdicionarItem - orcamentoParaUsar encontrado:", orcamentoParaUsar?.mes_referencia, orcamentoParaUsar?.nome)
-      
       // Verificar se o orçamento encontrado é realmente do mês correto
       if (orcamentoParaUsar) {
         const mesOrcamento = new Date(orcamentoParaUsar.mes_referencia)
         const mesItem = new Date(mesReferencia)
         if (mesOrcamento.getMonth() !== mesItem.getMonth() || mesOrcamento.getFullYear() !== mesItem.getFullYear()) {
-          console.log("⚠️ Orçamento encontrado não é do mês correto, criando novo...")
           orcamentoParaUsar = undefined
         }
       }
@@ -194,11 +183,7 @@ export default function MeuOrcamentoPage() {
           year: 'numeric', 
           month: 'long' 
         })
-        console.log("🔧 handleAdicionarItem - Criando novo orçamento:", { mesReferencia, nomeOrcamento })
         orcamentoParaUsar = await criarOrcamento(mesReferencia, nomeOrcamento, `Orçamento ${nomeOrcamento}`)
-        console.log("🔧 handleAdicionarItem - Orçamento criado:", orcamentoParaUsar?.mes_referencia, orcamentoParaUsar?.nome)
-      } else {
-        console.log("🔧 handleAdicionarItem - Usando orçamento existente:", orcamentoParaUsar?.mes_referencia, orcamentoParaUsar?.nome)
       }
 
       await adicionarItem(orcamentoParaUsar.id, item)
@@ -219,8 +204,6 @@ export default function MeuOrcamentoPage() {
   }
 
   const handleRemoverItem = async (itemId: string, tipo: "receita" | "despesa") => {
-    console.log("🔧 handleRemoverItem - Iniciando remoção:", { itemId, tipo, orcamentoAtualFiltrado: orcamentoAtualFiltrado?.id })
-    
     // Encontrar o orçamento que contém o item
     let orcamentoParaRemover: OrcamentoComItens | null = orcamentoAtualFiltrado
     
@@ -232,46 +215,34 @@ export default function MeuOrcamentoPage() {
       })
       
       orcamentoParaRemover = orcamentoEncontrado || null
-      console.log("🔍 handleRemoverItem - Orçamento encontrado pelo item:", orcamentoParaRemover?.id)
     }
     
     if (!orcamentoParaRemover) {
-      console.log("❌ handleRemoverItem - Nenhum orçamento encontrado para o item")
       toast.error("Orçamento não encontrado para este item")
       return
     }
 
     try {
-      console.log("🚀 handleRemoverItem - Chamando removerItem...")
       await removerItem(orcamentoParaRemover.id, itemId, tipo)
-      console.log("✅ handleRemoverItem - Item removido com sucesso")
       toast.success("Item removido com sucesso!")
     } catch (error) {
-      console.error("❌ handleRemoverItem - Erro ao remover item:", error)
+      console.error("Erro ao remover item:", error)
       toast.error("Erro ao remover item")
     }
   }
 
 
   const formatarMes = (data: string) => {
-    console.log("🔍 formatarMes - Input:", data)
-    
     // Dividir a data em partes para evitar problemas de timezone
     const [ano, mes, dia] = data.split('-').map(Number)
-    console.log("🔍 formatarMes - Partes:", { ano, mes, dia })
     
     // Criar data local (mês é 0-indexado, então subtrair 1)
     const date = new Date(ano, mes - 1, dia)
-    console.log("🔍 formatarMes - Date object local:", date)
-    console.log("🔍 formatarMes - getMonth():", date.getMonth())
-    console.log("🔍 formatarMes - getFullYear():", date.getFullYear())
     
-    const resultado = date.toLocaleDateString('pt-BR', { 
+    return date.toLocaleDateString('pt-BR', { 
       year: 'numeric', 
       month: 'long' 
     })
-    console.log("🔍 formatarMes - Resultado:", resultado)
-    return resultado
   }
 
   const formatarMesAbreviado = (data: string) => {
@@ -289,16 +260,12 @@ export default function MeuOrcamentoPage() {
 
 
   const handleCriarOrcamentosFaltantes = async () => {
-    console.log("🔧 Criando orçamentos faltantes...")
-    
     try {
       // Buscar todos os itens que têm orcamento_id mas o orçamento não existe
       const itensOrfaos = receitasFiltradas.concat(despesasFiltradas).filter(item => {
         const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
         return !orcamento
       })
-      
-      console.log("📋 Itens órfãos encontrados:", itensOrfaos.length)
       
       if (itensOrfaos.length === 0) {
         toast.info("Nenhum item órfão encontrado")
@@ -317,8 +284,6 @@ export default function MeuOrcamentoPage() {
         return acc
       }, {} as Record<string, any[]>)
       
-      console.log("📅 Itens agrupados por mês:", Object.keys(itensPorData))
-      
       // Criar orçamentos para cada mês
       for (const [mesReferencia, itens] of Object.entries(itensPorData)) {
         const dataItem = new Date(mesReferencia)
@@ -327,17 +292,11 @@ export default function MeuOrcamentoPage() {
           month: 'long' 
         })
         
-        console.log(`🔧 Criando orçamento para ${mesReferencia}: ${nomeOrcamento}`)
-        
-        const novoOrcamento = await criarOrcamento(
+        await criarOrcamento(
           mesReferencia, 
           nomeOrcamento, 
           `Orçamento ${nomeOrcamento}`
         )
-        
-        if (novoOrcamento) {
-          console.log(`✅ Orçamento criado: ${novoOrcamento.id}`)
-        }
       }
       
       // Recarregar dados
@@ -345,7 +304,7 @@ export default function MeuOrcamentoPage() {
       toast.success("Orçamentos criados com sucesso!")
       
     } catch (error) {
-      console.error("❌ Erro ao criar orçamentos:", error)
+      console.error("Erro ao criar orçamentos:", error)
       toast.error("Erro ao criar orçamentos")
     }
   }
@@ -386,15 +345,7 @@ export default function MeuOrcamentoPage() {
         return true
       })
 
-  // Logs para debug
-  console.log("🔧 MeuOrcamentoPage - filtroMes:", filtroMes)
-  console.log("🔧 MeuOrcamentoPage - orcamentos.length:", orcamentos.length)
-  console.log("🔧 MeuOrcamentoPage - orcamentoAtualFiltrado:", orcamentoAtualFiltrado?.mes_referencia)
-  console.log("🔧 MeuOrcamentoPage - receitasFiltradas:", receitasFiltradas.length)
-  console.log("🔧 MeuOrcamentoPage - despesasFiltradas:", despesasFiltradas.length)
-  console.log("🔧 MeuOrcamentoPage - receitasFiltradas detalhadas:", receitasFiltradas)
-  console.log("🔧 MeuOrcamentoPage - despesasFiltradas detalhadas:", despesasFiltradas)
-  console.log("🔧 MeuOrcamentoPage - orcamentos:", orcamentos.map(o => ({ mes: o.mes_referencia, receitas: o.receitas.length, despesas: o.despesas.length })))
+  // Debug logs removidos para melhor performance
 
   // Dados para o gráfico mensal - agrupar por mês e somar valores
   const dadosGrafico = orcamentos.reduce((acc, orcamento) => {
@@ -428,13 +379,7 @@ export default function MeuOrcamentoPage() {
     return new Date(orcamentoA.mes_referencia).getTime() - new Date(orcamentoB.mes_referencia).getTime()
   })
 
-  // Debug logs
-  console.log("🔧 MeuOrcamentoPage - dadosGrafico:", dadosGraficoArray)
-  console.log("🔧 MeuOrcamentoPage - orcamentos detalhados:", orcamentos.map(o => ({
-    mes: o.mes_referencia,
-    receitas: o.receitas.map(r => ({ nome: r.nome, valor: r.valor })),
-    despesas: o.despesas.map(d => ({ nome: d.nome, valor: d.valor }))
-  })))
+  // Debug logs removidos para melhor performance
 
   const formatarMoeda = (valor: number) => {
     return valor.toLocaleString('pt-BR', {
@@ -461,10 +406,7 @@ export default function MeuOrcamentoPage() {
           <p className="text-muted-foreground">
             Controle sua vida financeira de forma simples e eficiente
           </p>
-          {/* Debug info */}
-          <div className="text-xs text-gray-500 mt-2">
-            Debug: User: {user?.email || 'Não logado'} | Orçamentos: {orcamentos.length} | Receitas: {receitasFiltradas.length} | Despesas: {despesasFiltradas.length}
-          </div>
+          {/* Debug info removido para melhor performance */}
         </div>
 
       {/* Filtros */}
@@ -733,11 +675,8 @@ export default function MeuOrcamentoPage() {
                                   </span>
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-                                    console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
-                                    console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
                                     
                                     if (!orcamento) {
-                                      console.log("⚠️ Orçamento não encontrado para item:", item.nome)
                                       return (
                                         <Badge variant="destructive" className="text-xs">
                                           Orçamento não encontrado
@@ -745,7 +684,6 @@ export default function MeuOrcamentoPage() {
                                       )
                                     }
                                     
-                                    console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
                                     return orcamento?.mes_referencia && (
                                       <Badge variant="outline" className="text-xs">
                                         {formatarMes(orcamento.mes_referencia)}
@@ -804,11 +742,8 @@ export default function MeuOrcamentoPage() {
                                   </span>
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-                                    console.log("🔍 DEBUG MÊS - Item:", item.nome, "orcamento_id:", item.orcamento_id)
-                                    console.log("🔍 DEBUG MÊS - Orçamento encontrado:", orcamento?.mes_referencia, orcamento?.nome)
                                     
                                     if (!orcamento) {
-                                      console.log("⚠️ Orçamento não encontrado para item:", item.nome)
                                       return (
                                         <Badge variant="destructive" className="text-xs">
                                           Orçamento não encontrado
@@ -816,7 +751,6 @@ export default function MeuOrcamentoPage() {
                                       )
                                     }
                                     
-                                    console.log("🔍 DEBUG MÊS - formatarMes resultado:", orcamento?.mes_referencia ? formatarMes(orcamento.mes_referencia) : "N/A")
                                     return orcamento?.mes_referencia && (
                                       <Badge variant="outline" className="text-xs">
                                         {formatarMes(orcamento.mes_referencia)}

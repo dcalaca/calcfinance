@@ -84,14 +84,10 @@ export function useOrcamentosRefatorado() {
   }
 
   useEffect(() => {
-    console.log("🔧 use-orcamentos-refatorado - useEffect executado, user:", user?.email, "financeUser:", financeUser?.email, "authLoading:", authLoading)
     if (user && !authLoading) {
-      console.log("🔧 use-orcamentos-refatorado - Usuário encontrado, verificando cache...")
-      
       // Primeiro, tentar carregar do cache local
       const cachedOrcamentos = loadOrcamentosFromCache(user.id)
       if (cachedOrcamentos) {
-        console.log("🚀 Carregando orçamentos do cache local")
         setOrcamentos(cachedOrcamentos.orcamentos)
         setOrcamentoAtual(cachedOrcamentos.orcamentoAtual)
         setLoading(false)
@@ -104,23 +100,18 @@ export function useOrcamentosRefatorado() {
       // Se não há cache, fazer busca completa no servidor
       fetchOrcamentos()
     } else if (!user && !authLoading) {
-      console.log("🔧 use-orcamentos-refatorado - Nenhum usuário, limpando dados")
       setOrcamentos([])
       setOrcamentoAtual(null)
       clearOrcamentosCache()
       setLoading(false)
-    } else {
-      console.log("🔧 use-orcamentos-refatorado - Aguardando autenticação...")
     }
   }, [user, financeUser, authLoading])
 
   const fetchOrcamentos = async () => {
     if (!user) {
-      console.log("❌ fetchOrcamentos - Nenhum usuário")
       return
     }
 
-    console.log("🔧 fetchOrcamentos - Iniciando busca otimizada...")
     setLoading(true)
     
     try {
@@ -141,22 +132,19 @@ export function useOrcamentosRefatorado() {
       ])
 
       if (orcamentosResult.error) {
-        console.error("❌ Erro ao buscar orçamentos:", orcamentosResult.error)
+        console.error("Erro ao buscar orçamentos:", orcamentosResult.error)
         setLoading(false)
         return
       }
 
       if (itensResult.error) {
-        console.error("❌ Erro ao buscar itens:", itensResult.error)
+        console.error("Erro ao buscar itens:", itensResult.error)
         setLoading(false)
         return
       }
 
       const orcamentosData = orcamentosResult.data || []
       const itensData = itensResult.data || []
-
-      console.log("✅ Orçamentos encontrados:", orcamentosData.length)
-      console.log("✅ Itens encontrados:", itensData.length)
 
       // Combinar orçamentos com seus itens e calcular totais
       const orcamentosComItens: OrcamentoComItens[] = (orcamentosData || []).map((orcamento: OrcamentoComItens) => {
@@ -170,14 +158,6 @@ export function useOrcamentosRefatorado() {
         const totalReceitas = receitas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
         const totalDespesas = despesas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
         const saldo = totalReceitas - totalDespesas
-
-        console.log(`📊 Orçamento ${orcamento.mes_referencia}:`, {
-          receitas: receitas.length,
-          despesas: despesas.length,
-          totalReceitas,
-          totalDespesas,
-          saldo
-        })
 
         return {
           ...orcamento,
@@ -216,8 +196,6 @@ export function useOrcamentosRefatorado() {
     if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
 
     try {
-      console.log("🔧 Criando orçamento:", { mesReferencia, nome, descricao, userId: user.id })
-      
       const { data, error } = await supabase
         .from("calc_orcamentos")
         .insert({
@@ -231,11 +209,9 @@ export function useOrcamentosRefatorado() {
         .single()
 
       if (error) {
-        console.error("❌ Erro ao criar orçamento:", error)
+        console.error("Erro ao criar orçamento:", error)
         throw error
       }
-
-      console.log("✅ Orçamento criado com sucesso:", data)
       
       // Criar orçamento com itens vazios
       const novoOrcamento: OrcamentoComItens = {
