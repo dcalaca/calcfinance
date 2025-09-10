@@ -1,4 +1,4 @@
--- Criar tabela para mensagens de contato
+-- Criar tabela para mensagens de contato (versão simplificada)
 CREATE TABLE IF NOT EXISTS contact_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   nome_completo VARCHAR(255) NOT NULL,
@@ -18,7 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_contact_messages_email ON contact_messages(email)
 CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages(status);
 CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(created_at DESC);
 
--- RLS (Row Level Security) - permitir inserção para todos, leitura apenas para admins
+-- RLS (Row Level Security) - permitir inserção para todos, leitura apenas para usuários autenticados
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
 -- Política para permitir inserção de mensagens (qualquer pessoa pode enviar)
@@ -42,10 +42,3 @@ CREATE POLICY "Permitir atualização de mensagens para usuários autenticados" 
       WHERE calc_users.id = auth.uid()
     )
   );
-
--- Comentários para documentação
-COMMENT ON TABLE contact_messages IS 'Tabela para armazenar mensagens do formulário de contato';
-COMMENT ON COLUMN contact_messages.status IS 'Status da mensagem: pendente, lida, respondida, arquivada';
-COMMENT ON COLUMN contact_messages.user_id IS 'ID do usuário logado (opcional)';
-COMMENT ON COLUMN contact_messages.ip_address IS 'Endereço IP de quem enviou a mensagem';
-COMMENT ON COLUMN contact_messages.user_agent IS 'User agent do navegador';
