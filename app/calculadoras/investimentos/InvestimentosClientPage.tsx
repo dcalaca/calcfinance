@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Target, TrendingUp, BarChart3, Plus, Trash2 } from "lucide-react"
 
 interface Investimento {
@@ -22,8 +23,8 @@ export default function InvestimentosClientPage() {
   const [investimentos, setInvestimentos] = useState<Investimento[]>([])
   const [novoInvestimento, setNovoInvestimento] = useState({
     nome: "",
-    valorInicial: "",
-    contribuicaoMensal: "",
+    valorInicial: 0,
+    contribuicaoMensal: 0,
     taxaJuros: "",
     prazo: "",
     tipo: "",
@@ -55,8 +56,8 @@ export default function InvestimentosClientPage() {
     const investimento: Investimento = {
       id: Date.now(),
       nome: novoInvestimento.nome,
-      valorInicial: Number.parseFloat(novoInvestimento.valorInicial),
-      contribuicaoMensal: Number.parseFloat(novoInvestimento.contribuicaoMensal) || 0,
+      valorInicial: novoInvestimento.valorInicial,
+      contribuicaoMensal: novoInvestimento.contribuicaoMensal || 0,
       taxaJuros: Number.parseFloat(novoInvestimento.taxaJuros),
       prazo: Number.parseInt(novoInvestimento.prazo),
       tipo: novoInvestimento.tipo,
@@ -65,8 +66,8 @@ export default function InvestimentosClientPage() {
     setInvestimentos([...investimentos, investimento])
     setNovoInvestimento({
       nome: "",
-      valorInicial: "",
-      contribuicaoMensal: "",
+      valorInicial: 0,
+      contribuicaoMensal: 0,
       taxaJuros: "",
       prazo: "",
       tipo: "",
@@ -186,24 +187,22 @@ export default function InvestimentosClientPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="valorInicial">Valor Inicial (R$)</Label>
-                  <Input
+                  <Label htmlFor="valorInicial">Valor Inicial</Label>
+                  <CurrencyInput
                     id="valorInicial"
-                    type="number"
-                    placeholder="Ex: 10000"
                     value={novoInvestimento.valorInicial}
-                    onChange={(e) => setNovoInvestimento({ ...novoInvestimento, valorInicial: e.target.value })}
+                    onChange={(value) => setNovoInvestimento({ ...novoInvestimento, valorInicial: value })}
+                    placeholder="R$ 0,00"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="contribuicaoMensal">Contribuição Mensal (R$)</Label>
-                  <Input
+                  <Label htmlFor="contribuicaoMensal">Contribuição Mensal (opcional)</Label>
+                  <CurrencyInput
                     id="contribuicaoMensal"
-                    type="number"
-                    placeholder="Ex: 500 (opcional)"
                     value={novoInvestimento.contribuicaoMensal}
-                    onChange={(e) => setNovoInvestimento({ ...novoInvestimento, contribuicaoMensal: e.target.value })}
+                    onChange={(value) => setNovoInvestimento({ ...novoInvestimento, contribuicaoMensal: value })}
+                    placeholder="R$ 0,00"
                   />
                 </div>
 
