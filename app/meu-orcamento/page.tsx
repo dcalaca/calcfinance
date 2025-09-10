@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -70,7 +70,18 @@ export default function MeuOrcamentoPage() {
   //   }
   // }, [user, authLoading, router])
 
-  if (authLoading || loading) {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Verificando autenticação...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -315,35 +326,46 @@ export default function MeuOrcamentoPage() {
     return true
   })
 
-  // Orçamento atual baseado no filtro de mês
-  const orcamentoAtualFiltrado = filtroMes 
-    ? orcamentos.find(o => o.mes_referencia === filtroMes) || orcamentoAtual
-    : null // Quando "Todos os meses", não há orçamento específico
+  // Orçamento atual baseado no filtro de mês - memoizado
+  const orcamentoAtualFiltrado = useMemo(() => {
+    return filtroMes 
+      ? orcamentos.find(o => o.mes_referencia === filtroMes) || orcamentoAtual
+      : null // Quando "Todos os meses", não há orçamento específico
+  }, [filtroMes, orcamentos, orcamentoAtual])
 
-  // Quando "Todos os meses", somar todos os orçamentos
-  const receitasFiltradas = filtroMes 
-    ? (orcamentoAtualFiltrado?.receitas.filter(item => {
+  // Receitas filtradas - memoizado
+  const receitasFiltradas = useMemo(() => {
+    if (filtroMes) {
+      return (orcamentoAtualFiltrado?.receitas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
       }) || [])
-    : orcamentos.flatMap(o => o.receitas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
+    } else {
+      return orcamentos.flatMap(o => o.receitas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
       })
+    }
+  }, [filtroMes, orcamentoAtualFiltrado, filtroItem, tipoFiltro, orcamentos])
 
-  const despesasFiltradas = filtroMes 
-    ? (orcamentoAtualFiltrado?.despesas.filter(item => {
+  // Despesas filtradas - memoizado
+  const despesasFiltradas = useMemo(() => {
+    if (filtroMes) {
+      return (orcamentoAtualFiltrado?.despesas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
       }) || [])
-    : orcamentos.flatMap(o => o.despesas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
+    } else {
+      return orcamentos.flatMap(o => o.despesas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
       })
+    }
+  }, [filtroMes, orcamentoAtualFiltrado, filtroItem, tipoFiltro, orcamentos])
 
   // Debug logs removidos para melhor performance
 
@@ -388,14 +410,14 @@ export default function MeuOrcamentoPage() {
     })
   }
 
-  // Calcular sobra mensal para projeção de investimento
-  const calcularSobraMensal = () => {
+  // Calcular sobra mensal para projeção de investimento - memoizado
+  const calcularSobraMensal = useMemo(() => {
     const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
     const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
     return totalReceitas - totalDespesas
-  }
+  }, [receitasFiltradas, despesasFiltradas])
 
-  const sobraMensal = calcularSobraMensal()
+  const sobraMensal = calcularSobraMensal
   const temSobra = sobraMensal > 0
 
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Orcamento, OrcamentoItem, OrcamentoComItens } from "@/lib/supabase-types"
 import { useFinanceAuth } from "./use-finance-auth"
@@ -115,21 +115,14 @@ export function useOrcamentosRefatorado() {
     setLoading(true)
     
     try {
-      // Buscar orçamentos e itens em paralelo para melhor performance
-      const [orcamentosResult, itensResult] = await Promise.all([
-        supabase
-          .from("calc_orcamentos")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("status", "ativo")
-          .order("mes_referencia", { ascending: false }),
-        
-        supabase
-          .from("calc_orcamento_itens")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("data", { ascending: false })
-      ])
+      // Primeiro, buscar apenas os orçamentos
+      const orcamentosResult = await supabase
+        .from("calc_orcamentos")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "ativo")
+        .order("mes_referencia", { ascending: false })
+        .limit(10) // Limitar a 10 orçamentos mais recentes
 
       if (orcamentosResult.error) {
         console.error("Erro ao buscar orçamentos:", orcamentosResult.error)
@@ -137,26 +130,49 @@ export function useOrcamentosRefatorado() {
         return
       }
 
+      const orcamentosData = orcamentosResult.data || []
+      
+      if (orcamentosData.length === 0) {
+        setOrcamentos([])
+        setOrcamentoAtual(null)
+        setLoading(false)
+        return
+      }
+
+      // Buscar itens apenas para os orçamentos encontrados
+      const orcamentoIds = orcamentosData.map(o => o.id)
+      const itensResult = await supabase
+        .from("calc_orcamento_itens")
+        .select("*")
+        .eq("user_id", user.id)
+        .in("orcamento_id", orcamentoIds)
+        .order("data", { ascending: false })
+
       if (itensResult.error) {
         console.error("Erro ao buscar itens:", itensResult.error)
         setLoading(false)
         return
       }
 
-      const orcamentosData = orcamentosResult.data || []
       const itensData = itensResult.data || []
 
-      // Combinar orçamentos com seus itens e calcular totais
-      const orcamentosComItens: OrcamentoComItens[] = (orcamentosData || []).map((orcamento: OrcamentoComItens) => {
-        const receitas = itensData.filter((item: OrcamentoItem) => 
-          item.orcamento_id === orcamento.id && item.tipo === "receita"
-        )
-        const despesas = itensData.filter((item: OrcamentoItem) => 
-          item.orcamento_id === orcamento.id && item.tipo === "despesa"
-        )
+      // Otimizar processamento com Map para O(1) lookup
+      const itensPorOrcamento = new Map<string, OrcamentoItem[]>()
+      itensData.forEach((item: OrcamentoItem) => {
+        if (!itensPorOrcamento.has(item.orcamento_id)) {
+          itensPorOrcamento.set(item.orcamento_id, [])
+        }
+        itensPorOrcamento.get(item.orcamento_id)!.push(item)
+      })
 
-        const totalReceitas = receitas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
-        const totalDespesas = despesas.reduce((total: number, item: OrcamentoItem) => total + Number(item.valor), 0)
+      // Combinar orçamentos com seus itens de forma otimizada
+      const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map((orcamento: OrcamentoComItens) => {
+        const itens = itensPorOrcamento.get(orcamento.id) || []
+        const receitas = itens.filter(item => item.tipo === "receita")
+        const despesas = itens.filter(item => item.tipo === "despesa")
+
+        const totalReceitas = receitas.reduce((total, item) => total + Number(item.valor), 0)
+        const totalDespesas = despesas.reduce((total, item) => total + Number(item.valor), 0)
         const saldo = totalReceitas - totalDespesas
 
         return {
@@ -168,8 +184,6 @@ export function useOrcamentosRefatorado() {
           saldo
         }
       })
-
-      console.log("📋 Dados dos orçamentos com itens:", orcamentosComItens)
       
       // Definir orçamento atual (mês atual ou mais recente)
       const hoje = new Date()
