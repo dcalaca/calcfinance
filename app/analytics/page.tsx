@@ -149,30 +149,63 @@ export default function AnalyticsPage() {
     })
   }
 
-  const exportData = () => {
-    const csvContent = [
-      ['Data', 'Página', 'Dispositivo', 'Navegador', 'País', 'Cidade', 'Referrer', 'Session ID'],
-      ...recentVisits.map(visit => [
-        format(new Date(visit.created_at), 'dd/MM/yyyy HH:mm:ss'),
-        visit.page,
-        visit.device || 'N/A',
-        visit.browser || 'N/A',
-        visit.country || 'N/A',
-        visit.city || 'N/A',
-        visit.referrer || 'N/A',
-        visit.session_id
-      ])
-    ].map(row => row.join(',')).join('\n')
+  const exportData = async () => {
+    try {
+      setLoading(true)
+      
+      // Construir parâmetros de filtro
+      const params = new URLSearchParams()
+      if (filters.dateFrom) params.append('dateFrom', filters.dateFrom.toISOString())
+      if (filters.dateTo) params.append('dateTo', filters.dateTo.toISOString())
+      if (filters.device !== 'all') params.append('device', filters.device)
+      if (filters.browser !== 'all') params.append('browser', filters.browser)
+      if (filters.page !== 'all') params.append('page', filters.page)
+      if (filters.country !== 'all') params.append('country', filters.country)
+      if (filters.referrer !== 'all') params.append('referrer', filters.referrer)
+      if (filters.searchTerm) params.append('search', filters.searchTerm)
+      
+      // Buscar TODOS os dados filtrados para exportação
+      const response = await fetch(`/api/analytics/export-data?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error('Erro ao buscar dados para exportação')
+      }
+      
+      const allData = await response.json()
+      
+      const csvContent = [
+        ['Data', 'Página', 'Dispositivo', 'Navegador', 'País', 'Cidade', 'Região', 'Referrer', 'Session ID', 'IP', 'ISP'],
+        ...allData.map((visit: any) => [
+          format(new Date(visit.created_at), 'dd/MM/yyyy HH:mm:ss'),
+          visit.page,
+          visit.device || 'N/A',
+          visit.browser || 'N/A',
+          visit.country || 'N/A',
+          visit.city || 'N/A',
+          visit.region || 'N/A',
+          visit.referrer || 'Acesso Direto',
+          visit.session_id,
+          visit.ip_address || 'N/A',
+          visit.isp || 'N/A'
+        ])
+      ].map(row => row.join(',')).join('\n')
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute('download', `analytics-${format(new Date(), 'yyyy-MM-dd')}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `analytics-filtrado-${format(new Date(), 'yyyy-MM-dd')}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      console.log(`✅ Exportados ${allData.length} registros`)
+    } catch (error) {
+      console.error('❌ Erro ao exportar dados:', error)
+      alert('Erro ao exportar dados. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const getActiveFiltersCount = () => {

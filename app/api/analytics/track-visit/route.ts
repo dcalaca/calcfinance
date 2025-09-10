@@ -145,6 +145,7 @@ export async function GET(request: NextRequest) {
     const browser = searchParams.get('browser')
     const page = searchParams.get('page')
     const country = searchParams.get('country')
+    const referrer = searchParams.get('referrer')
     const search = searchParams.get('search')
 
     // Construir query base
@@ -168,6 +169,21 @@ export async function GET(request: NextRequest) {
     }
     if (country && country !== 'all') {
       query = query.eq('country', country)
+    }
+    if (referrer && referrer !== 'all') {
+      if (referrer === 'direct') {
+        query = query.is('referrer', null)
+      } else if (referrer === 'other') {
+        query = query.not('referrer', 'is', null)
+          .not('referrer', 'ilike', '%google.com%')
+          .not('referrer', 'ilike', '%facebook.com%')
+          .not('referrer', 'ilike', '%instagram.com%')
+          .not('referrer', 'ilike', '%linkedin.com%')
+          .not('referrer', 'ilike', '%twitter.com%')
+          .not('referrer', 'ilike', '%youtube.com%')
+      } else {
+        query = query.ilike('referrer', `%${referrer}%`)
+      }
     }
     if (search) {
       query = query.or(`page.ilike.%${search}%,country.ilike.%${search}%,city.ilike.%${search}%`)
