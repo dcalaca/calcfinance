@@ -140,7 +140,7 @@ export function useOrcamentosRefatorado() {
       }
 
       // Buscar itens apenas para os orçamentos encontrados
-      const orcamentoIds = orcamentosData.map(o => o.id)
+      const orcamentoIds = orcamentosData.map((o: Orcamento) => o.id)
       const itensResult = await supabase
         .from("calc_orcamento_itens")
         .select("*")
