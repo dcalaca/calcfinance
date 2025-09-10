@@ -353,19 +353,21 @@ export default function ConversorMoedasClientPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 items-end">
+            {/* Layout responsivo para seleção de moedas */}
+            <div className="space-y-4">
+              {/* Campo "De" */}
               <div>
                 <Label>De</Label>
                 <Select value={moedaOrigem} onValueChange={setMoedaOrigem}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {moedas.map((moeda) => (
                       <SelectItem key={moeda.code} value={moeda.code}>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{moeda.code}</span>
-                          <span>{moeda.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono text-sm flex-shrink-0">{moeda.code}</span>
+                          <span className="truncate">{moeda.name}</span>
                         </div>
                       </SelectItem>
                     ))}
@@ -373,30 +375,32 @@ export default function ConversorMoedasClientPage() {
                 </Select>
               </div>
 
+              {/* Botão de trocar moedas */}
               <div className="flex justify-center">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={trocarMoedas}
-                  className="mb-2 bg-transparent"
+                  className="bg-transparent"
                   title="Trocar moedas"
                 >
                   <ArrowRightLeft className="w-4 h-4" />
                 </Button>
               </div>
 
+              {/* Campo "Para" */}
               <div>
                 <Label>Para</Label>
                 <Select value={moedaDestino} onValueChange={setMoedaDestino}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {moedas.map((moeda) => (
                       <SelectItem key={moeda.code} value={moeda.code}>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{moeda.code}</span>
-                          <span>{moeda.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono text-sm flex-shrink-0">{moeda.code}</span>
+                          <span className="truncate">{moeda.name}</span>
                         </div>
                       </SelectItem>
                     ))}
@@ -503,13 +507,13 @@ export default function ConversorMoedasClientPage() {
               .filter((moeda) => moeda.code !== "BRL")
               .map((moeda) => (
                 <div key={moeda.code} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex items-center justify-between min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="font-semibold">{moeda.code}</div>
-                      <div className="text-sm text-muted-foreground">{moeda.name}</div>
+                      <div className="text-sm text-muted-foreground truncate">{moeda.name}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-mono">R$ {moeda.rate.toFixed(4)}</div>
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <div className="font-mono text-sm sm:text-base">R$ {moeda.rate.toFixed(4)}</div>
                       <div className="text-sm text-muted-foreground">{moeda.symbol}</div>
                       {moeda.variation && (
                         <div className={`text-xs ${moeda.variation > 0 ? "text-green-600" : "text-red-600"}`}>
