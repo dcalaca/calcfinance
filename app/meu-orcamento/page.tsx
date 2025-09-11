@@ -53,98 +53,83 @@ export default function MeuOrcamentoPage() {
   const [filtroItem, setFiltroItem] = useState("")
   const [tipoFiltro, setTipoFiltro] = useState<"receita" | "despesa" | "todos">("todos")
 
-  // Função simples para buscar itens de receitas e despesas
+  // Função ultra-simples para buscar itens
   const fetchItens = async () => {
-    if (!user) return
+    console.log("🚀 INICIANDO fetchItens - user:", user?.id)
+    
+    if (!user) {
+      console.log("❌ Nenhum usuário, parando")
+      setLoading(false)
+      return
+    }
 
     try {
       setLoading(true)
       setError(null)
       
-      console.log("🔍 Buscando itens para usuário:", user.id)
+      console.log("📡 Fazendo requisição para Supabase...")
       
-      // Buscar todos os itens (receitas e despesas)
-      const { data: itensData, error: itensError } = await supabase
+      const { data, error } = await supabase
         .from("calc_orcamento_itens")
         .select("*")
         .eq("user_id", user.id)
-        .order("data", { ascending: false })
 
-      if (itensError) {
-        console.error("❌ Erro ao buscar itens:", itensError)
-        setError("Erro ao carregar itens")
+      console.log("📊 Resposta do Supabase:", { data: data?.length, error })
+
+      if (error) {
+        console.error("❌ Erro Supabase:", error)
+        setError("Erro: " + error.message)
+        setLoading(false)
         return
       }
 
-      if (!itensData || itensData.length === 0) {
-        console.log("📊 Nenhum item encontrado")
-        setOrcamentos([])
-        return
+      console.log("✅ Dados recebidos:", data?.length || 0, "itens")
+      
+      // Simplificar - apenas mostrar os itens sem agrupamento complexo
+      const itensSimples = data || []
+      
+      // Criar um "orçamento" simples com todos os itens
+      const receitas = itensSimples.filter((item: any) => item.tipo === "receita")
+      const despesas = itensSimples.filter((item: any) => item.tipo === "despesa")
+      
+      const orcamentoSimples = {
+        id: "geral",
+        mes_referencia: "geral",
+        nome: "Todos os Itens",
+        receitas,
+        despesas,
+        total_receitas: receitas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
+        total_despesas: despesas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
+        saldo: 0
       }
-
-      // Separar receitas e despesas
-      const receitas = itensData.filter((item: any) => item.tipo === "receita")
-      const despesas = itensData.filter((item: any) => item.tipo === "despesa")
-
-      // Agrupar por mês para exibição
-      const itensPorMes = itensData.reduce((acc: any, item: any) => {
-        const dataItem = new Date(item.data + 'T00:00:00')
-        const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
-        
-        if (!acc[mesReferencia]) {
-          acc[mesReferencia] = {
-            id: mesReferencia,
-            mes_referencia: mesReferencia,
-            nome: dataItem.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' }),
-            receitas: [],
-            despesas: [],
-            total_receitas: 0,
-            total_despesas: 0,
-            saldo: 0
-          }
-        }
-        
-        if (item.tipo === "receita") {
-          acc[mesReferencia].receitas.push(item)
-        } else {
-          acc[mesReferencia].despesas.push(item)
-        }
-        
-        return acc
-      }, {})
-
-      // Calcular totais para cada mês
-      const orcamentosComItens = Object.values(itensPorMes).map((orcamento: any) => {
-        const totalReceitas = orcamento.receitas.reduce((total: number, item: any) => total + Number(item.valor), 0)
-        const totalDespesas = orcamento.despesas.reduce((total: number, item: any) => total + Number(item.valor), 0)
-        const saldo = totalReceitas - totalDespesas
-
-        return {
-          ...orcamento,
-          total_receitas: totalReceitas,
-          total_despesas: totalDespesas,
-          saldo
-        }
-      })
-
-      console.log("✅ Itens carregados:", orcamentosComItens.length, "meses")
-      setOrcamentos(orcamentosComItens)
+      
+      orcamentoSimples.saldo = orcamentoSimples.total_receitas - orcamentoSimples.total_despesas
+      
+      console.log("✅ Orçamento criado:", orcamentoSimples)
+      setOrcamentos([orcamentoSimples])
       
     } catch (error) {
-      console.error("❌ Erro geral:", error)
-      setError("Erro inesperado ao carregar dados")
+      console.error("💥 ERRO GERAL:", error)
+      setError("Erro: " + (error as Error).message)
     } finally {
+      console.log("🏁 FINALIZANDO - setLoading(false)")
       setLoading(false)
     }
   }
 
   // Carregar dados quando o usuário estiver disponível
   useEffect(() => {
+    console.log("🔄 useEffect executado - user:", !!user, "authLoading:", authLoading)
+    
     if (user && !authLoading) {
+      console.log("✅ Usuário logado, chamando fetchItens...")
       fetchItens()
     } else if (!user && !authLoading) {
+      console.log("❌ Usuário não logado, limpando dados...")
       setOrcamentos([])
       setLoading(false)
+    } else {
+      console.log("⏳ Aguardando... user:", !!user, "authLoading:", authLoading)
     }
   }, [user, authLoading])
 
