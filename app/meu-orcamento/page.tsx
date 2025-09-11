@@ -548,15 +548,6 @@ export default function MeuOrcamentoPage() {
                       <Calendar className="w-5 h-5" />
                       {filtroMes && orcamentoAtualFiltrado ? formatarMes(orcamentoAtualFiltrado.mes_referencia) : "Orçamento Geral"}
                     </CardTitle>
-                    {orcamentoAtualFiltrado && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleFavorite(orcamentoAtualFiltrado.id)}
-                      >
-                        <Star className={`w-4 h-4 ${orcamentoAtualFiltrado.is_favorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                      </Button>
-                    )}
                   </div>
                   <CardDescription>
                     {filtroMes && orcamentoAtualFiltrado ? `Orçamento ${formatarMes(orcamentoAtualFiltrado.mes_referencia)}` : "Orçamento Geral Acumulado"}
