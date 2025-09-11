@@ -26,21 +26,9 @@ export function CalculadorasPageClient() {
 
   const calculators = [
     {
-      id: "juros-compostos",
-      name: "Juros Compostos",
-      description: "Calcule o crescimento do seu dinheiro ao longo do tempo",
-      icon: TrendingUp,
-      category: "Investimentos",
-      href: "/calculadoras/juros-compostos",
-      color: "bg-green-500",
-      textColor: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200"
-    },
-    {
       id: "financiamento",
-      name: "Financiamento",
-      description: "Simule financiamentos imobiliários",
+      name: "Financiamento Imobiliário",
+      description: "Cálculos pela Tabela Price e SAC",
       icon: Home,
       category: "Financiamento",
       href: "/calculadoras/financiamento",
@@ -60,6 +48,18 @@ export function CalculadorasPageClient() {
       textColor: "text-purple-600",
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200"
+    },
+    {
+      id: "juros-compostos",
+      name: "Juros Compostos",
+      description: "Calcule o crescimento do seu dinheiro ao longo do tempo",
+      icon: TrendingUp,
+      category: "Investimentos",
+      href: "/calculadoras/juros-compostos",
+      color: "bg-green-500",
+      textColor: "text-green-600",
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200"
     },
     {
       id: "aposentadoria",
