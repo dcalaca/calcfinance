@@ -1,17 +1,16 @@
 // Service Worker básico e seguro
 const CACHE_NAME = 'calcfy-v1'
-const urlsToCache = [
-  '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css'
-]
 
 // Instalar service worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache)
+        // Só fazer cache da página principal
+        return cache.add('/')
+      })
+      .catch((error) => {
+        console.log('Service Worker: Erro ao fazer cache inicial:', error)
       })
   )
 })
