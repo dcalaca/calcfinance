@@ -85,7 +85,7 @@ export default function MeuOrcamentoPage() {
       }
 
       // Buscar itens para os orçamentos
-      const orcamentoIds = orcamentosData.map(o => o.id)
+      const orcamentoIds = orcamentosData.map((o: any) => o.id)
       const { data: itensData, error: itensError } = await supabase
         .from("calc_orcamento_itens")
         .select("*")
