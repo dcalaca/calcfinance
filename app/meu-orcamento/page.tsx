@@ -426,11 +426,23 @@ export default function MeuOrcamentoPage() {
           month: 'long' 
         })
         
-        await criarOrcamento(
-          mesReferencia, 
-          nomeOrcamento, 
-          `Orçamento ${nomeOrcamento}`
-        )
+        const { data: novoOrcamento, error: orcamentoError } = await supabase
+          .from("calc_orcamentos")
+          .insert({
+            user_id: user.id,
+            mes_referencia: mesReferencia,
+            nome: nomeOrcamento,
+            descricao: `Orçamento ${nomeOrcamento}`,
+            status: "ativo"
+          })
+          .select()
+          .single()
+
+        if (orcamentoError) {
+          console.error("Erro ao criar orçamento:", orcamentoError)
+          toast.error("Erro ao criar orçamento")
+          return
+        }
       }
       
       // Recarregar dados
