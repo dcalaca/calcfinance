@@ -33,11 +33,17 @@ export function useFinanceCalculations() {
       console.error("Erro ao buscar cálculos:", error)
     } else {
       // Mapear os dados para o formato esperado
-      const mappedData = (data || []).map(calc => ({
-        ...calc,
-        type: calc.calculation_type, // Mapear calculation_type para type
-        inputs: calc.input_data,     // Mapear input_data para inputs
-        results: calc.result_data    // Mapear result_data para results
+      const mappedData = (data || []).map((calc: any): FinanceCalculation => ({
+        id: calc.id,
+        user_id: calc.user_id,
+        type: calc.calculation_type as FinanceCalculation["type"],
+        title: calc.title,
+        inputs: calc.input_data,
+        results: calc.result_data,
+        tags: calc.tags,
+        is_favorite: calc.is_favorite,
+        created_at: calc.created_at,
+        updated_at: calc.updated_at
       }))
       setCalculations(mappedData)
     }
