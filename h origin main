@@ -1,0 +1,5 @@
+[33m992aaf4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m  URGENTE: Simplificar autenticação para resolver lentidão geral
+[33m157ebb9[m  Fix: Adicionar propriedades faltantes no orcamentoSimples
+[33mfc1d88f[m  Debug: Versão ultra-simplificada com logs detalhados para debug
+[33mff6a2a7[m  Fix: Corrigir loading infinito na autenticação com timeout
+[33m34467bd[m  Remove: Campo 'Orçamento não encontrado' desnecessário

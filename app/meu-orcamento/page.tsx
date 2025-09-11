@@ -499,6 +499,114 @@ export default function MeuOrcamentoPage() {
         </div>
       </div>
 
+      {/* Botão para adicionar item - MOVIDO PARA O TOPO */}
+      <div className="mb-6">
+        <Button 
+          className="w-full md:w-auto" 
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          disabled={!orcamentoAtualFiltrado && !!filtroMes}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {mostrarFormulario ? "Ocultar Formulário" : "Adicionar Item"}
+        </Button>
+      </div>
+
+      {/* Formulário para adicionar item - MOVIDO PARA O TOPO */}
+      {mostrarFormulario && (orcamentoAtualFiltrado || !filtroMes) && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Adicionar Item</CardTitle>
+            <CardDescription>
+              Adicione uma nova receita ou despesa ao seu orçamento
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="tipo">Tipo *</Label>
+                <Select
+                  value={novoItem.tipo}
+                  onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="receita">Receita</SelectItem>
+                    <SelectItem value="despesa">Despesa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="categoria">Categoria *</Label>
+                <Select
+                  value={novoItem.categoria}
+                  onValueChange={(value) => setNovoItem({ ...novoItem, categoria: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {novoItem.tipo === "receita" 
+                      ? categoriasReceitas.map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))
+                      : categoriasDespesas.map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="nome">Nome *</Label>
+                <Input
+                  id="nome"
+                  value={novoItem.nome}
+                  onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
+                  placeholder="Ex: Salário, Aluguel, Supermercado"
+                />
+              </div>
+              <div>
+                <Label htmlFor="valor">Valor *</Label>
+                <CurrencyInput
+                  value={novoItem.valor}
+                  onChange={(value) => setNovoItem({ ...novoItem, valor: value })}
+                  placeholder="0,00"
+                />
+              </div>
+              <div>
+                <Label htmlFor="data">Data</Label>
+                <Input
+                  id="data"
+                  type="date"
+                  value={novoItem.data}
+                  onChange={(e) => setNovoItem({ ...novoItem, data: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="observacoes">Observações</Label>
+                <Input
+                  id="observacoes"
+                  value={novoItem.observacoes}
+                  onChange={(e) => setNovoItem({ ...novoItem, observacoes: e.target.value })}
+                  placeholder="Observações opcionais"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleAdicionarItem}>
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar
+              </Button>
+              <Button variant="outline" onClick={() => setMostrarFormulario(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {!orcamentoAtualFiltrado && filtroMes ? (
         <Card>
           <CardContent className="p-8 text-center">
@@ -653,19 +761,6 @@ export default function MeuOrcamentoPage() {
               />
             )}
 
-            {/* Botão para adicionar item */}
-            <Card className="mt-4">
-              <CardContent className="p-4">
-                <Button 
-                  className="w-full" 
-                  onClick={() => setMostrarFormulario(!mostrarFormulario)}
-                  disabled={!orcamentoAtualFiltrado && !!filtroMes}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Item
-                </Button>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Lista de Itens */}
@@ -804,101 +899,6 @@ export default function MeuOrcamentoPage() {
         </div>
       )}
 
-      {/* Formulário para adicionar item */}
-      {mostrarFormulario && (orcamentoAtualFiltrado || !filtroMes) && (
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Adicionar Item</CardTitle>
-            <CardDescription>
-              Adicione uma nova receita ou despesa ao seu orçamento
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="tipo">Tipo *</Label>
-                <Select
-                  value={novoItem.tipo}
-                  onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="receita">Receita</SelectItem>
-                    <SelectItem value="despesa">Despesa</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="categoria">Categoria *</Label>
-                <Select
-                  value={novoItem.categoria}
-                  onValueChange={(value) => setNovoItem({ ...novoItem, categoria: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {novoItem.tipo === "receita" 
-                      ? categoriasReceitas.map(cat => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))
-                      : categoriasDespesas.map(cat => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))
-                    }
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="nome">Nome *</Label>
-                <Input
-                  id="nome"
-                  value={novoItem.nome}
-                  onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
-                  placeholder="Ex: Salário, Aluguel, Supermercado"
-                />
-              </div>
-              <div>
-                <Label htmlFor="valor">Valor *</Label>
-                <CurrencyInput
-                  value={novoItem.valor}
-                  onChange={(value) => setNovoItem({ ...novoItem, valor: value })}
-                  placeholder="0,00"
-                />
-              </div>
-              <div>
-                <Label htmlFor="data">Data</Label>
-                <Input
-                  id="data"
-                  type="date"
-                  value={novoItem.data}
-                  onChange={(e) => setNovoItem({ ...novoItem, data: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="observacoes">Observações</Label>
-                <Input
-                  id="observacoes"
-                  value={novoItem.observacoes}
-                  onChange={(e) => setNovoItem({ ...novoItem, observacoes: e.target.value })}
-                  placeholder="Observações opcionais"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAdicionarItem}>
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar
-              </Button>
-              <Button variant="outline" onClick={() => setMostrarFormulario(false)}>
-                Cancelar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
 
       </div>
