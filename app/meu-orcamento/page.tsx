@@ -81,12 +81,42 @@ export default function MeuOrcamentoPage() {
     )
   }
 
-  if (loading) {
+  // Timeout para evitar loading infinito
+  const [loadingTimeout, setLoadingTimeout] = useState(false)
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        setLoadingTimeout(true)
+      }
+    }, 8000) // 8 segundos
+
+    return () => clearTimeout(timer)
+  }, [loading])
+
+  if (loading && !loadingTimeout) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-slate-600">Carregando seus orçamentos...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loadingTimeout) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="h-8 w-8 text-orange-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Carregamento Lento</h2>
+          <p className="text-slate-600 mb-4">Os dados estão demorando para carregar. Tente recarregar a página.</p>
+          <Button onClick={() => window.location.reload()}>
+            Recarregar Página
+          </Button>
         </div>
       </div>
     )

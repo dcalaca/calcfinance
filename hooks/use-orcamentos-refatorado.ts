@@ -9,8 +9,8 @@ import { useFinanceAuth } from "./use-finance-auth"
 const ORCAMENTOS_CACHE_KEY = 'calcfy_orcamentos_cache'
 const ORCAMENTOS_TIMESTAMP_KEY = 'calcfy_orcamentos_timestamp'
 
-// Tempo de cache em milissegundos (5 minutos)
-const CACHE_DURATION = 5 * 60 * 1000
+// Tempo de cache em milissegundos (10 minutos)
+const CACHE_DURATION = 10 * 60 * 1000
 
 interface OrcamentosCache {
   orcamentos: OrcamentoComItens[]
@@ -193,9 +193,6 @@ export function useOrcamentosRefatorado() {
     }
   }
 
-  // Memoizar fetchOrcamentos para evitar loops infinitos
-  const fetchOrcamentosMemo = useCallback(fetchOrcamentos, [user])
-
   useEffect(() => {
     console.log("🔄 useEffect: user:", !!user, "authLoading:", authLoading)
     
@@ -209,18 +206,20 @@ export function useOrcamentosRefatorado() {
         setOrcamentoAtual(cachedOrcamentos.orcamentoAtual)
         setLoading(false)
         
-        // Validar no servidor em background (sem bloquear a UI)
-        // Usar setTimeout para evitar loop infinito
-        setTimeout(() => {
-          console.log("🔄 useEffect: Validando no servidor em background...")
-          fetchOrcamentosMemo()
-        }, 100)
+        // Validar no servidor em background apenas se o cache for muito antigo (mais de 2 minutos)
+        const cacheAge = Date.now() - cachedOrcamentos.timestamp
+        if (cacheAge > 2 * 60 * 1000) { // 2 minutos
+          console.log("🔄 useEffect: Cache antigo, validando no servidor em background...")
+          setTimeout(() => {
+            fetchOrcamentos()
+          }, 100)
+        }
         return
       }
       
       // Se não há cache, fazer busca completa no servidor
       console.log("🔄 useEffect: Sem cache, buscando no servidor...")
-      fetchOrcamentosMemo()
+      fetchOrcamentos()
     } else if (!user && !authLoading) {
       console.log("🚫 useEffect: Usuário não logado, limpando dados...")
       setOrcamentos([])
@@ -228,7 +227,7 @@ export function useOrcamentosRefatorado() {
       clearOrcamentosCache()
       setLoading(false)
     }
-  }, [user, financeUser, authLoading, fetchOrcamentosMemo])
+  }, [user, financeUser, authLoading])
 
   const criarOrcamento = async (mesReferencia: string, nome: string, descricao?: string) => {
     if (!user) throw new Error("Favor entrar ou se cadastrar para usufruir do site")
@@ -264,8 +263,8 @@ export function useOrcamentosRefatorado() {
       setOrcamentos(prev => [novoOrcamento, ...prev])
       setOrcamentoAtual(novoOrcamento)
       
-      // Limpar cache para forçar atualização
-      clearOrcamentosCache()
+      // Atualizar cache com os novos dados
+      saveOrcamentosToCache([novoOrcamento, ...orcamentos], novoOrcamento, user.id)
       
       return novoOrcamento
     } catch (error) {
@@ -319,8 +318,30 @@ export function useOrcamentosRefatorado() {
         return orcamento
       }))
 
-      // Limpar cache para forçar atualização
-      clearOrcamentosCache()
+      // Atualizar cache com os novos dados
+      const orcamentosAtualizados = orcamentos.map(orcamento => {
+        if (orcamento.id === orcamentoId) {
+          const novaLista = item.tipo === "receita" 
+            ? [...orcamento.receitas, data]
+            : [...orcamento.despesas, data]
+
+          const totalReceitas = novaLista.filter(i => i.tipo === "receita").reduce((acc, i) => acc + Number(i.valor), 0)
+          const totalDespesas = novaLista.filter(i => i.tipo === "despesa").reduce((acc, i) => acc + Number(i.valor), 0)
+          const saldo = totalReceitas - totalDespesas
+
+          return {
+            ...orcamento,
+            [item.tipo === "receita" ? "receitas" : "despesas"]: novaLista,
+            total_receitas: totalReceitas,
+            total_despesas: totalDespesas,
+            saldo: saldo
+          }
+        }
+        return orcamento
+      })
+      
+      const orcamentoAtualNovo = orcamentosAtualizados.find(o => o.id === orcamentoAtual?.id) || orcamentoAtual
+      saveOrcamentosToCache(orcamentosAtualizados, orcamentoAtualNovo, user.id)
 
       return data
     } catch (error) {
@@ -349,7 +370,7 @@ export function useOrcamentosRefatorado() {
       console.log("✅ Item removido com sucesso")
       
       // Atualizar estado local
-      setOrcamentos(prev => prev.map(orcamento => {
+      const orcamentosAtualizados = orcamentos.map(orcamento => {
         if (orcamento.id === orcamentoId) {
           const novaLista = (tipo === "receita" ? orcamento.receitas : orcamento.despesas)
             .filter(item => item.id !== itemId)
@@ -367,10 +388,13 @@ export function useOrcamentosRefatorado() {
           }
         }
         return orcamento
-      }))
+      })
+      
+      setOrcamentos(orcamentosAtualizados)
 
-      // Limpar cache para forçar atualização
-      clearOrcamentosCache()
+      // Atualizar cache com os novos dados
+      const orcamentoAtualNovo = orcamentosAtualizados.find(o => o.id === orcamentoAtual?.id) || orcamentoAtual
+      saveOrcamentosToCache(orcamentosAtualizados, orcamentoAtualNovo, user.id)
 
     } catch (error) {
       console.error("❌ Erro ao remover item:", error)
