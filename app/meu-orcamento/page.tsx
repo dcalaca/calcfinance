@@ -100,7 +100,7 @@ export default function MeuOrcamentoPage() {
       }
 
       // Combinar dados
-      const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map(orcamento => {
+      const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map((orcamento: any) => {
         const itens = itensData?.filter(item => item.orcamento_id === orcamento.id) || []
         const receitas = itens.filter(item => item.tipo === "receita")
         const despesas = itens.filter(item => item.tipo === "despesa")
