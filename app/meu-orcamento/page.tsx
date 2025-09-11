@@ -8,9 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useOrcamentosRefatorado } from "@/hooks/use-orcamentos-refatorado"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 import type { OrcamentoComItens } from "@/lib/supabase-types"
 import { 
   Plus, 
@@ -34,19 +33,11 @@ import Link from "next/link"
 
 export default function MeuOrcamentoPage() {
   const { user, loading: authLoading } = useFinanceAuth()
-  const router = useRouter()
-  const {
-    orcamentos,
-    orcamentoAtual,
-    loading,
-    criarOrcamento,
-    adicionarItem,
-    removerItem,
-    toggleFavorite,
-    fetchOrcamentos
-  } = useOrcamentosRefatorado()
-
-  // Debug logs removidos para melhor performance
+  
+  // Estados simplificados
+  const [orcamentos, setOrcamentos] = useState<OrcamentoComItens[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const [novoItem, setNovoItem] = useState({
     nome: "",
@@ -62,13 +53,92 @@ export default function MeuOrcamentoPage() {
   const [filtroItem, setFiltroItem] = useState("")
   const [tipoFiltro, setTipoFiltro] = useState<"receita" | "despesa" | "todos">("todos")
 
+  // Função simples para buscar orçamentos
+  const fetchOrcamentos = async () => {
+    if (!user) return
 
-  // Remover verificação de autenticação - deixar o middleware cuidar disso
-  // useEffect(() => {
-  //   if (!authLoading && !user) {
-  //     router.push("/login")
-  //   }
-  // }, [user, authLoading, router])
+    try {
+      setLoading(true)
+      setError(null)
+      
+      console.log("🔍 Buscando orçamentos para usuário:", user.id)
+      
+      // Buscar orçamentos
+      const { data: orcamentosData, error: orcamentosError } = await supabase
+        .from("calc_orcamentos")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "ativo")
+        .order("mes_referencia", { ascending: false })
+        .limit(10)
+
+      if (orcamentosError) {
+        console.error("❌ Erro ao buscar orçamentos:", orcamentosError)
+        setError("Erro ao carregar orçamentos")
+        return
+      }
+
+      if (!orcamentosData || orcamentosData.length === 0) {
+        console.log("📊 Nenhum orçamento encontrado")
+        setOrcamentos([])
+        return
+      }
+
+      // Buscar itens para os orçamentos
+      const orcamentoIds = orcamentosData.map(o => o.id)
+      const { data: itensData, error: itensError } = await supabase
+        .from("calc_orcamento_itens")
+        .select("*")
+        .eq("user_id", user.id)
+        .in("orcamento_id", orcamentoIds)
+        .order("data", { ascending: false })
+
+      if (itensError) {
+        console.error("❌ Erro ao buscar itens:", itensError)
+        setError("Erro ao carregar itens dos orçamentos")
+        return
+      }
+
+      // Combinar dados
+      const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map(orcamento => {
+        const itens = itensData?.filter(item => item.orcamento_id === orcamento.id) || []
+        const receitas = itens.filter(item => item.tipo === "receita")
+        const despesas = itens.filter(item => item.tipo === "despesa")
+
+        const totalReceitas = receitas.reduce((total, item) => total + Number(item.valor), 0)
+        const totalDespesas = despesas.reduce((total, item) => total + Number(item.valor), 0)
+        const saldo = totalReceitas - totalDespesas
+
+        return {
+          ...orcamento,
+          receitas,
+          despesas,
+          total_receitas: totalReceitas,
+          total_despesas: totalDespesas,
+          saldo
+        }
+      })
+
+      console.log("✅ Orçamentos carregados:", orcamentosComItens.length)
+      setOrcamentos(orcamentosComItens)
+      
+    } catch (error) {
+      console.error("❌ Erro geral:", error)
+      setError("Erro inesperado ao carregar dados")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Carregar dados quando o usuário estiver disponível
+  useEffect(() => {
+    if (user && !authLoading) {
+      fetchOrcamentos()
+    } else if (!user && !authLoading) {
+      setOrcamentos([])
+      setLoading(false)
+    }
+  }, [user, authLoading])
 
   if (authLoading) {
     return (
@@ -81,20 +151,7 @@ export default function MeuOrcamentoPage() {
     )
   }
 
-  // Timeout para evitar loading infinito
-  const [loadingTimeout, setLoadingTimeout] = useState(false)
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
-        setLoadingTimeout(true)
-      }
-    }, 8000) // 8 segundos
-
-    return () => clearTimeout(timer)
-  }, [loading])
-
-  if (loading && !loadingTimeout) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -105,17 +162,17 @@ export default function MeuOrcamentoPage() {
     )
   }
 
-  if (loadingTimeout) {
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Calendar className="h-8 w-8 text-orange-600" />
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="h-8 w-8 text-red-600" />
           </div>
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">Carregamento Lento</h2>
-          <p className="text-slate-600 mb-4">Os dados estão demorando para carregar. Tente recarregar a página.</p>
-          <Button onClick={() => window.location.reload()}>
-            Recarregar Página
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">Erro ao Carregar</h2>
+          <p className="text-slate-600 mb-4">{error}</p>
+          <Button onClick={() => fetchOrcamentos()}>
+            Tentar Novamente
           </Button>
         </div>
       </div>
@@ -192,31 +249,12 @@ export default function MeuOrcamentoPage() {
     }
 
     try {
-      const item = {
-        nome: novoItem.nome,
-        valor: Number(novoItem.valor),
-        categoria: novoItem.categoria,
-        tipo: novoItem.tipo,
-        data: novoItem.data,
-        observacoes: novoItem.observacoes
-      }
-
       // Determinar o orçamento baseado na data do item
-      const dataItem = new Date(novoItem.data + 'T00:00:00') // Forçar timezone local
+      const dataItem = new Date(novoItem.data + 'T00:00:00')
       const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
       
-      // Debug logs removidos para melhor performance
-      
-      // Buscar orçamento existente para o mês ou criar um novo
+      // Buscar orçamento existente para o mês
       let orcamentoParaUsar = orcamentos.find(o => o.mes_referencia === mesReferencia)
-      // Verificar se o orçamento encontrado é realmente do mês correto
-      if (orcamentoParaUsar) {
-        const mesOrcamento = new Date(orcamentoParaUsar.mes_referencia)
-        const mesItem = new Date(mesReferencia)
-        if (mesOrcamento.getMonth() !== mesItem.getMonth() || mesOrcamento.getFullYear() !== mesItem.getFullYear()) {
-          orcamentoParaUsar = undefined
-        }
-      }
       
       if (!orcamentoParaUsar) {
         // Criar novo orçamento automaticamente
@@ -224,10 +262,60 @@ export default function MeuOrcamentoPage() {
           year: 'numeric', 
           month: 'long' 
         })
-        orcamentoParaUsar = await criarOrcamento(mesReferencia, nomeOrcamento, `Orçamento ${nomeOrcamento}`)
+        
+        const { data: novoOrcamento, error: orcamentoError } = await supabase
+          .from("calc_orcamentos")
+          .insert({
+            user_id: user.id,
+            mes_referencia: mesReferencia,
+            nome: nomeOrcamento,
+            descricao: `Orçamento ${nomeOrcamento}`,
+            status: "ativo"
+          })
+          .select()
+          .single()
+
+        if (orcamentoError) {
+          console.error("Erro ao criar orçamento:", orcamentoError)
+          toast.error("Erro ao criar orçamento")
+          return
+        }
+
+        orcamentoParaUsar = {
+          ...novoOrcamento,
+          receitas: [],
+          despesas: [],
+          total_receitas: 0,
+          total_despesas: 0,
+          saldo: 0
+        }
       }
 
-      await adicionarItem(orcamentoParaUsar.id, item)
+      // Adicionar item
+      const { data: itemData, error: itemError } = await supabase
+        .from("calc_orcamento_itens")
+        .insert({
+          orcamento_id: orcamentoParaUsar.id,
+          user_id: user.id,
+          nome: novoItem.nome,
+          valor: Number(novoItem.valor),
+          categoria: novoItem.categoria,
+          tipo: novoItem.tipo,
+          data: novoItem.data,
+          observacoes: novoItem.observacoes
+        })
+        .select()
+        .single()
+
+      if (itemError) {
+        console.error("Erro ao adicionar item:", itemError)
+        toast.error("Erro ao adicionar item")
+        return
+      }
+
+      // Recarregar dados
+      await fetchOrcamentos()
+      
       setNovoItem({
         nome: "",
         valor: 0,
@@ -245,26 +333,26 @@ export default function MeuOrcamentoPage() {
   }
 
   const handleRemoverItem = async (itemId: string, tipo: "receita" | "despesa") => {
-    // Encontrar o orçamento que contém o item
-    let orcamentoParaRemover: OrcamentoComItens | null = orcamentoAtualFiltrado
-    
-    if (!orcamentoParaRemover) {
-      // Se não há orçamento filtrado, buscar o orçamento que contém o item
-      const orcamentoEncontrado = orcamentos.find(orcamento => {
-        const itens = [...orcamento.receitas, ...orcamento.despesas]
-        return itens.some(item => item.id === itemId)
-      })
-      
-      orcamentoParaRemover = orcamentoEncontrado || null
-    }
-    
-    if (!orcamentoParaRemover) {
-      toast.error("Orçamento não encontrado para este item")
+    if (!user) {
+      toast.error("Usuário não logado")
       return
     }
 
     try {
-      await removerItem(orcamentoParaRemover.id, itemId, tipo)
+      const { error } = await supabase
+        .from("calc_orcamento_itens")
+        .delete()
+        .eq("id", itemId)
+        .eq("user_id", user.id)
+
+      if (error) {
+        console.error("Erro ao remover item:", error)
+        toast.error("Erro ao remover item")
+        return
+      }
+
+      // Recarregar dados
+      await fetchOrcamentos()
       toast.success("Item removido com sucesso!")
     } catch (error) {
       console.error("Erro ao remover item:", error)
@@ -350,7 +438,7 @@ export default function MeuOrcamentoPage() {
     }
   }
 
-  // Funções de filtro
+  // Funções de filtro simplificadas
   const orcamentosFiltrados = orcamentos.filter(orcamento => {
     if (filtroMes && !orcamento.mes_referencia.includes(filtroMes)) return false
     return true
@@ -358,17 +446,17 @@ export default function MeuOrcamentoPage() {
 
   // Orçamento atual baseado no filtro de mês
   const orcamentoAtualFiltrado = filtroMes 
-    ? orcamentos.find(o => o.mes_referencia === filtroMes) || orcamentoAtual
-    : null // Quando "Todos os meses", não há orçamento específico
+    ? orcamentos.find(o => o.mes_referencia === filtroMes) || null
+    : null
 
   // Receitas filtradas
   const receitasFiltradas = (() => {
-    if (filtroMes) {
-      return (orcamentoAtualFiltrado?.receitas.filter(item => {
+    if (filtroMes && orcamentoAtualFiltrado) {
+      return orcamentoAtualFiltrado.receitas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
-      }) || [])
+      })
     } else {
       return orcamentos.flatMap(o => o.receitas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
@@ -380,12 +468,12 @@ export default function MeuOrcamentoPage() {
 
   // Despesas filtradas
   const despesasFiltradas = (() => {
-    if (filtroMes) {
-      return (orcamentoAtualFiltrado?.despesas.filter(item => {
+    if (filtroMes && orcamentoAtualFiltrado) {
+      return orcamentoAtualFiltrado.despesas.filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
         if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
         return true
-      }) || [])
+      })
     } else {
       return orcamentos.flatMap(o => o.despesas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
         if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
