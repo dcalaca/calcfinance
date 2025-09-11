@@ -718,14 +718,6 @@ export default function MeuOrcamentoPage() {
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
                                     
-                                    if (!orcamento) {
-                                      return (
-                                        <Badge variant="destructive" className="text-xs">
-                                          Orçamento não encontrado
-                                        </Badge>
-                                      )
-                                    }
-                                    
                                     return orcamento?.mes_referencia && (
                                       <Badge variant="outline" className="text-xs">
                                         {formatarMes(orcamento.mes_referencia)}
@@ -784,14 +776,6 @@ export default function MeuOrcamentoPage() {
                                   </span>
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-                                    
-                                    if (!orcamento) {
-                                      return (
-                                        <Badge variant="destructive" className="text-xs">
-                                          Orçamento não encontrado
-                                        </Badge>
-                                      )
-                                    }
                                     
                                     return orcamento?.mes_referencia && (
                                       <Badge variant="outline" className="text-xs">
