@@ -237,22 +237,43 @@ export default function MeuOrcamentoPage() {
   ]
 
   const handleAdicionarItem = async () => {
+    console.log("🚀 INICIANDO handleAdicionarItem")
+    console.log("👤 User:", user?.id)
+    console.log("📝 Novo item:", novoItem)
+    
     if (!user) {
+      console.log("❌ Usuário não logado")
       toast.error("Favor entrar ou se cadastrar para usufruir do site")
       return
     }
 
     if (!novoItem.nome || novoItem.valor <= 0 || !novoItem.categoria) {
+      console.log("❌ Campos obrigatórios não preenchidos")
       toast.error("Preencha todos os campos obrigatórios")
       return
     }
 
     try {
-      // Primeiro, verificar se existe um orçamento ativo para o mês atual
+      console.log("✅ Validações passaram, iniciando processo...")
+      // Buscar ou criar um orçamento padrão para o usuário
       let orcamentoId = null
       
-      if (orcamentos.length === 0) {
-        // Criar um orçamento para o mês atual se não existir
+      // Primeiro, tentar buscar um orçamento existente
+      const { data: orcamentosExistentes, error: buscaError } = await supabase
+        .from("calc_orcamentos")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("status", "ativo")
+        .limit(1)
+
+      if (buscaError) {
+        console.error("Erro ao buscar orçamentos:", buscaError)
+      }
+
+      if (orcamentosExistentes && orcamentosExistentes.length > 0) {
+        orcamentoId = orcamentosExistentes[0].id
+      } else {
+        // Criar um orçamento padrão se não existir
         const mesAtual = new Date().toISOString().slice(0, 7) // YYYY-MM
         const { data: novoOrcamento, error: orcamentoError } = await supabase
           .from("calc_orcamentos")
@@ -272,12 +293,9 @@ export default function MeuOrcamentoPage() {
         }
         
         orcamentoId = novoOrcamento.id
-      } else {
-        // Usar o primeiro orçamento ativo
-        orcamentoId = orcamentos[0].id
       }
 
-      // Adicionar item na tabela de itens com orcamento_id
+      // Adicionar item na tabela de itens
       const { data: itemData, error: itemError } = await supabase
         .from("calc_orcamento_itens")
         .insert({
@@ -295,6 +313,16 @@ export default function MeuOrcamentoPage() {
 
       if (itemError) {
         console.error("Erro ao adicionar item:", itemError)
+        console.error("Dados enviados:", {
+          orcamento_id: orcamentoId,
+          user_id: user.id,
+          nome: novoItem.nome,
+          valor: Number(novoItem.valor),
+          categoria: novoItem.categoria,
+          tipo: novoItem.tipo,
+          data: novoItem.data,
+          observacoes: novoItem.observacoes
+        })
         toast.error("Erro ao adicionar item")
         return
       }
