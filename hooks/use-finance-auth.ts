@@ -94,129 +94,72 @@ export function useFinanceAuth() {
 
   useEffect(() => {
     console.log("🔧 Hook de autenticação iniciado")
-    console.log("🔧 Supabase configurado:", isSupabaseConfigured())
     
     if (!isSupabaseConfigured()) {
-      console.log("❌ Supabase não configurado, definindo loading como false")
+      console.log("❌ Supabase não configurado")
       setLoading(false)
       return
     }
 
-    // Timeout de segurança para evitar loading infinito
+    // Timeout muito mais curto - 3 segundos apenas
     const timeoutId = setTimeout(() => {
-      console.log("⏰ Timeout de autenticação atingido, parando loading")
+      console.log("⏰ Timeout de autenticação - 3 segundos")
       setLoading(false)
-    }, 10000) // 10 segundos
+    }, 3000)
 
-    // Primeiro, tentar carregar do cache local
-    const cachedAuth = loadFromCache()
-    if (cachedAuth) {
-      console.log("🚀 Carregando do cache local:", cachedAuth.user?.email || "Nenhum")
-      setUser(cachedAuth.user)
-      setFinanceUser(cachedAuth.financeUser)
-      setLoading(false)
-      clearTimeout(timeoutId)
-      
-      // Validar no servidor em background (sem bloquear a UI)
-      validateWithServer()
-      return
+    // Busca ULTRA SIMPLES - apenas uma verificação
+    const checkAuth = async () => {
+      try {
+        console.log("🔍 Verificação simples de auth...")
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (user) {
+          console.log("✅ Usuário encontrado:", user.email)
+          setUser(user)
+          setFinanceUser(user) // Simplificar - usar apenas user
+        } else {
+          console.log("❌ Nenhum usuário")
+          setUser(null)
+          setFinanceUser(null)
+        }
+      } catch (error) {
+        console.error("❌ Erro na verificação:", error)
+        setUser(null)
+        setFinanceUser(null)
+      } finally {
+        console.log("🏁 Finalizando auth - setLoading(false)")
+        setLoading(false)
+        clearTimeout(timeoutId)
+      }
     }
 
-    // Se não há cache, fazer validação completa no servidor
-    validateWithServer().finally(() => {
-      clearTimeout(timeoutId)
-    })
-
+    checkAuth()
     return () => clearTimeout(timeoutId)
   }, [])
 
-  // Função para validar com o servidor (sem bloquear a UI)
-  const validateWithServer = async () => {
-    try {
-      console.log("🔍 Validando autenticação com servidor...")
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log("🔍 Usuário do servidor:", user?.email || "Nenhum")
-      
-      if (user) {
-        // Buscar dados completos do usuário na tabela calc_users
-        const { data: userProfile, error: profileError } = await supabase
-          .from('calc_users')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        
-        const financeUserData = profileError ? user : { ...user, ...userProfile }
-        
-        // Atualizar estado e cache
-        setUser(user)
-        setFinanceUser(financeUserData)
-        saveToCache(user, financeUserData)
-        setLoading(false)
-        
-        console.log("✅ Validação do servidor concluída")
-      } else {
-        // Usuário não está logado no servidor
-        setUser(null)
-        setFinanceUser(null)
-        clearCache()
-        setLoading(false)
-        console.log("❌ Usuário não encontrado no servidor")
-      }
-    } catch (error) {
-      console.error("❌ Erro na validação do servidor:", error)
-      setLoading(false)
-      // Em caso de erro, manter o cache local se existir
-    }
-  }
 
-  // Listen for auth changes
+  // Listen for auth changes - SIMPLIFICADO
   useEffect(() => {
     if (!isSupabaseConfigured()) return
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-      console.log("🔄 Mudança de estado de autenticação:", event, session?.user ? "Usuário logado" : "Usuário deslogado")
-      console.log("👤 Usuário da sessão:", session?.user?.email)
+    } = supabase.auth.onAuthStateChange((event: any, session: any) => {
+      console.log("🔄 Auth change:", event)
       
-      // Se for um evento de SIGNED_OUT, garantir que o estado seja limpo
       if (event === 'SIGNED_OUT') {
-        console.log("🚪 Evento SIGNED_OUT detectado, limpando estado...")
         setUser(null)
         setFinanceUser(null)
-        clearCache()
         setLoading(false)
         return
       }
       
       setUser(session?.user ?? null)
-      
-      if (session?.user) {
-        console.log("✅ Usuário definido:", session.user.email)
-        
-        // Buscar dados completos do usuário na tabela calc_users
-        const { data: userProfile, error: profileError } = await supabase
-          .from('calc_users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-        
-        const financeUserData = profileError ? session.user : { ...session.user, ...userProfile }
-        
-        setFinanceUser(financeUserData)
-        saveToCache(session.user, financeUserData)
-      } else {
-        console.log("❌ Nenhum usuário na sessão")
-        setFinanceUser(null)
-        clearCache()
-      }
-      
+      setFinanceUser(session?.user ?? null)
       setLoading(false)
     })
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   const signUp = async (email: string, password: string, fullName?: string) => {
