@@ -32,7 +32,14 @@ export function useFinanceCalculations() {
     if (error) {
       console.error("Erro ao buscar cálculos:", error)
     } else {
-      setCalculations(data || [])
+      // Mapear os dados para o formato esperado
+      const mappedData = (data || []).map(calc => ({
+        ...calc,
+        type: calc.calculation_type, // Mapear calculation_type para type
+        inputs: calc.input_data,     // Mapear input_data para inputs
+        results: calc.result_data    // Mapear result_data para results
+      }))
+      setCalculations(mappedData)
     }
     setLoading(false)
   }
@@ -60,7 +67,14 @@ export function useFinanceCalculations() {
       .single()
 
     if (!error && data) {
-      setCalculations((prev) => [data, ...prev])
+      // Mapear os dados para o formato esperado
+      const mappedData = {
+        ...data,
+        type: data.calculation_type,
+        inputs: data.input_data,
+        results: data.result_data
+      }
+      setCalculations((prev) => [mappedData, ...prev])
     }
 
     return { data, error }
