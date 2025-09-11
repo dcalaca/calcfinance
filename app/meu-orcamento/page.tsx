@@ -248,10 +248,40 @@ export default function MeuOrcamentoPage() {
     }
 
     try {
-      // Adicionar item diretamente na tabela de itens
+      // Primeiro, verificar se existe um orçamento ativo para o mês atual
+      let orcamentoId = null
+      
+      if (orcamentos.length === 0) {
+        // Criar um orçamento para o mês atual se não existir
+        const mesAtual = new Date().toISOString().slice(0, 7) // YYYY-MM
+        const { data: novoOrcamento, error: orcamentoError } = await supabase
+          .from("calc_orcamentos")
+          .insert({
+            user_id: user.id,
+            mes_referencia: `${mesAtual}-01`,
+            nome: `Orçamento ${mesAtual}`,
+            status: "ativo"
+          })
+          .select()
+          .single()
+
+        if (orcamentoError) {
+          console.error("Erro ao criar orçamento:", orcamentoError)
+          toast.error("Erro ao criar orçamento")
+          return
+        }
+        
+        orcamentoId = novoOrcamento.id
+      } else {
+        // Usar o primeiro orçamento ativo
+        orcamentoId = orcamentos[0].id
+      }
+
+      // Adicionar item na tabela de itens com orcamento_id
       const { data: itemData, error: itemError } = await supabase
         .from("calc_orcamento_itens")
         .insert({
+          orcamento_id: orcamentoId,
           user_id: user.id,
           nome: novoItem.nome,
           valor: Number(novoItem.valor),
