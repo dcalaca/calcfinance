@@ -1,6 +1,28 @@
-// SERVICE WORKER TEMPORARIAMENTE DESABILITADO
-// Devido a problemas no Vercel (erro 503)
+// Service Worker básico e seguro
+const CACHE_NAME = 'calcfy-v1'
+const urlsToCache = [
+  '/',
+  '/static/js/bundle.js',
+  '/static/css/main.css'
+]
 
-console.log('Service Worker carregado mas desabilitado temporariamente')
+// Instalar service worker
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(urlsToCache)
+      })
+  )
+})
 
-// Não fazer nada - deixar o browser carregar normalmente
+// Interceptar requisições
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Retornar do cache se disponível, senão buscar da rede
+        return response || fetch(event.request)
+      })
+  )
+})
