@@ -53,73 +53,81 @@ export default function MeuOrcamentoPage() {
   const [filtroItem, setFiltroItem] = useState("")
   const [tipoFiltro, setTipoFiltro] = useState<"receita" | "despesa" | "todos">("todos")
 
-  // Função simples para buscar orçamentos
-  const fetchOrcamentos = async () => {
+  // Função simples para buscar itens de receitas e despesas
+  const fetchItens = async () => {
     if (!user) return
 
     try {
       setLoading(true)
       setError(null)
       
-      console.log("🔍 Buscando orçamentos para usuário:", user.id)
+      console.log("🔍 Buscando itens para usuário:", user.id)
       
-      // Buscar orçamentos
-      const { data: orcamentosData, error: orcamentosError } = await supabase
-        .from("calc_orcamentos")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("status", "ativo")
-        .order("mes_referencia", { ascending: false })
-        .limit(10)
-
-      if (orcamentosError) {
-        console.error("❌ Erro ao buscar orçamentos:", orcamentosError)
-        setError("Erro ao carregar orçamentos")
-        return
-      }
-
-      if (!orcamentosData || orcamentosData.length === 0) {
-        console.log("📊 Nenhum orçamento encontrado")
-        setOrcamentos([])
-        return
-      }
-
-      // Buscar itens para os orçamentos
-      const orcamentoIds = orcamentosData.map((o: any) => o.id)
+      // Buscar todos os itens (receitas e despesas)
       const { data: itensData, error: itensError } = await supabase
         .from("calc_orcamento_itens")
         .select("*")
         .eq("user_id", user.id)
-        .in("orcamento_id", orcamentoIds)
         .order("data", { ascending: false })
 
       if (itensError) {
         console.error("❌ Erro ao buscar itens:", itensError)
-        setError("Erro ao carregar itens dos orçamentos")
+        setError("Erro ao carregar itens")
         return
       }
 
-      // Combinar dados
-      const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map((orcamento: any) => {
-        const itens = itensData?.filter((item: any) => item.orcamento_id === orcamento.id) || []
-        const receitas = itens.filter((item: any) => item.tipo === "receita")
-        const despesas = itens.filter((item: any) => item.tipo === "despesa")
+      if (!itensData || itensData.length === 0) {
+        console.log("📊 Nenhum item encontrado")
+        setOrcamentos([])
+        return
+      }
 
-        const totalReceitas = receitas.reduce((total: number, item: any) => total + Number(item.valor), 0)
-        const totalDespesas = despesas.reduce((total: number, item: any) => total + Number(item.valor), 0)
+      // Separar receitas e despesas
+      const receitas = itensData.filter((item: any) => item.tipo === "receita")
+      const despesas = itensData.filter((item: any) => item.tipo === "despesa")
+
+      // Agrupar por mês para exibição
+      const itensPorMes = itensData.reduce((acc: any, item: any) => {
+        const dataItem = new Date(item.data + 'T00:00:00')
+        const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
+        
+        if (!acc[mesReferencia]) {
+          acc[mesReferencia] = {
+            id: mesReferencia,
+            mes_referencia: mesReferencia,
+            nome: dataItem.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' }),
+            receitas: [],
+            despesas: [],
+            total_receitas: 0,
+            total_despesas: 0,
+            saldo: 0
+          }
+        }
+        
+        if (item.tipo === "receita") {
+          acc[mesReferencia].receitas.push(item)
+        } else {
+          acc[mesReferencia].despesas.push(item)
+        }
+        
+        return acc
+      }, {})
+
+      // Calcular totais para cada mês
+      const orcamentosComItens = Object.values(itensPorMes).map((orcamento: any) => {
+        const totalReceitas = orcamento.receitas.reduce((total: number, item: any) => total + Number(item.valor), 0)
+        const totalDespesas = orcamento.despesas.reduce((total: number, item: any) => total + Number(item.valor), 0)
         const saldo = totalReceitas - totalDespesas
 
         return {
           ...orcamento,
-          receitas,
-          despesas,
           total_receitas: totalReceitas,
           total_despesas: totalDespesas,
           saldo
         }
       })
 
-      console.log("✅ Orçamentos carregados:", orcamentosComItens.length)
+      console.log("✅ Itens carregados:", orcamentosComItens.length, "meses")
       setOrcamentos(orcamentosComItens)
       
     } catch (error) {
@@ -133,7 +141,7 @@ export default function MeuOrcamentoPage() {
   // Carregar dados quando o usuário estiver disponível
   useEffect(() => {
     if (user && !authLoading) {
-      fetchOrcamentos()
+      fetchItens()
     } else if (!user && !authLoading) {
       setOrcamentos([])
       setLoading(false)
@@ -249,58 +257,10 @@ export default function MeuOrcamentoPage() {
     }
 
     try {
-      // Determinar o orçamento baseado na data do item
-      const dataItem = new Date(novoItem.data + 'T00:00:00')
-      const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
-      
-      // Buscar orçamento existente para o mês
-      let orcamentoParaUsar = orcamentos.find(o => o.mes_referencia === mesReferencia)
-      
-      if (!orcamentoParaUsar) {
-        // Criar novo orçamento automaticamente
-        const nomeOrcamento = dataItem.toLocaleDateString('pt-BR', { 
-          year: 'numeric', 
-          month: 'long' 
-        })
-        
-        const { data: novoOrcamento, error: orcamentoError } = await supabase
-          .from("calc_orcamentos")
-          .insert({
-            user_id: user.id,
-            mes_referencia: mesReferencia,
-            nome: nomeOrcamento,
-            descricao: `Orçamento ${nomeOrcamento}`,
-            status: "ativo"
-          })
-          .select()
-          .single()
-
-        if (orcamentoError) {
-          console.error("Erro ao criar orçamento:", orcamentoError)
-          toast.error("Erro ao criar orçamento")
-          return
-        }
-
-        orcamentoParaUsar = {
-          ...novoOrcamento,
-          receitas: [],
-          despesas: [],
-          total_receitas: 0,
-          total_despesas: 0,
-          saldo: 0
-        }
-      }
-
-      // Adicionar item
-      if (!orcamentoParaUsar) {
-        toast.error("Erro ao encontrar orçamento")
-        return
-      }
-
+      // Adicionar item diretamente na tabela de itens
       const { data: itemData, error: itemError } = await supabase
         .from("calc_orcamento_itens")
         .insert({
-          orcamento_id: orcamentoParaUsar.id,
           user_id: user.id,
           nome: novoItem.nome,
           valor: Number(novoItem.valor),
@@ -319,7 +279,7 @@ export default function MeuOrcamentoPage() {
       }
 
       // Recarregar dados
-      await fetchOrcamentos()
+      await fetchItens()
       
       setNovoItem({
         nome: "",
@@ -357,7 +317,7 @@ export default function MeuOrcamentoPage() {
       }
 
       // Recarregar dados
-      await fetchOrcamentos()
+      await fetchItens()
       toast.success("Item removido com sucesso!")
     } catch (error) {
       console.error("Erro ao remover item:", error)
@@ -393,67 +353,6 @@ export default function MeuOrcamentoPage() {
   }
 
 
-  const handleCriarOrcamentosFaltantes = async () => {
-    try {
-      // Buscar todos os itens que têm orcamento_id mas o orçamento não existe
-      const itensOrfaos = receitasFiltradas.concat(despesasFiltradas).filter(item => {
-        const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
-        return !orcamento
-      })
-      
-      if (itensOrfaos.length === 0) {
-        toast.info("Nenhum item órfão encontrado")
-        return
-      }
-      
-      // Agrupar por data para criar orçamentos
-      const itensPorData = itensOrfaos.reduce((acc, item) => {
-        const dataItem = new Date(item.data + 'T00:00:00')
-        const mesReferencia = `${dataItem.getFullYear()}-${String(dataItem.getMonth() + 1).padStart(2, '0')}-01`
-        
-        if (!acc[mesReferencia]) {
-          acc[mesReferencia] = []
-        }
-        acc[mesReferencia].push(item)
-        return acc
-      }, {} as Record<string, any[]>)
-      
-      // Criar orçamentos para cada mês
-      for (const [mesReferencia, itens] of Object.entries(itensPorData)) {
-        const dataItem = new Date(mesReferencia)
-        const nomeOrcamento = dataItem.toLocaleDateString('pt-BR', { 
-          year: 'numeric', 
-          month: 'long' 
-        })
-        
-        const { data: novoOrcamento, error: orcamentoError } = await supabase
-          .from("calc_orcamentos")
-          .insert({
-            user_id: user.id,
-            mes_referencia: mesReferencia,
-            nome: nomeOrcamento,
-            descricao: `Orçamento ${nomeOrcamento}`,
-            status: "ativo"
-          })
-          .select()
-          .single()
-
-        if (orcamentoError) {
-          console.error("Erro ao criar orçamento:", orcamentoError)
-          toast.error("Erro ao criar orçamento")
-          return
-        }
-      }
-      
-      // Recarregar dados
-      await fetchOrcamentos()
-      toast.success("Orçamentos criados com sucesso!")
-      
-    } catch (error) {
-      console.error("Erro ao criar orçamentos:", error)
-      toast.error("Erro ao criar orçamentos")
-    }
-  }
 
   // Funções de filtro simplificadas
   const orcamentosFiltrados = orcamentos.filter(orcamento => {
@@ -1035,28 +934,6 @@ export default function MeuOrcamentoPage() {
         </Card>
       )}
 
-      {/* Botão para criar orçamentos faltantes */}
-      {receitasFiltradas.concat(despesasFiltradas).some(item => !orcamentos.find(o => o.id === item.orcamento_id)) && (
-        <Card className="mt-4">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-orange-600">⚠️ Orçamentos Faltantes</h3>
-                <p className="text-sm text-muted-foreground">
-                  Alguns itens não têm orçamento associado. Clique para criar automaticamente.
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                onClick={handleCriarOrcamentosFaltantes}
-                className="text-orange-600 border-orange-600 hover:bg-orange-50"
-              >
-                Criar Orçamentos
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       </div>
     </div>
