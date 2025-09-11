@@ -292,6 +292,11 @@ export default function MeuOrcamentoPage() {
       }
 
       // Adicionar item
+      if (!orcamentoParaUsar) {
+        toast.error("Erro ao encontrar orçamento")
+        return
+      }
+
       const { data: itemData, error: itemError } = await supabase
         .from("calc_orcamento_itens")
         .insert({
