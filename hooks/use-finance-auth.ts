@@ -102,6 +102,12 @@ export function useFinanceAuth() {
       return
     }
 
+    // Timeout de segurança para evitar loading infinito
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ Timeout de autenticação atingido, parando loading")
+      setLoading(false)
+    }, 10000) // 10 segundos
+
     // Primeiro, tentar carregar do cache local
     const cachedAuth = loadFromCache()
     if (cachedAuth) {
@@ -109,6 +115,7 @@ export function useFinanceAuth() {
       setUser(cachedAuth.user)
       setFinanceUser(cachedAuth.financeUser)
       setLoading(false)
+      clearTimeout(timeoutId)
       
       // Validar no servidor em background (sem bloquear a UI)
       validateWithServer()
@@ -116,7 +123,11 @@ export function useFinanceAuth() {
     }
 
     // Se não há cache, fazer validação completa no servidor
-    validateWithServer()
+    validateWithServer().finally(() => {
+      clearTimeout(timeoutId)
+    })
+
+    return () => clearTimeout(timeoutId)
   }, [])
 
   // Função para validar com o servidor (sem bloquear a UI)
@@ -140,6 +151,7 @@ export function useFinanceAuth() {
         setUser(user)
         setFinanceUser(financeUserData)
         saveToCache(user, financeUserData)
+        setLoading(false)
         
         console.log("✅ Validação do servidor concluída")
       } else {
@@ -147,10 +159,12 @@ export function useFinanceAuth() {
         setUser(null)
         setFinanceUser(null)
         clearCache()
+        setLoading(false)
         console.log("❌ Usuário não encontrado no servidor")
       }
     } catch (error) {
       console.error("❌ Erro na validação do servidor:", error)
+      setLoading(false)
       // Em caso de erro, manter o cache local se existir
     }
   }
