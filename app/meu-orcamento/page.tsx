@@ -179,7 +179,7 @@ export default function MeuOrcamentoPage() {
           </div>
           <h2 className="text-xl font-semibold text-slate-900 mb-2">Erro ao Carregar</h2>
           <p className="text-slate-600 mb-4">{error}</p>
-          <Button onClick={() => fetchOrcamentos()}>
+          <Button onClick={() => fetchItens()}>
             Tentar Novamente
           </Button>
         </div>
