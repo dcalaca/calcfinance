@@ -86,22 +86,32 @@ async function fetchBitcoin() {
 
 export async function GET() {
   try {
-    console.log('🔄 Buscando dados reais de mercado...')
+    console.log('🔄 Buscando dados de mercado com timeout...')
     
-    // Buscar todos os dados em paralelo
-    const [currencyData, selic, ipca, bitcoinData] = await Promise.allSettled([
+    // Timeout de 10 segundos para evitar 503
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Timeout')), 10000)
+    )
+    
+    // Buscar dados com timeout
+    const dataPromise = Promise.allSettled([
       fetchCurrencyRates(),
       fetchSELIC(),
       fetchIPCA(),
       fetchBitcoin()
     ])
     
+    const [currencyData, selic, ipca, bitcoinData] = await Promise.race([
+      dataPromise,
+      timeoutPromise
+    ]) as any[]
+    
     // Processar resultados
-    const dolar = currencyData.status === 'fulfilled' ? currencyData.value.dolar : 5.25
-    const euro = currencyData.status === 'fulfilled' ? currencyData.value.euro : 5.68
-    const bitcoin = bitcoinData.status === 'fulfilled' ? bitcoinData.value.price : 42500
-    const selicRate = selic.status === 'fulfilled' ? selic.value : 11.75
-    const ipcaRate = ipca.status === 'fulfilled' ? ipca.value : 4.62
+    const dolar = currencyData?.status === 'fulfilled' ? currencyData.value.dolar : 5.25
+    const euro = currencyData?.status === 'fulfilled' ? currencyData.value.euro : 5.68
+    const bitcoin = bitcoinData?.status === 'fulfilled' ? bitcoinData.value.price : 42500
+    const selicRate = selic?.status === 'fulfilled' ? selic.value : 11.75
+    const ipcaRate = ipca?.status === 'fulfilled' ? ipca.value : 4.62
     
     const marketData = {
       dolar: Math.round(dolar * 100) / 100,
@@ -109,10 +119,9 @@ export async function GET() {
       bitcoin: Math.round(bitcoin),
       selic: Math.round(selicRate * 100) / 100,
       ipca: Math.round(ipcaRate * 100) / 100,
-      // Adicionar variações reais se disponíveis
-      dolarVariation: currencyData.status === 'fulfilled' ? currencyData.value.dolarVariation : 0,
-      euroVariation: currencyData.status === 'fulfilled' ? currencyData.value.euroVariation : 0,
-      bitcoinVariation: bitcoinData.status === 'fulfilled' ? bitcoinData.value.change : 0,
+      dolarVariation: currencyData?.status === 'fulfilled' ? currencyData.value.dolarVariation : 0,
+      euroVariation: currencyData?.status === 'fulfilled' ? currencyData.value.euroVariation : 0,
+      bitcoinVariation: bitcoinData?.status === 'fulfilled' ? bitcoinData.value.change : 0,
       lastUpdated: new Date().toISOString()
     }
     
