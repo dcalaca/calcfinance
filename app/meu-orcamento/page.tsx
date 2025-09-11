@@ -94,13 +94,19 @@ export default function MeuOrcamentoPage() {
       
       const orcamentoSimples = {
         id: "geral",
+        user_id: user.id,
         mes_referencia: "geral",
         nome: "Todos os Itens",
+        descricao: "Todos os itens de receitas e despesas",
         receitas,
         despesas,
         total_receitas: receitas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
         total_despesas: despesas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
-        saldo: 0
+        saldo: 0,
+        status: "ativo" as const,
+        is_favorite: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
       
       orcamentoSimples.saldo = orcamentoSimples.total_receitas - orcamentoSimples.total_despesas
