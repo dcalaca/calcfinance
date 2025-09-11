@@ -40,7 +40,7 @@ export function CalculadorasPageClient() {
     {
       id: "financiamento",
       name: "Financiamento",
-      description: "Simule financiamentos imobiliários e veiculares",
+      description: "Simule financiamentos imobiliários",
       icon: Home,
       category: "Financiamento",
       href: "/calculadoras/financiamento",
