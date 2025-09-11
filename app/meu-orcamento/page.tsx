@@ -101,12 +101,12 @@ export default function MeuOrcamentoPage() {
 
       // Combinar dados
       const orcamentosComItens: OrcamentoComItens[] = orcamentosData.map((orcamento: any) => {
-        const itens = itensData?.filter(item => item.orcamento_id === orcamento.id) || []
-        const receitas = itens.filter(item => item.tipo === "receita")
-        const despesas = itens.filter(item => item.tipo === "despesa")
+        const itens = itensData?.filter((item: any) => item.orcamento_id === orcamento.id) || []
+        const receitas = itens.filter((item: any) => item.tipo === "receita")
+        const despesas = itens.filter((item: any) => item.tipo === "despesa")
 
-        const totalReceitas = receitas.reduce((total, item) => total + Number(item.valor), 0)
-        const totalDespesas = despesas.reduce((total, item) => total + Number(item.valor), 0)
+        const totalReceitas = receitas.reduce((total: number, item: any) => total + Number(item.valor), 0)
+        const totalDespesas = despesas.reduce((total: number, item: any) => total + Number(item.valor), 0)
         const saldo = totalReceitas - totalDespesas
 
         return {
