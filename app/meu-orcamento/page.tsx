@@ -276,17 +276,29 @@ export default function MeuOrcamentoPage() {
         console.error("Erro ao buscar orçamentos:", buscaError)
       }
 
-      if (orcamentosExistentes && orcamentosExistentes.length > 0) {
-        orcamentoId = orcamentosExistentes[0].id
+      // Determinar o mês baseado na data do item
+      const dataItem = novoItem.data // Formato YYYY-MM-DD
+      const mesItem = dataItem.slice(0, 7) // YYYY-MM
+      
+      // Buscar orçamento específico para o mês do item
+      const { data: orcamentoMesItem } = await supabase
+        .from("calc_orcamentos")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("mes_referencia", `${mesItem}-01`)
+        .single()
+
+      if (orcamentoMesItem) {
+        // Usar orçamento específico do mês se existir
+        orcamentoId = orcamentoMesItem.id
       } else {
-        // Criar um orçamento padrão se não existir
-        const mesAtual = new Date().toISOString().slice(0, 7) // YYYY-MM
+        // Criar um orçamento para o mês do item
         const { data: novoOrcamento, error: orcamentoError } = await supabase
           .from("calc_orcamentos")
           .insert({
             user_id: user.id,
-            mes_referencia: `${mesAtual}-01`,
-            nome: `Orçamento ${mesAtual}`,
+            mes_referencia: `${mesItem}-01`,
+            nome: `Orçamento ${mesItem}`,
             status: "ativo"
           })
           .select()
