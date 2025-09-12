@@ -16,6 +16,14 @@ export interface CFPTransaction {
   createdAt: Date
 }
 
+// Função para converter Date para string no formato YYYY-MM-DD sem problemas de timezone
+const formatDateForDB = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function useCFPTransactions() {
   const { user, loading: authLoading } = useFinanceAuth()
   const [transactions, setTransactions] = useState<CFPTransaction[]>([])
@@ -120,7 +128,7 @@ export function useCFPTransactions() {
           valor: transaction.amount,
           categoria: transaction.category,
           tipo: transaction.type,
-          data: transaction.date.toISOString().split('T')[0],
+          data: formatDateForDB(transaction.date),
           observacoes: transaction.observations
         })
         .select()
@@ -200,7 +208,7 @@ export function useCFPTransactions() {
       if (updates.amount !== undefined) updateData.valor = updates.amount
       if (updates.category) updateData.categoria = updates.category
       if (updates.type) updateData.tipo = updates.type
-      if (updates.date) updateData.data = updates.date.toISOString().split('T')[0]
+      if (updates.date) updateData.data = formatDateForDB(updates.date)
       if (updates.observations !== undefined) updateData.observacoes = updates.observations
 
       const { data, error } = await supabase
