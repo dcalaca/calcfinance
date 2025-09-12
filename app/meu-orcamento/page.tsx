@@ -44,7 +44,7 @@ export default function MeuOrcamentoPage() {
     valor: 0,
     categoria: "",
     tipo: "despesa" as "receita" | "despesa",
-    data: new Date().toISOString().split('T')[0],
+    data: new Date().toLocaleDateString('pt-CA'), // Formato YYYY-MM-DD sem timezone
     observacoes: ""
   })
 
@@ -335,11 +335,14 @@ export default function MeuOrcamentoPage() {
         valor: 0,
         categoria: "",
         tipo: "despesa",
-        data: new Date().toISOString().split('T')[0],
+        data: new Date().toLocaleDateString('pt-CA'), // Formato YYYY-MM-DD sem timezone
         observacoes: ""
       })
       setMostrarFormulario(false)
       toast.success("Item adicionado com sucesso!")
+      
+      // Scroll para o topo da página
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       console.error("Erro ao adicionar item:", error)
       toast.error("Erro ao adicionar item")
@@ -394,6 +397,11 @@ export default function MeuOrcamentoPage() {
     
     // Criar data local (mês é 0-indexado, então subtrair 1)
     const date = new Date(ano, mes - 1, dia)
+    
+    // Verificar se a data é válida
+    if (isNaN(date.getTime())) {
+      return `${mes.toString().padStart(2, '0')}/${ano.toString().slice(-2)}`
+    }
     
     return date.toLocaleDateString('pt-BR', { 
       year: '2-digit', 
