@@ -36,7 +36,7 @@ const nextConfig = {
     // Otimizações de bundle (removido optimizeCss que pode causar problemas com critters)
   },
   
-  // Headers de segurança
+  // Headers de segurança e cache
   async headers() {
     return [
       {
@@ -53,6 +53,19 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
@@ -28,11 +28,17 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const { user, signOut } = useFinanceAuth()
   
   // Verificar se é o usuário autorizado para ver Analytics
   const isAuthorizedForAnalytics = user?.email === 'dcalaca@gmail.com'
+
+  // Garantir que o componente seja hidratado no cliente
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSignOut = async () => {
     try {
@@ -44,6 +50,54 @@ export function Header() {
       // Mesmo com erro, limpar o estado local
       window.location.href = '/'
     }
+  }
+
+  // Renderizar apenas quando montado no cliente para evitar problemas de hidratação
+  if (!mounted) {
+    return (
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
+          <div className="flex w-full items-center justify-between py-4">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/logooriginal.png"
+                  alt="CalcFy - Calculadoras Financeiras Gratuitas"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </Link>
+            </div>
+            <div className="hidden md:flex md:items-center md:space-x-6">
+              {navigation.map((item) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.name}</span>
+                  </Link>
+                )
+              })}
+            </div>
+            <div className="hidden md:flex md:items-center md:space-x-4">
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" asChild>
+                  <Link href="/login">Entrar</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/registro">Cadastrar</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+    )
   }
 
   return (
