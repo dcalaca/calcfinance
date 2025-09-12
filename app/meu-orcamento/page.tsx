@@ -385,11 +385,36 @@ export default function MeuOrcamentoPage() {
 
 
   const formatarMes = (data: string) => {
+    // Verificar se data existe e tem formato válido
+    if (!data || typeof data !== 'string') {
+      return 'Data inválida'
+    }
+    
+    // Se for "geral", retornar "Geral"
+    if (data === 'geral') {
+      return 'Geral'
+    }
+    
     // Dividir a data em partes para evitar problemas de timezone
-    const [ano, mes, dia] = data.split('-').map(Number)
+    const partes = data.split('-')
+    if (partes.length !== 3) {
+      return 'Data inválida'
+    }
+    
+    const [ano, mes, dia] = partes.map(Number)
+    
+    // Verificar se os números são válidos
+    if (isNaN(ano) || isNaN(mes) || isNaN(dia)) {
+      return 'Data inválida'
+    }
     
     // Criar data local (mês é 0-indexado, então subtrair 1)
     const date = new Date(ano, mes - 1, dia)
+    
+    // Verificar se a data é válida
+    if (isNaN(date.getTime())) {
+      return `${mes.toString().padStart(2, '0')}/${ano.toString()}`
+    }
     
     return date.toLocaleDateString('pt-BR', { 
       year: 'numeric', 
