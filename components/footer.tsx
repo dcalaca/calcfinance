@@ -74,14 +74,6 @@ export function Footer() {
                   Conversor de Moedas
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/calculadoras/orcamento"
-                  className="hover:text-white transition-colors text-sm sm:text-base"
-                >
-                  Orçamento Mensal
-                </Link>
-              </li>
             </ul>
           </div>
 
