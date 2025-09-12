@@ -300,6 +300,15 @@ export default function MeuOrcamentoPage() {
     }
 
     try {
+      // Garantir que a data esteja no formato correto (yyyy-mm-dd)
+      let dataFormatada = novoItem.data || new Date().toISOString().split('T')[0]
+      
+      // Se a data estiver no formato brasileiro (dd/mm/yyyy), converter para ISO
+      if (dataFormatada.includes('/')) {
+        const [dia, mes, ano] = dataFormatada.split('/')
+        dataFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
+      }
+
       const { data, error } = await supabase
         .from('calc_orcamento_itens')
         .insert([{
@@ -307,7 +316,7 @@ export default function MeuOrcamentoPage() {
           valor: novoItem.valor,
           categoria: novoItem.categoria,
           tipo: novoItem.tipo,
-          data: novoItem.data || new Date().toISOString().split('T')[0],
+          data: dataFormatada,
           observacoes: novoItem.observacoes || '',
           user_id: user?.id
         }])
@@ -575,11 +584,13 @@ export default function MeuOrcamentoPage() {
                   <Label htmlFor="valor">Valor</Label>
                   <Input
                     id="valor"
-                    type="number"
-                    step="0.01"
-                    value={novoItem.valor}
-                    onChange={(e) => setNovoItem({ ...novoItem, valor: Number(e.target.value) })}
-                    placeholder="0,00"
+                    type="text"
+                    value={novoItem.valor ? formatarMoeda(novoItem.valor) : ''}
+                    onChange={(e) => {
+                      const valor = e.target.value.replace(/[^\d,]/g, '').replace(',', '.')
+                      setNovoItem({ ...novoItem, valor: valor ? Number(valor) : 0 })
+                    }}
+                    placeholder="R$ 0,00"
                   />
                 </div>
                 <div>
