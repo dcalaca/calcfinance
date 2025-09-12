@@ -532,36 +532,58 @@ export default function MeuOrcamentoPage() {
   // Debug logs removidos para melhor performance
 
   // Dados para o gráfico mensal - agrupar por mês e somar valores
-  const dadosGrafico = orcamentos.reduce((acc, orcamento) => {
-    const mesKey = orcamento.mes_referencia
-    const mesFormatado = formatarMesAbreviado(orcamento.mes_referencia)
-    
-    if (!acc[mesKey]) {
-      acc[mesKey] = {
-        mes: mesFormatado,
-        receitas: 0,
-        despesas: 0,
+  const dadosGrafico = (() => {
+    if (filtroMes) {
+      // Se há filtro de mês, mostrar apenas os dados filtrados
+      const receitasFiltradas = receitasFiltradas
+      const despesasFiltradas = despesasFiltradas
+      
+      return [{
+        mes: formatarMesAbreviado(filtroMes),
+        receitas: receitasFiltradas.reduce((total, item) => total + (item?.valor || 0), 0),
+        despesas: despesasFiltradas.reduce((total, item) => total + (item?.valor || 0), 0),
         saldo: 0
-      }
+      }].map(item => ({
+        ...item,
+        saldo: item.receitas - item.despesas
+      }))
+    } else {
+      // Se não há filtro, mostrar todos os meses
+      const dados = orcamentos.reduce((acc, orcamento) => {
+        const mesKey = orcamento.mes_referencia
+        const mesFormatado = formatarMesAbreviado(orcamento.mes_referencia)
+        
+        if (!acc[mesKey]) {
+          acc[mesKey] = {
+            mes: mesFormatado,
+            receitas: 0,
+            despesas: 0,
+            saldo: 0
+          }
+        }
+        
+        // Somar receitas e despesas de todos os orçamentos do mesmo mês
+        acc[mesKey].receitas += (orcamento.receitas || []).reduce((total, item) => total + (item?.valor || 0), 0)
+        acc[mesKey].despesas += (orcamento.despesas || []).reduce((total, item) => total + (item?.valor || 0), 0)
+        acc[mesKey].saldo = acc[mesKey].receitas - acc[mesKey].despesas
+        
+        return acc
+      }, {} as Record<string, { mes: string; receitas: number; despesas: number; saldo: number }>)
+
+      // Converter para array e ordenar
+      return Object.values(dados).sort((a, b) => {
+        const orcamentoA = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === a.mes)
+        const orcamentoB = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === b.mes)
+        
+        if (!orcamentoA || !orcamentoB) return 0
+        
+        return new Date(orcamentoA.mes_referencia).getTime() - new Date(orcamentoB.mes_referencia).getTime()
+      })
     }
-    
-    // Somar receitas e despesas de todos os orçamentos do mesmo mês
-    acc[mesKey].receitas += (orcamento.receitas || []).reduce((total, item) => total + (item?.valor || 0), 0)
-    acc[mesKey].despesas += (orcamento.despesas || []).reduce((total, item) => total + (item?.valor || 0), 0)
-    acc[mesKey].saldo = acc[mesKey].receitas - acc[mesKey].despesas
-    
-    return acc
-  }, {} as Record<string, { mes: string; receitas: number; despesas: number; saldo: number }>)
+  })()
 
   // Converter para array e ordenar
-  const dadosGraficoArray = Object.values(dadosGrafico).sort((a, b) => {
-    const orcamentoA = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === a.mes)
-    const orcamentoB = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === b.mes)
-    
-    if (!orcamentoA || !orcamentoB) return 0
-    
-    return new Date(orcamentoA.mes_referencia).getTime() - new Date(orcamentoB.mes_referencia).getTime()
-  })
+  const dadosGraficoArray = dadosGrafico
 
   // Debug logs removidos para melhor performance
 
