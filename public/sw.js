@@ -1,27 +1,18 @@
-// Service Worker básico e seguro
-const CACHE_NAME = 'calcfy-v1'
+// Service Worker desabilitado temporariamente para resolver problemas de cache
+// const CACHE_NAME = 'calcfy-v1'
 
 // Instalar service worker
 self.addEventListener('install', (event) => {
+  // Não fazer cache para evitar problemas de MIME type
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        // Só fazer cache da página principal
-        return cache.add('/')
-      })
-      .catch((error) => {
-        console.log('Service Worker: Erro ao fazer cache inicial:', error)
-      })
+    Promise.resolve()
   )
 })
 
 // Interceptar requisições
 self.addEventListener('fetch', (event) => {
+  // Sempre buscar da rede, sem cache
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Retornar do cache se disponível, senão buscar da rede
-        return response || fetch(event.request)
-      })
+    fetch(event.request)
   )
 })

@@ -9,6 +9,9 @@ export function useAnalytics() {
   useEffect(() => {
     const trackVisit = async () => {
       try {
+        // Verificar se está no cliente
+        if (typeof window === 'undefined') return
+        
         console.log('🔍 Iniciando rastreamento de visita...')
         console.log('📍 Página atual:', pathname)
         
