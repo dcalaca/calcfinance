@@ -190,9 +190,20 @@ export default function CPFPage() {
       return acc
     }, {} as Record<string, any>)
 
+    // Ordenar por data crescente (mais antigo primeiro)
     return Object.values(monthlyData).sort((a, b) => {
-      const dateA = new Date(a.month.split('/')[1], a.month.split('/')[0] - 1)
-      const dateB = new Date(b.month.split('/')[1], b.month.split('/')[0] - 1)
+      // Converter MMM/yyyy para Date para ordenação correta
+      const monthNames = {
+        'jan': 0, 'fev': 1, 'mar': 2, 'abr': 3, 'mai': 4, 'jun': 5,
+        'jul': 6, 'ago': 7, 'set': 8, 'out': 9, 'nov': 10, 'dez': 11
+      }
+      
+      const [monthA, yearA] = a.month.split('/')
+      const [monthB, yearB] = b.month.split('/')
+      
+      const dateA = new Date(parseInt(yearA), monthNames[monthA.toLowerCase() as keyof typeof monthNames])
+      const dateB = new Date(parseInt(yearB), monthNames[monthB.toLowerCase() as keyof typeof monthNames])
+      
       return dateA.getTime() - dateB.getTime()
     })
   }
@@ -422,7 +433,7 @@ export default function CPFPage() {
                     <TabsContent value="timeline" className="mt-6">
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={chartData}>
+                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="month" />
                             <YAxis />
@@ -432,23 +443,19 @@ export default function CPFPage() {
                                 name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo'
                               ]}
                             />
-                            <Area 
-                              type="monotone" 
+                            <Bar 
                               dataKey="receitas" 
-                              stackId="1" 
-                              stroke="#10b981" 
                               fill="#10b981" 
-                              fillOpacity={0.6}
+                              name="receitas"
+                              radius={[4, 4, 0, 0]}
                             />
-                            <Area 
-                              type="monotone" 
+                            <Bar 
                               dataKey="despesas" 
-                              stackId="2" 
-                              stroke="#ef4444" 
                               fill="#ef4444" 
-                              fillOpacity={0.6}
+                              name="despesas"
+                              radius={[4, 4, 0, 0]}
                             />
-                          </AreaChart>
+                          </BarChart>
                         </ResponsiveContainer>
                       </div>
                     </TabsContent>
