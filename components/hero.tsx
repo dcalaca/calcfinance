@@ -18,93 +18,115 @@ export function Hero() {
               Calculadoras avançadas, notícias em tempo real e educação gratuita para você tomar as melhores decisões
               financeiras
             </p>
+          </div>
 
-            {/* CFP Highlight */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <DollarSign className="w-8 h-8 text-green-600" />
-                  <h3 className="text-2xl font-bold text-slate-900">CFP - Controle Financeiro Pessoal</h3>
-                </div>
-                <p className="text-lg text-slate-700 mb-6 max-w-3xl mx-auto">
-                  Gerencie suas receitas e despesas com gráficos interativos, filtros avançados e orientações inteligentes. 
-                  Tudo em uma ferramenta completa e gratuita!
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Card Principal */}
+          <Card className="bg-white shadow-xl border-0">
+            <CardContent className="p-8">
+              {/* Call to Action Buttons */}
+              <div className="text-center mb-12">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                   <Button 
                     size="lg" 
-                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold"
                     asChild
                   >
-                    <Link href="/registro">
+                    <Link href="/calculadoras">
                       <Calculator className="w-5 h-5 mr-2" />
-                      Criar Conta Gratuita
+                      Começar Agora
                     </Link>
                   </Button>
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="border-green-600 text-green-600 hover:bg-green-50 px-8 py-4 text-lg font-semibold"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold"
                     asChild
                   >
-                    <Link href="/cfp">
-                      <DollarSign className="w-5 h-5 mr-2" />
-                      Ver Demonstração
+                    <Link href="/educacao">
+                      <BookOpen className="w-5 h-5 mr-2" />
+                      Educação Gratuita
                     </Link>
                   </Button>
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-6" asChild>
-                <Link href="/calculadoras">
-                  <Calculator className="w-5 h-5 mr-2" />
-                  Começar Agora
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 bg-transparent" asChild>
-                <Link href="/educacao">
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Educação Gratuita
-                </Link>
-              </Button>
-            </div>
-          </div>
+              {/* Why Choose Section */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                  Por que escolher o CalcFy?
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                  A plataforma completa para controle financeiro pessoal com ferramentas gratuitas e educação de qualidade
+                </p>
+              </div>
 
-          {/* Benefícios - Versão Compacta */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-center text-slate-900 mb-6">Por que escolher o FinanceHub?</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-4 h-4 text-blue-600" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {/* 100% Gratuito */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">100% Gratuito</h3>
+                  <p className="text-slate-600">Todas as ferramentas gratuitas</p>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-sm">100% Gratuito</h3>
-                  <p className="text-slate-600 text-xs">Todas as ferramentas gratuitas</p>
+
+                {/* Para Toda Família */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Para Toda Família</h3>
+                  <p className="text-slate-600">Conteúdo para todas as idades</p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-sm">Para Toda Família</h3>
-                  <p className="text-slate-600 text-xs">Conteúdo para todas as idades</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-4 h-4 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900 text-sm">Sempre Atualizado</h3>
-                  <p className="text-slate-600 text-xs">Informações sempre atuais</p>
+
+                {/* Sempre Atualizado */}
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Zap className="w-8 h-8 text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">Sempre Atualizado</h3>
+                  <p className="text-slate-600">Informações sempre atuais</p>
                 </div>
               </div>
-            </div>
-          </div>
+
+              {/* CFP Highlight */}
+              <div className="p-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <DollarSign className="w-8 h-8 text-green-600" />
+                    <h3 className="text-2xl font-bold text-slate-900">CFP - Controle Financeiro Pessoal</h3>
+                  </div>
+                  <p className="text-lg text-slate-700 mb-6 max-w-3xl mx-auto">
+                    Gerencie suas receitas e despesas com gráficos interativos, filtros avançados e orientações inteligentes. 
+                    Tudo em uma ferramenta completa e gratuita!
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button 
+                      size="lg" 
+                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold"
+                      asChild
+                    >
+                      <Link href="/registro">
+                        <Calculator className="w-5 h-5 mr-2" />
+                        Criar Conta Gratuita
+                      </Link>
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="border-green-600 text-green-600 hover:bg-green-50 px-8 py-4 text-lg font-semibold"
+                      asChild
+                    >
+                      <Link href="/cfp">
+                        <DollarSign className="w-5 h-5 mr-2" />
+                        Ver Demonstração
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
