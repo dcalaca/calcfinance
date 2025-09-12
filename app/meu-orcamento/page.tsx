@@ -385,7 +385,8 @@ export default function MeuOrcamentoPage() {
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
       console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
-      alert(`Erro ao adicionar item: ${error.message || 'Erro desconhecido'}`)
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+      alert(`Erro ao adicionar item: ${errorMessage}`)
     }
   }
 
