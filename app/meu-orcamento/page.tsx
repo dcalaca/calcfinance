@@ -473,8 +473,8 @@ export default function MeuOrcamentoPage() {
     }
     
     // Somar receitas e despesas de todos os orçamentos do mesmo mês
-    acc[mesKey].receitas += orcamento.receitas.reduce((total, item) => total + item.valor, 0)
-    acc[mesKey].despesas += orcamento.despesas.reduce((total, item) => total + item.valor, 0)
+    acc[mesKey].receitas += (orcamento.receitas || []).reduce((total, item) => total + (item?.valor || 0), 0)
+    acc[mesKey].despesas += (orcamento.despesas || []).reduce((total, item) => total + (item?.valor || 0), 0)
     acc[mesKey].saldo = acc[mesKey].receitas - acc[mesKey].despesas
     
     return acc
