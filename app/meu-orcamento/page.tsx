@@ -325,9 +325,7 @@ export default function MeuOrcamentoPage() {
             saldo: totalReceitas - totalDespesas,
             user_id: user?.id || '',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            observacoes: '',
-            meta_mensal: 0
+            updated_at: new Date().toISOString()
           }
           updated.push(novoOrcamento)
         }
