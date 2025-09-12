@@ -553,7 +553,7 @@ export default function CPFPage() {
           <div className="mb-8">
             <Button onClick={() => setShowForm(!showForm)} className="w-full md:w-auto">
               <Plus className="w-4 h-4 mr-2" />
-              Adicionar {formData.type === 'receita' ? 'Receita' : 'Despesa'}
+              Adicionar
             </Button>
           </div>
 

@@ -24,6 +24,12 @@ const formatDateForDB = (date: Date): string => {
   return `${year}-${month}-${day}`
 }
 
+// Função para converter string YYYY-MM-DD para Date sem problemas de timezone
+const parseDateFromDB = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 export function useCFPTransactions() {
   const { user, loading: authLoading } = useFinanceAuth()
   const [transactions, setTransactions] = useState<CFPTransaction[]>([])
@@ -57,7 +63,7 @@ export function useCFPTransactions() {
         category: item.categoria,
         description: item.nome,
         amount: Number(item.valor),
-        date: new Date(item.data),
+        date: parseDateFromDB(item.data),
         observations: item.observacoes,
         createdAt: new Date(item.created_at)
       }))
@@ -145,7 +151,7 @@ export function useCFPTransactions() {
         category: data.categoria,
         description: data.nome,
         amount: Number(data.valor),
-        date: new Date(data.data),
+        date: parseDateFromDB(data.data),
         observations: data.observacoes,
         createdAt: new Date(data.created_at)
       }
@@ -232,7 +238,7 @@ export function useCFPTransactions() {
               category: data.categoria,
               description: data.nome,
               amount: Number(data.valor),
-              date: new Date(data.data),
+              date: parseDateFromDB(data.data),
               observations: data.observacoes
             }
           : t
