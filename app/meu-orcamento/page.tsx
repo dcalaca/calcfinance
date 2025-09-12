@@ -317,6 +317,7 @@ export default function MeuOrcamentoPage() {
           
           const novoOrcamento: OrcamentoComItens = {
             id: Date.now().toString(),
+            nome: `Orçamento ${filtroMes || 'Geral'}`,
             mes_referencia: filtroMes || 'geral',
             receitas,
             despesas,
@@ -325,7 +326,9 @@ export default function MeuOrcamentoPage() {
             saldo: totalReceitas - totalDespesas,
             user_id: user?.id || '',
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            status: 'ativo',
+            is_favorite: false
           }
           updated.push(novoOrcamento)
         }
