@@ -100,8 +100,8 @@ export default function MeuOrcamentoPage() {
         descricao: "Todos os itens de receitas e despesas",
         receitas,
         despesas,
-        total_receitas: receitas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
-        total_despesas: despesas.reduce((total: number, item: any) => total + Number(item.valor || 0), 0),
+        total_receitas: (receitas || []).reduce((total: number, item: any) => total + Number(item?.valor || 0), 0),
+        total_despesas: (despesas || []).reduce((total: number, item: any) => total + Number(item?.valor || 0), 0),
         saldo: 0,
         status: "ativo" as const,
         is_favorite: false,
@@ -500,8 +500,8 @@ export default function MeuOrcamentoPage() {
   }
 
   // Calcular sobra mensal para projeção de investimento
-  const totalReceitas = receitasFiltradas.reduce((total, item) => total + item.valor, 0)
-  const totalDespesas = despesasFiltradas.reduce((total, item) => total + item.valor, 0)
+  const totalReceitas = (receitasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0)
+  const totalDespesas = (despesasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0)
   const sobraMensal = totalReceitas - totalDespesas
 
   const temSobra = sobraMensal > 0
@@ -722,22 +722,22 @@ export default function MeuOrcamentoPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-green-600">Receitas</span>
                     <span className="font-semibold text-green-600">
-                      {formatarMoeda(receitasFiltradas.reduce((total, item) => total + item.valor, 0))}
+                      {formatarMoeda((receitasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0))}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-red-600">Despesas</span>
                     <span className="font-semibold text-red-600">
-                      {formatarMoeda(despesasFiltradas.reduce((total, item) => total + item.valor, 0))}
+                      {formatarMoeda((despesasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0))}
                     </span>
                   </div>
                   <div className="border-t pt-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Saldo</span>
                       <span className={`font-bold text-lg ${
-                        (receitasFiltradas.reduce((total, item) => total + item.valor, 0) - despesasFiltradas.reduce((total, item) => total + item.valor, 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                        ((receitasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0) - (despesasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        {formatarMoeda(receitasFiltradas.reduce((total, item) => total + item.valor, 0) - despesasFiltradas.reduce((total, item) => total + item.valor, 0))}
+                        {formatarMoeda((receitasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0) - (despesasFiltradas || []).reduce((total, item) => total + (item?.valor || 0), 0))}
                       </span>
                     </div>
                     
