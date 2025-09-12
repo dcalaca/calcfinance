@@ -173,7 +173,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/cfp" className="flex items-center">
                         <DollarSign className="mr-2 h-4 w-4" />
-                        CFP - Controle Financeiro
+                        CFP - Controle de Finanças Pessoal
                       </Link>
                     </DropdownMenuItem>
                     {isAuthorizedForAnalytics && (
@@ -266,7 +266,7 @@ export function Header() {
                             className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
                           >
                             <DollarSign className="h-5 w-5" />
-                            <span>CFP - Controle Financeiro</span>
+                            <span>CFP - Controle de Finanças Pessoal</span>
                           </Link>
                           {isAuthorizedForAnalytics && (
                             <Link

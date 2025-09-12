@@ -185,70 +185,27 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Destaque de Investimentos - Mobile First */}
-          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+          {/* CFP - Controle de Finanças Pessoais */}
+          <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-700">
-                <TrendingUp className="w-6 h-6" />
-                Calculadoras Financeiras
+              <CardTitle className="flex items-center gap-2 text-green-700">
+                <DollarSign className="w-6 h-6" />
+                CFP - Controle de Finanças Pessoais
               </CardTitle>
-              <CardDescription className="text-blue-600">
-                Simule investimentos e planeje seu futuro financeiro
+              <CardDescription className="text-green-600">
+                Gerencie suas receitas e despesas com gráficos interativos e filtros avançados
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Simulador de investimento */}
-                <Button asChild className="h-24 flex-col bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
-                  <Link href="/calculadoras/investimentos">
-                    <TrendingUp className="w-8 h-8 mb-2" />
-                    <span className="text-lg font-semibold">Investimentos</span>
-                    <span className="text-sm opacity-90">Simule seus ganhos</span>
-                  </Link>
-                </Button>
-                
-                {/* Juros Compostos */}
-                <Button asChild variant="outline" className="h-24 flex-col border-green-300 hover:bg-green-50">
-                  <Link href="/calculadoras/juros-compostos">
-                    <Calculator className="w-8 h-8 mb-2 text-green-600" />
-                    <span className="text-lg font-semibold text-green-700">Juros Compostos</span>
-                    <span className="text-sm text-green-600">Calcule o crescimento</span>
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions - Secundário */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Outras Calculadoras</CardTitle>
-              <CardDescription>Acesse rapidamente suas calculadoras favoritas</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
-                  <Link href="/calculadoras/juros-compostos">
-                    <Calculator className="w-6 h-6 mb-2" />
-                    Juros Compostos
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
-                  <Link href="/calculadoras/conversor-moedas">
-                    <TrendingUp className="w-6 h-6 mb-2" />
-                    Conversor
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
-                  <Link href="/calculadoras/financiamento">
-                    <Calculator className="w-6 h-6 mb-2" />
-                    Financiamento
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="h-20 flex-col bg-transparent">
-                  <Link href="/calculadoras/aposentadoria">
-                    <Calculator className="w-6 h-6 mb-2" />
-                    Aposentadoria
+              <div className="text-center">
+                <p className="text-slate-700 mb-6">
+                  Acesse sua ferramenta completa de controle financeiro pessoal. 
+                  Adicione receitas e despesas, visualize gráficos interativos e mantenha suas finanças organizadas.
+                </p>
+                <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold">
+                  <Link href="/cfp">
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    Acessar CFP
                   </Link>
                 </Button>
               </div>
