@@ -42,6 +42,7 @@ export default function MeuOrcamentoPage() {
   const [novoItem, setNovoItem] = useState({
     nome: "",
     valor: 0,
+    valorTexto: "",
     categoria: "",
     tipo: "despesa" as "receita" | "despesa",
     data: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD garantido
@@ -368,6 +369,7 @@ export default function MeuOrcamentoPage() {
       setNovoItem({
         nome: '',
         valor: 0,
+        valorTexto: '',
         categoria: '',
         tipo: 'receita',
         data: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD garantido
@@ -585,10 +587,14 @@ export default function MeuOrcamentoPage() {
                   <Input
                     id="valor"
                     type="text"
-                    value={novoItem.valor ? formatarMoeda(novoItem.valor) : ''}
+                    value={novoItem.valorTexto || ''}
                     onChange={(e) => {
+                      setNovoItem({ ...novoItem, valorTexto: e.target.value })
+                    }}
+                    onBlur={(e) => {
                       const valor = e.target.value.replace(/[^\d,]/g, '').replace(',', '.')
-                      setNovoItem({ ...novoItem, valor: valor ? Number(valor) : 0 })
+                      const valorNumerico = valor ? Number(valor) : 0
+                      setNovoItem({ ...novoItem, valor: valorNumerico, valorTexto: valorNumerico ? formatarMoeda(valorNumerico) : '' })
                     }}
                     placeholder="R$ 0,00"
                   />
