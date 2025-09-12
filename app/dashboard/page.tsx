@@ -108,7 +108,6 @@ export default function DashboardPage() {
       financiamento: "Financiamento",
       aposentadoria: "Aposentadoria",
       inflacao: "Inflação",
-      orcamento: "Orçamento",
     }
     return labels[type as keyof typeof labels] || type
   }
@@ -120,7 +119,6 @@ export default function DashboardPage() {
       financiamento: "bg-green-100 text-green-800",
       aposentadoria: "bg-purple-100 text-purple-800",
       inflacao: "bg-red-100 text-red-800",
-      orcamento: "bg-indigo-100 text-indigo-800",
     }
     return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
@@ -187,34 +185,34 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Destaque do Orçamento - Mobile First */}
-          <Card className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+          {/* Destaque de Investimentos - Mobile First */}
+          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-700">
-                <DollarSign className="w-6 h-6" />
-                Controle Financeiro
+              <CardTitle className="flex items-center gap-2 text-blue-700">
+                <TrendingUp className="w-6 h-6" />
+                Calculadoras Financeiras
               </CardTitle>
-              <CardDescription className="text-green-600">
-                Gerencie seu orçamento e veja projeções de investimento
+              <CardDescription className="text-blue-600">
+                Simule investimentos e planeje seu futuro financeiro
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Botão principal do orçamento - destaque no mobile */}
-                <Button asChild className="h-24 flex-col bg-green-600 hover:bg-green-700 text-white shadow-lg">
-                  <Link href="/meu-orcamento">
-                    <DollarSign className="w-8 h-8 mb-2" />
-                    <span className="text-lg font-semibold">Meu Orçamento</span>
-                    <span className="text-sm opacity-90">Controle suas finanças</span>
+                {/* Simulador de investimento */}
+                <Button asChild className="h-24 flex-col bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
+                  <Link href="/calculadoras/investimentos">
+                    <TrendingUp className="w-8 h-8 mb-2" />
+                    <span className="text-lg font-semibold">Investimentos</span>
+                    <span className="text-sm opacity-90">Simule seus ganhos</span>
                   </Link>
                 </Button>
                 
-                {/* Simulador de investimento */}
-                <Button asChild variant="outline" className="h-24 flex-col border-blue-300 hover:bg-blue-50">
-                  <Link href="/calculadoras/investimentos">
-                    <TrendingUp className="w-8 h-8 mb-2 text-blue-600" />
-                    <span className="text-lg font-semibold text-blue-700">Investimentos</span>
-                    <span className="text-sm text-blue-600">Simule seus ganhos</span>
+                {/* Juros Compostos */}
+                <Button asChild variant="outline" className="h-24 flex-col border-green-300 hover:bg-green-50">
+                  <Link href="/calculadoras/juros-compostos">
+                    <Calculator className="w-8 h-8 mb-2 text-green-600" />
+                    <span className="text-lg font-semibold text-green-700">Juros Compostos</span>
+                    <span className="text-sm text-green-600">Calcule o crescimento</span>
                   </Link>
                 </Button>
               </div>

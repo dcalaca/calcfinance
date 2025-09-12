@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Mail, DollarSign } from "lucide-react"
+import { Menu, Calculator, TrendingUp, BookOpen, User, LogOut, Home, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -19,7 +19,6 @@ import { useFinanceAuth } from "@/hooks/use-finance-auth"
 
 const navigation = [
   { name: "Início", href: "/", icon: Home },
-  { name: "Orçamento", href: "/meu-orcamento", icon: DollarSign, highlight: true },
   { name: "Calculadoras", href: "/calculadoras", icon: Calculator },
   { name: "Blog", href: "/blog", icon: BookOpen },
   { name: "Notícias", href: "/noticias", icon: TrendingUp },
@@ -117,12 +116,6 @@ export function Header() {
                         Histórico
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/meu-orcamento" className="flex items-center">
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        Meu Orçamento
-                      </Link>
-                    </DropdownMenuItem>
                     {isAuthorizedForAnalytics && (
                       <DropdownMenuItem asChild>
                         <Link href="/analytics" className="flex items-center">
@@ -206,14 +199,6 @@ export function Header() {
                           >
                             <TrendingUp className="h-5 w-5" />
                             <span>Histórico</span>
-                          </Link>
-                          <Link
-                            href="/meu-orcamento"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-green-700 hover:text-green-600 hover:bg-green-50 bg-green-50"
-                          >
-                            <DollarSign className="h-5 w-5" />
-                            <span>Meu Orçamento</span>
                           </Link>
                           {isAuthorizedForAnalytics && (
                             <Link

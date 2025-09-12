@@ -480,7 +480,6 @@ export default function AnalyticsPage() {
                   <SelectContent>
                     <SelectItem value="all">Todas</SelectItem>
                     <SelectItem value="/">Página Inicial</SelectItem>
-                    <SelectItem value="/meu-orcamento">Meu Orçamento</SelectItem>
                     <SelectItem value="/calculadoras">Calculadoras</SelectItem>
                     <SelectItem value="/noticias">Notícias</SelectItem>
                     <SelectItem value="/educacao">Educação</SelectItem>

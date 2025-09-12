@@ -46,7 +46,6 @@ export default function HistoricoPage() {
       financiamento: "Financiamento",
       aposentadoria: "Aposentadoria",
       inflacao: "Inflação",
-      orcamento: "Orçamento",
     }
     return labels[type as keyof typeof labels] || type
   }
@@ -58,7 +57,6 @@ export default function HistoricoPage() {
       financiamento: "bg-green-100 text-green-800",
       aposentadoria: "bg-purple-100 text-purple-800",
       inflacao: "bg-red-100 text-red-800",
-      orcamento: "bg-indigo-100 text-indigo-800",
     }
     return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
@@ -160,7 +158,6 @@ export default function HistoricoPage() {
                       <SelectItem value="financiamento">Financiamento</SelectItem>
                       <SelectItem value="aposentadoria">Aposentadoria</SelectItem>
                       <SelectItem value="inflacao">Inflação</SelectItem>
-                      <SelectItem value="orcamento">Orçamento</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
