@@ -170,6 +170,12 @@ export function Header() {
                         Histórico
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/cfp" className="flex items-center">
+                        <DollarSign className="mr-2 h-4 w-4" />
+                        CFP - Controle Financeiro
+                      </Link>
+                    </DropdownMenuItem>
                     {isAuthorizedForAnalytics && (
                       <DropdownMenuItem asChild>
                         <Link href="/analytics" className="flex items-center">
@@ -253,6 +259,14 @@ export function Header() {
                           >
                             <TrendingUp className="h-5 w-5" />
                             <span>Histórico</span>
+                          </Link>
+                          <Link
+                            href="/cfp"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                          >
+                            <DollarSign className="h-5 w-5" />
+                            <span>CFP - Controle Financeiro</span>
                           </Link>
                           {isAuthorizedForAnalytics && (
                             <Link
