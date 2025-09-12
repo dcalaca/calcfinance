@@ -50,6 +50,7 @@ export default function MeuOrcamentoPage() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [filtroMes, setFiltroMes] = useState("")
+  const [filtroMeses, setFiltroMeses] = useState<string[]>([])
   const [filtroItem, setFiltroItem] = useState("")
   const [tipoFiltro, setTipoFiltro] = useState<"receita" | "despesa" | "todos">("todos")
 
@@ -497,6 +498,12 @@ export default function MeuOrcamentoPage() {
         if (mesItem !== filtroMes) return false
       }
       
+      // Filtro por múltiplos meses
+      if (filtroMeses.length > 0) {
+        const mesItem = item.data ? item.data.slice(0, 7) + '-01' : null
+        if (!mesItem || !filtroMeses.includes(mesItem)) return false
+      }
+      
       // Filtro por nome do item
       if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
       
@@ -519,6 +526,12 @@ export default function MeuOrcamentoPage() {
         if (mesItem !== filtroMes) return false
       }
       
+      // Filtro por múltiplos meses
+      if (filtroMeses.length > 0) {
+        const mesItem = item.data ? item.data.slice(0, 7) + '-01' : null
+        if (!mesItem || !filtroMeses.includes(mesItem)) return false
+      }
+      
       // Filtro por nome do item
       if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
       
@@ -534,7 +547,7 @@ export default function MeuOrcamentoPage() {
   // Dados para o gráfico mensal - agrupar por mês e somar valores
   const dadosGrafico = (() => {
     if (filtroMes) {
-      // Se há filtro de mês, mostrar apenas os dados filtrados
+      // Se há filtro de mês único, mostrar apenas os dados filtrados
       return [{
         mes: formatarMesAbreviado(filtroMes),
         receitas: receitasFiltradas.reduce((total, item) => total + (item?.valor || 0), 0),
@@ -544,37 +557,75 @@ export default function MeuOrcamentoPage() {
         ...item,
         saldo: item.receitas - item.despesas
       }))
-    } else {
-      // Se não há filtro, mostrar todos os meses
-      const dados = orcamentos.reduce((acc, orcamento) => {
-        const mesKey = orcamento.mes_referencia
-        const mesFormatado = formatarMesAbreviado(orcamento.mes_referencia)
+    } else if (filtroMeses.length > 0) {
+      // Se há filtro de múltiplos meses, mostrar apenas os meses selecionados
+      return filtroMeses.map(mes => {
+        const receitasMes = receitasFiltradas.filter(item => 
+          item.data && item.data.slice(0, 7) + '-01' === mes
+        ).reduce((total, item) => total + (item?.valor || 0), 0)
         
-        if (!acc[mesKey]) {
-          acc[mesKey] = {
-            mes: mesFormatado,
-            receitas: 0,
-            despesas: 0,
-            saldo: 0
-          }
+        const despesasMes = despesasFiltradas.filter(item => 
+          item.data && item.data.slice(0, 7) + '-01' === mes
+        ).reduce((total, item) => total + (item?.valor || 0), 0)
+        
+        return {
+          mes: formatarMesAbreviado(mes),
+          receitas: receitasMes,
+          despesas: despesasMes,
+          saldo: receitasMes - despesasMes
         }
+      }).sort((a, b) => {
+        const mesA = filtroMeses.find(m => formatarMesAbreviado(m) === a.mes) || ''
+        const mesB = filtroMeses.find(m => formatarMesAbreviado(m) === b.mes) || ''
+        return new Date(mesA).getTime() - new Date(mesB).getTime()
+      })
+    } else {
+      // Se não há filtro, mostrar todos os meses baseado nos itens individuais
+      const mesesUnicos = new Set<string>()
+      
+      // Coletar todos os meses dos itens
+      orcamentos.forEach(orcamento => {
+        if (orcamento.receitas) {
+          orcamento.receitas.forEach((item: any) => {
+            if (item.data) {
+              const mesItem = item.data.slice(0, 7) + '-01'
+              mesesUnicos.add(mesItem)
+            }
+          })
+        }
+        if (orcamento.despesas) {
+          orcamento.despesas.forEach((item: any) => {
+            if (item.data) {
+              const mesItem = item.data.slice(0, 7) + '-01'
+              mesesUnicos.add(mesItem)
+            }
+          })
+        }
+      })
+      
+      // Processar cada mês único
+      const dados = Array.from(mesesUnicos).map(mes => {
+        const receitasMes = orcamentos.flatMap(o => o.receitas || [])
+          .filter(item => item.data && item.data.slice(0, 7) + '-01' === mes)
+          .reduce((total, item) => total + (item?.valor || 0), 0)
         
-        // Somar receitas e despesas de todos os orçamentos do mesmo mês
-        acc[mesKey].receitas += (orcamento.receitas || []).reduce((total, item) => total + (item?.valor || 0), 0)
-        acc[mesKey].despesas += (orcamento.despesas || []).reduce((total, item) => total + (item?.valor || 0), 0)
-        acc[mesKey].saldo = acc[mesKey].receitas - acc[mesKey].despesas
+        const despesasMes = orcamentos.flatMap(o => o.despesas || [])
+          .filter(item => item.data && item.data.slice(0, 7) + '-01' === mes)
+          .reduce((total, item) => total + (item?.valor || 0), 0)
         
-        return acc
-      }, {} as Record<string, { mes: string; receitas: number; despesas: number; saldo: number }>)
-
-      // Converter para array e ordenar
-      return Object.values(dados).sort((a, b) => {
-        const orcamentoA = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === a.mes)
-        const orcamentoB = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === b.mes)
-        
-        if (!orcamentoA || !orcamentoB) return 0
-        
-        return new Date(orcamentoA.mes_referencia).getTime() - new Date(orcamentoB.mes_referencia).getTime()
+        return {
+          mes: formatarMesAbreviado(mes),
+          receitas: receitasMes,
+          despesas: despesasMes,
+          saldo: receitasMes - despesasMes
+        }
+      })
+      
+      // Ordenar por data
+      return dados.sort((a, b) => {
+        const mesA = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === a.mes)?.mes_referencia || ''
+        const mesB = orcamentos.find(o => formatarMesAbreviado(o.mes_referencia) === b.mes)?.mes_referencia || ''
+        return new Date(mesA).getTime() - new Date(mesB).getTime()
       })
     }
   })()
@@ -621,7 +672,10 @@ export default function MeuOrcamentoPage() {
           <label className="text-sm font-medium">Mês:</label>
           <select 
             value={filtroMes} 
-            onChange={(e) => setFiltroMes(e.target.value)}
+            onChange={(e) => {
+              setFiltroMes(e.target.value)
+              setFiltroMeses([]) // Limpar filtro múltiplo
+            }}
             className="px-3 py-1 border rounded-md text-sm"
           >
             <option value="">Todos os meses</option>
@@ -668,6 +722,58 @@ export default function MeuOrcamentoPage() {
               ))
             })()}
           </select>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Múltiplos meses:</label>
+          <div className="flex flex-wrap gap-2 max-w-md">
+            {(() => {
+              // Buscar meses únicos dos itens
+              const mesesUnicos = new Set<string>()
+              
+              orcamentos.forEach(orcamento => {
+                if (orcamento.receitas) {
+                  orcamento.receitas.forEach((item: any) => {
+                    if (item.data) {
+                      const mesItem = item.data.slice(0, 7) + '-01'
+                      mesesUnicos.add(mesItem)
+                    }
+                  })
+                }
+                if (orcamento.despesas) {
+                  orcamento.despesas.forEach((item: any) => {
+                    if (item.data) {
+                      const mesItem = item.data.slice(0, 7) + '-01'
+                      mesesUnicos.add(mesItem)
+                    }
+                  })
+                }
+              })
+              
+              const mesesArray = Array.from(mesesUnicos).sort((a, b) => {
+                return new Date(a).getTime() - new Date(b).getTime()
+              })
+              
+              return mesesArray.map(mes => (
+                <label key={mes} className="flex items-center gap-1 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={filtroMeses.includes(mes)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFiltroMeses([...filtroMeses, mes])
+                        setFiltroMes("") // Limpar filtro único
+                      } else {
+                        setFiltroMeses(filtroMeses.filter(m => m !== mes))
+                      }
+                    }}
+                    className="rounded"
+                  />
+                  <span className="text-xs">{formatarMesAbreviado(mes)}</span>
+                </label>
+              ))
+            })()}
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -817,9 +923,9 @@ export default function MeuOrcamentoPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 min-h-screen">
           {/* Resumo do Orçamento */}
-          <div className="lg:col-span-2 xl:col-span-2">
+          <div className="lg:col-span-4 xl:col-span-3">
             {orcamentos.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -977,7 +1083,7 @@ export default function MeuOrcamentoPage() {
           </div>
 
           {/* Lista de Itens */}
-          <div className="lg:col-span-3 xl:col-span-4">
+          <div className="lg:col-span-8 xl:col-span-9">
                 <Tabs defaultValue="receitas" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="receitas" className="flex items-center gap-2">
