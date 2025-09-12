@@ -310,11 +310,24 @@ export default function MeuOrcamentoPage() {
           }
         } else {
           // Criar novo orçamento se não existir
-          const novoOrcamento = {
+          const receitas = novoItem.tipo === 'receita' ? [data[0]] : []
+          const despesas = novoItem.tipo === 'despesa' ? [data[0]] : []
+          const totalReceitas = receitas.reduce((sum, item) => sum + (item.valor || 0), 0)
+          const totalDespesas = despesas.reduce((sum, item) => sum + (item.valor || 0), 0)
+          
+          const novoOrcamento: OrcamentoComItens = {
             id: Date.now().toString(),
             mes_referencia: filtroMes || 'geral',
-            receitas: novoItem.tipo === 'receita' ? [data[0]] : [],
-            despesas: novoItem.tipo === 'despesa' ? [data[0]] : []
+            receitas,
+            despesas,
+            total_receitas: totalReceitas,
+            total_despesas: totalDespesas,
+            saldo: totalReceitas - totalDespesas,
+            user_id: user?.id || '',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            observacoes: '',
+            meta_mensal: 0
           }
           updated.push(novoOrcamento)
         }
