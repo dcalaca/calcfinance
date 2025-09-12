@@ -44,7 +44,7 @@ export default function MeuOrcamentoPage() {
     valor: 0,
     categoria: "",
     tipo: "despesa" as "receita" | "despesa",
-    data: new Date().toLocaleDateString('pt-CA'), // Formato YYYY-MM-DD sem timezone
+    data: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD garantido
     observacoes: ""
   })
 
@@ -370,7 +370,7 @@ export default function MeuOrcamentoPage() {
         valor: 0,
         categoria: '',
         tipo: 'receita',
-        data: new Date().toISOString().split('T')[0],
+        data: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD garantido
         observacoes: ''
       })
       
