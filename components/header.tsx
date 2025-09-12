@@ -254,19 +254,14 @@ export function Header() {
           <div className="flex items-center py-2 min-w-max px-2">
             {navigation.map((item) => {
               const Icon = item.icon
-              const isHighlight = item.highlight
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-md transition-colors flex-shrink-0 ${
                     pathname === item.href 
-                      ? isHighlight 
-                        ? "text-green-600 bg-green-50" 
-                        : "text-blue-600"
-                      : isHighlight
-                        ? "text-green-700 hover:text-green-600 hover:bg-green-50"
-                        : "text-gray-600 hover:text-blue-600"
+                      ? "text-blue-600"
+                      : "text-gray-600 hover:text-blue-600"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
