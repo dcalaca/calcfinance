@@ -229,6 +229,25 @@ export default function MeuOrcamentoPage() {
     )
   }
 
+  // Filtrar receitas e despesas
+  const receitasFiltradas = orcamentos
+    .flatMap(orcamento => orcamento.receitas || [])
+    .filter(item => {
+      const passaFiltroMes = !filtroMes || item.data?.startsWith(filtroMes.slice(0, 7))
+      const passaFiltroTipo = tipoFiltro === 'todos' || tipoFiltro === 'receita'
+      const passaFiltroItem = !filtroItem || item.nome?.toLowerCase().includes(filtroItem.toLowerCase())
+      return passaFiltroMes && passaFiltroTipo && passaFiltroItem
+    })
+
+  const despesasFiltradas = orcamentos
+    .flatMap(orcamento => orcamento.despesas || [])
+    .filter(item => {
+      const passaFiltroMes = !filtroMes || item.data?.startsWith(filtroMes.slice(0, 7))
+      const passaFiltroTipo = tipoFiltro === 'todos' || tipoFiltro === 'despesa'
+      const passaFiltroItem = !filtroItem || item.nome?.toLowerCase().includes(filtroItem.toLowerCase())
+      return passaFiltroMes && passaFiltroTipo && passaFiltroItem
+    })
+
   const formatarMoeda = (valor: number) => {
     return valor.toLocaleString('pt-BR', {
       style: 'currency',
