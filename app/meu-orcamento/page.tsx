@@ -403,6 +403,11 @@ export default function MeuOrcamentoPage() {
       return 'Data inválida'
     }
     
+    // Se for "geral", retornar "Geral"
+    if (data === 'geral') {
+      return 'Geral'
+    }
+    
     // Dividir a data em partes para evitar problemas de timezone
     const partes = data.split('-')
     if (partes.length !== 3) {
@@ -910,7 +915,10 @@ export default function MeuOrcamentoPage() {
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge variant="secondary">{item.categoria}</Badge>
                                   <span className="text-sm text-muted-foreground">
-                                    {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
+                                    {item.data && (() => {
+                                      const [ano, mes, dia] = item.data.split('-').map(Number)
+                                      return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR')
+                                    })()}
                                   </span>
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
@@ -969,7 +977,10 @@ export default function MeuOrcamentoPage() {
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge variant="secondary">{item.categoria}</Badge>
                                   <span className="text-sm text-muted-foreground">
-                                    {item.data && new Date(item.data).toLocaleDateString('pt-BR')}
+                                    {item.data && (() => {
+                                      const [ano, mes, dia] = item.data.split('-').map(Number)
+                                      return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR')
+                                    })()}
                                   </span>
                                   {!filtroMes && (() => {
                                     const orcamento = orcamentos.find(o => o.id === item.orcamento_id)
