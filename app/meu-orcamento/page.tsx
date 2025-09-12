@@ -230,8 +230,28 @@ export default function MeuOrcamentoPage() {
   }
 
   return (
-    <div>
-      <h1>Meu Orçamento - Teste</h1>
+    <div className="w-full max-w-none py-8 px-4 pb-20 md:pb-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Meu Orçamento</h1>
+          <p className="text-muted-foreground">
+            Controle sua vida financeira de forma simples e eficiente
+          </p>
+        </div>
+
+        {/* Conteúdo principal será adicionado aqui */}
+        <div className="space-y-6">
+              <Card>
+                <CardContent className="p-8 text-center">
+              <DollarSign className="h-16 w-16 mx-auto mb-4 text-blue-600" />
+              <h2 className="text-2xl font-bold mb-2">Sistema de Orçamento</h2>
+                  <p className="text-muted-foreground mb-4">
+                Funcionalidade será restaurada em breve...
+                        </p>
+                      </CardContent>
+                    </Card>
+        </div>
+      </div>
     </div>
   )
 }
