@@ -535,9 +535,6 @@ export default function MeuOrcamentoPage() {
   const dadosGrafico = (() => {
     if (filtroMes) {
       // Se há filtro de mês, mostrar apenas os dados filtrados
-      const receitasFiltradas = receitasFiltradas
-      const despesasFiltradas = despesasFiltradas
-      
       return [{
         mes: formatarMesAbreviado(filtroMes),
         receitas: receitasFiltradas.reduce((total, item) => total + (item?.valor || 0), 0),
