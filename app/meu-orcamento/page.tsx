@@ -596,16 +596,48 @@ export default function MeuOrcamentoPage() {
             className="px-3 py-1 border rounded-md text-sm"
           >
             <option value="">Todos os meses</option>
-            {orcamentos
-              .filter((orcamento, index, self) => 
-                index === self.findIndex(o => o.mes_referencia === orcamento.mes_referencia) &&
-                (orcamento.receitas.length > 0 || orcamento.despesas.length > 0)
-              )
-              .map(orcamento => (
-                <option key={orcamento.id} value={orcamento.mes_referencia}>
-                  {formatarMes(orcamento.mes_referencia)}
+            {(() => {
+              // Buscar meses únicos dos itens
+              const mesesUnicos = new Set<string>()
+              
+              // Adicionar meses dos orçamentos existentes
+              orcamentos.forEach(orcamento => {
+                if (orcamento.mes_referencia && orcamento.mes_referencia !== 'geral') {
+                  mesesUnicos.add(orcamento.mes_referencia)
+                }
+              })
+              
+              // Adicionar meses dos itens individuais
+              orcamentos.forEach(orcamento => {
+                if (orcamento.receitas) {
+                  orcamento.receitas.forEach((item: any) => {
+                    if (item.data) {
+                      const mesItem = item.data.slice(0, 7) + '-01' // YYYY-MM-01
+                      mesesUnicos.add(mesItem)
+                    }
+                  })
+                }
+                if (orcamento.despesas) {
+                  orcamento.despesas.forEach((item: any) => {
+                    if (item.data) {
+                      const mesItem = item.data.slice(0, 7) + '-01' // YYYY-MM-01
+                      mesesUnicos.add(mesItem)
+                    }
+                  })
+                }
+              })
+              
+              // Converter para array e ordenar
+              const mesesArray = Array.from(mesesUnicos).sort((a, b) => {
+                return new Date(a).getTime() - new Date(b).getTime()
+              })
+              
+              return mesesArray.map(mes => (
+                <option key={mes} value={mes}>
+                  {formatarMes(mes)}
                 </option>
-              ))}
+              ))
+            })()}
           </select>
         </div>
         
