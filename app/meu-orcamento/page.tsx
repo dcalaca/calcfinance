@@ -513,6 +513,56 @@ export default function MeuOrcamentoPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                  <Label htmlFor="tipo">Tipo</Label>
+                  <Select 
+                    value={novoItem.tipo} 
+                    onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value, categoria: '' })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="receita">Receita</SelectItem>
+                      <SelectItem value="despesa">Despesa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="categoria">Categoria</Label>
+                  <Select 
+                    value={novoItem.categoria} 
+                    onValueChange={(value) => setNovoItem({ ...novoItem, categoria: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {novoItem.tipo === 'receita' ? (
+                        <>
+                          <SelectItem value="Salário">Salário</SelectItem>
+                          <SelectItem value="Freelance">Freelance</SelectItem>
+                          <SelectItem value="Investimentos">Investimentos</SelectItem>
+                          <SelectItem value="Vendas">Vendas</SelectItem>
+                          <SelectItem value="Bônus">Bônus</SelectItem>
+                          <SelectItem value="Outros">Outros</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="Alimentação">Alimentação</SelectItem>
+                          <SelectItem value="Transporte">Transporte</SelectItem>
+                          <SelectItem value="Moradia">Moradia</SelectItem>
+                          <SelectItem value="Saúde">Saúde</SelectItem>
+                          <SelectItem value="Educação">Educação</SelectItem>
+                          <SelectItem value="Lazer">Lazer</SelectItem>
+                          <SelectItem value="Roupas">Roupas</SelectItem>
+                          <SelectItem value="Contas">Contas</SelectItem>
+                          <SelectItem value="Outros">Outros</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label htmlFor="nome">Nome</Label>
                   <Input
                     id="nome"
@@ -531,30 +581,6 @@ export default function MeuOrcamentoPage() {
                     onChange={(e) => setNovoItem({ ...novoItem, valor: Number(e.target.value) })}
                     placeholder="0,00"
                   />
-                </div>
-                <div>
-                  <Label htmlFor="categoria">Categoria</Label>
-                  <Input
-                    id="categoria"
-                    value={novoItem.categoria}
-                    onChange={(e) => setNovoItem({ ...novoItem, categoria: e.target.value })}
-                    placeholder="Ex: Alimentação, Salário, etc."
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="tipo">Tipo</Label>
-                  <Select 
-                    value={novoItem.tipo} 
-                    onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="receita">Receita</SelectItem>
-                      <SelectItem value="despesa">Despesa</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="data">Data</Label>
