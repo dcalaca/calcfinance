@@ -923,9 +923,107 @@ export default function MeuOrcamentoPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 min-h-screen">
-          {/* Resumo do Orçamento */}
-          <div className="lg:col-span-4 xl:col-span-3">
+        <div className="space-y-6">
+          {/* 1. Botão Adicionar Item */}
+          <div className="flex justify-start">
+            <Button 
+              className="w-full md:w-auto" 
+              onClick={() => setMostrarFormulario(!mostrarFormulario)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {mostrarFormulario ? "Ocultar Formulário" : "Adicionar Item"}
+            </Button>
+          </div>
+
+          {/* 2. Formulário para adicionar item */}
+          {mostrarFormulario && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Adicionar Item</CardTitle>
+                <CardDescription>
+                  Adicione uma nova receita ou despesa ao seu orçamento
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="nome">Nome</Label>
+                    <Input
+                      id="nome"
+                      value={novoItem.nome}
+                      onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
+                      placeholder="Ex: Salário, Aluguel, etc."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="valor">Valor</Label>
+                    <Input
+                      id="valor"
+                      type="number"
+                      step="0.01"
+                      value={novoItem.valor}
+                      onChange={(value) => setNovoItem({ ...novoItem, valor: value })}
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="categoria">Categoria</Label>
+                    <Input
+                      id="categoria"
+                      value={novoItem.categoria}
+                      onChange={(e) => setNovoItem({ ...novoItem, categoria: e.target.value })}
+                      placeholder="Ex: Moradia, Alimentação, etc."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="tipo">Tipo</Label>
+                    <Select
+                      value={novoItem.tipo}
+                      onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="receita">Receita</SelectItem>
+                        <SelectItem value="despesa">Despesa</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="data">Data</Label>
+                    <Input
+                      id="data"
+                      type="date"
+                      value={novoItem.data}
+                      onChange={(e) => setNovoItem({ ...novoItem, data: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="observacoes">Observações</Label>
+                    <Input
+                      id="observacoes"
+                      value={novoItem.observacoes}
+                      onChange={(e) => setNovoItem({ ...novoItem, observacoes: e.target.value })}
+                      placeholder="Observações opcionais"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleAdicionarItem} disabled={!novoItem.nome || !novoItem.valor}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Adicionar Item
+                  </Button>
+                  <Button variant="outline" onClick={() => setMostrarFormulario(false)}>
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 3. Orçamento Geral */}
+          <div>
             {orcamentos.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -1029,61 +1127,59 @@ export default function MeuOrcamentoPage() {
               </Card>
             )}
 
-            {/* Gráfico mensal - só exibir se há dados reais */}
-            {dadosGraficoArray.length > 0 && dadosGraficoArray.some(d => d.receitas > 0 || d.despesas > 0) && (
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
-                    Evolução Mensal
-                  </CardTitle>
-                  <CardDescription>
-                    Receitas vs Despesas por mês
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={dadosGraficoArray}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="mes" 
-                        tick={{ fontSize: 12 }}
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12 }}
-                        tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
-                        domain={[0, 'dataMax']}
-                      />
-                      <Tooltip 
-                        formatter={(value: number, name: string) => [
-                          formatarMoeda(value), 
-                          name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo'
-                        ]}
-                        labelFormatter={(label) => `Mês: ${label}`}
-                      />
-                      <Legend />
-                      <Bar dataKey="receitas" fill="#22c55e" name="Receitas" />
-                      <Bar dataKey="despesas" fill="#ef4444" name="Despesas" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
+          {/* 4. Evolução Mensal (Gráfico) */}
+          {dadosGraficoArray.length > 0 && dadosGraficoArray.some(d => d.receitas > 0 || d.despesas > 0) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Evolução Mensal
+                </CardTitle>
+                <CardDescription>
+                  Receitas vs Despesas por mês
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={dadosGraficoArray}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="mes" 
+                      tick={{ fontSize: 12 }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                      domain={[0, 'dataMax']}
+                    />
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [
+                        formatarMoeda(value), 
+                        name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo'
+                      ]}
+                      labelFormatter={(label) => `Mês: ${label}`}
+                    />
+                    <Legend />
+                    <Bar dataKey="receitas" fill="#22c55e" name="Receitas" />
+                    <Bar dataKey="despesas" fill="#ef4444" name="Despesas" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Projeção de Investimento - só mostra se há sobra */}
-            {temSobra && (
-              <InvestmentProjection 
-                monthlySurplus={sobraMensal} 
-              />
-            )}
+          {/* Projeção de Investimento - só mostra se há sobra */}
+          {temSobra && (
+            <InvestmentProjection 
+              monthlySurplus={sobraMensal} 
+            />
+          )}
 
-          </div>
-
-          {/* Lista de Itens */}
-          <div className="lg:col-span-8 xl:col-span-9">
+          {/* 5. Receitas e Despesas */}
+          <div>
                 <Tabs defaultValue="receitas" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="receitas" className="flex items-center gap-2">
