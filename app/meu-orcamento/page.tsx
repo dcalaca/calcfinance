@@ -274,6 +274,101 @@ export default function MeuOrcamentoPage() {
     })
   }
 
+  const handleAdicionarItem = async () => {
+    if (!novoItem.nome || !novoItem.valor || !novoItem.categoria || !novoItem.tipo) {
+      alert('Por favor, preencha todos os campos obrigatórios')
+      return
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('calc_orcamento_itens')
+        .insert([{
+          nome: novoItem.nome,
+          valor: novoItem.valor,
+          categoria: novoItem.categoria,
+          tipo: novoItem.tipo,
+          data: novoItem.data || new Date().toISOString().split('T')[0],
+          observacoes: novoItem.observacoes || '',
+          user_id: user?.id
+        }])
+        .select()
+
+      if (error) throw error
+
+      // Atualizar estado local
+      setOrcamentos(prev => {
+        const updated = [...prev]
+        const orcamentoIndex = updated.findIndex(o => o.mes_referencia === (filtroMes || 'geral'))
+        
+        if (orcamentoIndex >= 0) {
+          const orcamento = updated[orcamentoIndex]
+          if (novoItem.tipo === 'receita') {
+            orcamento.receitas = [...(orcamento.receitas || []), data[0]]
+          } else {
+            orcamento.despesas = [...(orcamento.despesas || []), data[0]]
+          }
+        } else {
+          // Criar novo orçamento se não existir
+          const novoOrcamento = {
+            id: Date.now().toString(),
+            mes_referencia: filtroMes || 'geral',
+            receitas: novoItem.tipo === 'receita' ? [data[0]] : [],
+            despesas: novoItem.tipo === 'despesa' ? [data[0]] : []
+          }
+          updated.push(novoOrcamento)
+        }
+        
+        return updated
+      })
+
+      // Limpar formulário
+      setNovoItem({
+        nome: '',
+        valor: 0,
+        categoria: '',
+        tipo: 'receita',
+        data: new Date().toISOString().split('T')[0],
+        observacoes: ''
+      })
+      
+      setMostrarFormulario(false)
+      
+    } catch (error) {
+      console.error('Erro ao adicionar item:', error)
+      alert('Erro ao adicionar item. Tente novamente.')
+    }
+  }
+
+  const handleRemoverItem = async (itemId: string, tipo: 'receita' | 'despesa') => {
+    if (!confirm('Tem certeza que deseja remover este item?')) return
+
+    try {
+      const { error } = await supabase
+        .from('calc_orcamento_itens')
+        .delete()
+        .eq('id', itemId)
+
+      if (error) throw error
+
+      // Atualizar estado local
+      setOrcamentos(prev => {
+        return prev.map(orcamento => {
+          if (tipo === 'receita') {
+            orcamento.receitas = (orcamento.receitas || []).filter(item => item.id !== itemId)
+          } else {
+            orcamento.despesas = (orcamento.despesas || []).filter(item => item.id !== itemId)
+          }
+          return orcamento
+        })
+      })
+      
+    } catch (error) {
+      console.error('Erro ao remover item:', error)
+      alert('Erro ao remover item. Tente novamente.')
+    }
+  }
+
   return (
     <div className="w-full max-w-none py-8 px-4 pb-20 md:pb-8">
       <div className="max-w-7xl mx-auto">
