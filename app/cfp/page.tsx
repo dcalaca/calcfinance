@@ -23,22 +23,14 @@ import {
   AlertCircle,
   CheckCircle,
   PiggyBank,
-  Lightbulb
+  Lightbulb,
+  Loader2
 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { useCFPTransactions, type CFPTransaction } from "@/hooks/use-cfp-transactions"
 import { useRouter } from "next/navigation"
-
-interface Transaction {
-  id: string
-  type: 'receita' | 'despesa'
-  category: string
-  description: string
-  amount: number
-  date: Date
-  createdAt: Date
-}
 
 interface FilterOptions {
   dateFrom: Date | null
@@ -57,10 +49,9 @@ const DESPESA_CATEGORIES = [
 
 export default function CPFPage() {
   const { user, loading: authLoading } = useFinanceAuth()
+  const { transactions, loading, error, addTransaction, deleteTransaction } = useCFPTransactions()
   const router = useRouter()
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
-  const [loading, setLoading] = useState(false)
+  const [filteredTransactions, setFilteredTransactions] = useState<CFPTransaction[]>([])
   
   // Estados do formulário
   const [showForm, setShowForm] = useState(false)
@@ -69,7 +60,8 @@ export default function CPFPage() {
     category: '',
     description: '',
     amount: '',
-    date: new Date()
+    date: new Date(),
+    observations: ''
   })
   
   // Estados dos filtros
@@ -86,21 +78,6 @@ export default function CPFPage() {
       router.push("/login")
     }
   }, [user, authLoading, router])
-
-  // Carregar transações do localStorage
-  useEffect(() => {
-    if (user) {
-      const savedTransactions = localStorage.getItem(`cpf_transactions_${user.id}`)
-      if (savedTransactions) {
-        const parsed = JSON.parse(savedTransactions).map((t: any) => ({
-          ...t,
-          date: new Date(t.date),
-          createdAt: new Date(t.createdAt)
-        }))
-        setTransactions(parsed)
-      }
-    }
-  }, [user])
 
   // Aplicar filtros
   useEffect(() => {
@@ -125,7 +102,7 @@ export default function CPFPage() {
     setFilteredTransactions(filtered)
   }, [transactions, filters])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!formData.description || !formData.amount || !formData.category) {
@@ -133,40 +110,40 @@ export default function CPFPage() {
       return
     }
 
-    const newTransaction: Transaction = {
-      id: Date.now().toString(),
-      type: formData.type,
-      category: formData.category,
-      description: formData.description,
-      amount: parseFloat(formData.amount),
-      date: formData.date,
-      createdAt: new Date()
-    }
+    try {
+      await addTransaction({
+        type: formData.type,
+        category: formData.category,
+        description: formData.description,
+        amount: parseFloat(formData.amount),
+        date: formData.date,
+        observations: formData.observations
+      })
 
-    const updatedTransactions = [...transactions, newTransaction]
-    setTransactions(updatedTransactions)
-    
-    if (user) {
-      localStorage.setItem(`cpf_transactions_${user.id}`, JSON.stringify(updatedTransactions))
+      // Reset form
+      setFormData({
+        type: 'receita',
+        category: '',
+        description: '',
+        amount: '',
+        date: new Date(),
+        observations: ''
+      })
+      setShowForm(false)
+    } catch (error) {
+      console.error('Erro ao adicionar transação:', error)
+      alert('Erro ao adicionar transação. Tente novamente.')
     }
-
-    // Reset form
-    setFormData({
-      type: 'receita',
-      category: '',
-      description: '',
-      amount: '',
-      date: new Date()
-    })
-    setShowForm(false)
   }
 
-  const deleteTransaction = (id: string) => {
-    const updatedTransactions = transactions.filter(t => t.id !== id)
-    setTransactions(updatedTransactions)
-    
-    if (user) {
-      localStorage.setItem(`cpf_transactions_${user.id}`, JSON.stringify(updatedTransactions))
+  const handleDeleteTransaction = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir esta transação?')) {
+      try {
+        await deleteTransaction(id)
+      } catch (error) {
+        console.error('Erro ao deletar transação:', error)
+        alert('Erro ao deletar transação. Tente novamente.')
+      }
     }
   }
 
@@ -184,11 +161,11 @@ export default function CPFPage() {
   // Categorias disponíveis baseadas no tipo
   const availableCategories = formData.type === 'receita' ? RECEITA_CATEGORIES : DESPESA_CATEGORIES
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-slate-600">Carregando...</p>
         </div>
       </div>
@@ -211,6 +188,11 @@ export default function CPFPage() {
             <p className="text-slate-600">
               Gerencie suas receitas e despesas com gráficos e análises detalhadas
             </p>
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
           </div>
 
           {/* Cards de Resumo */}
@@ -417,6 +399,15 @@ export default function CPFPage() {
                         </PopoverContent>
                       </Popover>
                     </div>
+
+                    <div className="md:col-span-2">
+                      <Label>Observações (opcional)</Label>
+                      <Input
+                        value={formData.observations}
+                        onChange={(e) => setFormData(prev => ({ ...prev, observations: e.target.value }))}
+                        placeholder="Observações adicionais..."
+                      />
+                    </div>
                   </div>
 
                   <div className="flex gap-2">
@@ -556,6 +547,11 @@ export default function CPFPage() {
                           <p className="text-sm text-slate-600">
                             {transaction.category} • {format(transaction.date, 'dd/MM/yyyy')}
                           </p>
+                          {transaction.observations && (
+                            <p className="text-xs text-slate-500 mt-1">
+                              {transaction.observations}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
@@ -565,7 +561,7 @@ export default function CPFPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteTransaction(transaction.id)}
+                          onClick={() => handleDeleteTransaction(transaction.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           Excluir

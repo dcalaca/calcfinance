@@ -47,6 +47,20 @@ export interface FinanceUserPreferences {
   updated_at: string
 }
 
+export interface OrcamentoItem {
+  id: string
+  orcamento_id: string
+  user_id: string
+  nome: string
+  valor: number
+  categoria: string
+  tipo: 'receita' | 'despesa'
+  data: string
+  observacoes?: string
+  created_at: string
+  updated_at: string
+}
+
 export interface FinanceAlert {
   id: string
   user_id: string
