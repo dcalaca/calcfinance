@@ -310,17 +310,21 @@ export default function MeuOrcamentoPage() {
         dataFormatada = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`
       }
 
+      const itemData = {
+        nome: novoItem.nome,
+        valor: novoItem.valor,
+        categoria: novoItem.categoria,
+        tipo: novoItem.tipo,
+        data: dataFormatada,
+        observacoes: novoItem.observacoes || '',
+        user_id: user?.id
+      }
+
+      console.log('Dados sendo enviados:', itemData)
+
       const { data, error } = await supabase
         .from('calc_orcamento_itens')
-        .insert([{
-          nome: novoItem.nome,
-          valor: novoItem.valor,
-          categoria: novoItem.categoria,
-          tipo: novoItem.tipo,
-          data: dataFormatada,
-          observacoes: novoItem.observacoes || '',
-          user_id: user?.id
-        }])
+        .insert([itemData])
         .select()
 
       if (error) throw error
@@ -380,7 +384,8 @@ export default function MeuOrcamentoPage() {
       
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
-      alert('Erro ao adicionar item. Tente novamente.')
+      console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+      alert(`Erro ao adicionar item: ${error.message || 'Erro desconhecido'}`)
     }
   }
 
