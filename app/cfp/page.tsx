@@ -20,11 +20,6 @@ import {
   DollarSign,
   PieChart as PieChartIcon,
   BarChart3,
-  Target,
-  AlertCircle,
-  CheckCircle,
-  PiggyBank,
-  Lightbulb,
   Loader2
 } from "lucide-react"
 import { format } from "date-fns"
@@ -652,96 +647,6 @@ export default function CPFPage() {
             </Card>
           )}
 
-          {/* Resultado e Orientações */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Resultado e Orientações
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {saldo > 0 ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    <div>
-                      <h3 className="font-semibold text-green-800">Parabéns! Você está no azul!</h3>
-                      <p className="text-green-700">
-                        Seu saldo positivo de R$ {saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} indica uma boa gestão financeira.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <PiggyBank className="w-5 h-5 text-blue-600" />
-                        <h4 className="font-semibold text-blue-800">Invista o Excedente</h4>
-                      </div>
-                      <p className="text-blue-700 text-sm">
-                        Considere investir parte do valor em aplicações de renda fixa ou variável para fazer seu dinheiro trabalhar por você.
-                      </p>
-                    </div>
-                    
-                    <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Lightbulb className="w-5 h-5 text-purple-600" />
-                        <h4 className="font-semibold text-purple-800">Reserva de Emergência</h4>
-                      </div>
-                      <p className="text-purple-700 text-sm">
-                        Mantenha uma reserva de emergência equivalente a 6 meses de despesas para imprevistos.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : saldo < 0 ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <AlertCircle className="w-6 h-6 text-red-600" />
-                    <div>
-                      <h3 className="font-semibold text-red-800">Atenção! Você está no vermelho</h3>
-                      <p className="text-red-700">
-                        Seu saldo negativo de R$ {Math.abs(saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} indica que você está gastando mais do que ganha.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingDown className="w-5 h-5 text-orange-600" />
-                        <h4 className="font-semibold text-orange-800">Reduza Gastos</h4>
-                      </div>
-                      <p className="text-orange-700 text-sm">
-                        Analise suas despesas e identifique categorias onde pode economizar. Priorize gastos essenciais.
-                      </p>
-                    </div>
-                    
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Target className="w-5 h-5 text-yellow-600" />
-                        <h4 className="font-semibold text-yellow-800">Aumente Receitas</h4>
-                      </div>
-                      <p className="text-yellow-700 text-sm">
-                        Considere formas de aumentar sua renda: freelances, vendas, ou desenvolvimento de novas habilidades.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                  <AlertCircle className="w-6 h-6 text-gray-600" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Equilíbrio Financeiro</h3>
-                    <p className="text-gray-700">
-                      Suas receitas e despesas estão equilibradas. Continue monitorando para manter esse controle.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
           {/* Lista de Transações */}
           <Card>
