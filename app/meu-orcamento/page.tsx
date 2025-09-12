@@ -239,17 +239,303 @@ export default function MeuOrcamentoPage() {
           </p>
         </div>
 
-        {/* Conteúdo principal será adicionado aqui */}
+        {/* Filtros */}
+        <div className="flex flex-wrap gap-4 p-4 bg-muted/50 rounded-lg mb-6">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Mês:</label>
+            <select 
+              value={filtroMes} 
+              onChange={(e) => {
+                setFiltroMes(e.target.value)
+                setFiltroMeses([]) // Limpar filtro múltiplo
+              }}
+              className="px-3 py-1 border rounded-md text-sm"
+            >
+              <option value="">Todos os meses</option>
+              {(() => {
+                // Buscar meses únicos dos itens
+                const mesesUnicos = new Set<string>()
+                
+                // Adicionar meses dos orçamentos existentes
+                orcamentos.forEach(orcamento => {
+                  if (orcamento.mes_referencia && orcamento.mes_referencia !== 'geral') {
+                    mesesUnicos.add(orcamento.mes_referencia)
+                  }
+                })
+                
+                // Adicionar meses dos itens individuais
+                orcamentos.forEach(orcamento => {
+                  if (orcamento.receitas) {
+                    orcamento.receitas.forEach((item: any) => {
+                      if (item.data) {
+                        const mesItem = item.data.slice(0, 7) + '-01'
+                        mesesUnicos.add(mesItem)
+                      }
+                    })
+                  }
+                  if (orcamento.despesas) {
+                    orcamento.despesas.forEach((item: any) => {
+                      if (item.data) {
+                        const mesItem = item.data.slice(0, 7) + '-01'
+                        mesesUnicos.add(mesItem)
+                      }
+                    })
+                  }
+                })
+                
+                return Array.from(mesesUnicos).sort().map(mes => (
+                  <option key={mes} value={mes}>
+                    {formatarMesAbreviado(mes)}
+                  </option>
+                ))
+              })()}
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Tipo:</label>
+            <select 
+              value={tipoFiltro} 
+              onChange={(e) => setTipoFiltro(e.target.value as "receita" | "despesa" | "todos")}
+              className="px-3 py-1 border rounded-md text-sm"
+            >
+              <option value="todos">Todos</option>
+              <option value="receita">Receitas</option>
+              <option value="despesa">Despesas</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Buscar:</label>
+            <Input
+              type="text"
+              placeholder="Nome do item..."
+              value={filtroItem}
+              onChange={(e) => setFiltroItem(e.target.value)}
+              className="w-48"
+            />
+          </div>
+        </div>
+
+        {/* Botão Adicionar Item */}
+        <div className="flex justify-start mb-6">
+          <Button 
+            className="w-full md:w-auto" 
+            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {mostrarFormulario ? "Ocultar Formulário" : "Adicionar Item"}
+          </Button>
+        </div>
+
+        {/* Formulário para adicionar item */}
+        {mostrarFormulario && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Adicionar Item</CardTitle>
+              <CardDescription>
+                Adicione uma nova receita ou despesa ao seu orçamento
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="nome">Nome</Label>
+                  <Input
+                    id="nome"
+                    value={novoItem.nome}
+                    onChange={(e) => setNovoItem({ ...novoItem, nome: e.target.value })}
+                    placeholder="Ex: Salário, Aluguel, etc."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="valor">Valor</Label>
+                  <Input
+                    id="valor"
+                    type="number"
+                    step="0.01"
+                    value={novoItem.valor}
+                    onChange={(e) => setNovoItem({ ...novoItem, valor: Number(e.target.value) })}
+                    placeholder="0,00"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="categoria">Categoria</Label>
+                  <Input
+                    id="categoria"
+                    value={novoItem.categoria}
+                    onChange={(e) => setNovoItem({ ...novoItem, categoria: e.target.value })}
+                    placeholder="Ex: Alimentação, Salário, etc."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="tipo">Tipo</Label>
+                  <Select 
+                    value={novoItem.tipo} 
+                    onValueChange={(value: "receita" | "despesa") => setNovoItem({ ...novoItem, tipo: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="receita">Receita</SelectItem>
+                      <SelectItem value="despesa">Despesa</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="data">Data</Label>
+                  <Input
+                    id="data"
+                    type="date"
+                    value={novoItem.data}
+                    onChange={(e) => setNovoItem({ ...novoItem, data: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="observacoes">Observações</Label>
+                  <Input
+                    id="observacoes"
+                    value={novoItem.observacoes}
+                    onChange={(e) => setNovoItem({ ...novoItem, observacoes: e.target.value })}
+                    placeholder="Observações opcionais"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button onClick={handleAdicionarItem} className="flex-1">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Item
+                </Button>
+                <Button variant="outline" onClick={() => setMostrarFormulario(false)}>
+                  Cancelar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Lista de Receitas e Despesas */}
         <div className="space-y-6">
-              <Card>
-                <CardContent className="p-8 text-center">
-              <DollarSign className="h-16 w-16 mx-auto mb-4 text-blue-600" />
-              <h2 className="text-2xl font-bold mb-2">Sistema de Orçamento</h2>
-                  <p className="text-muted-foreground mb-4">
-                Funcionalidade será restaurada em breve...
-                        </p>
-                      </CardContent>
-                    </Card>
+          <Tabs defaultValue="receitas" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="receitas" className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Receitas ({receitasFiltradas.length})
+              </TabsTrigger>
+              <TabsTrigger value="despesas" className="flex items-center gap-2">
+                <TrendingDown className="w-4 h-4" />
+                Despesas ({despesasFiltradas.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="receitas" className="space-y-4">
+              <div className="max-h-[70vh] overflow-y-auto pr-2">
+                {receitasFiltradas.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">
+                        {filtroItem ? "Nenhuma receita encontrada" : "Nenhuma receita adicionada"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {receitasFiltradas.map((item) => (
+                      <Card key={item.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{item.nome}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary">{item.categoria}</Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {item.data && (() => {
+                                    const [ano, mes, dia] = item.data.split('-').map(Number)
+                                    return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR')
+                                  })()}
+                                </span>
+                              </div>
+                              {item.observacoes && (
+                                <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-green-600">
+                                {formatarMoeda(item.valor)}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoverItem(item.id, "receita")}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="despesas" className="space-y-4">
+              <div className="max-h-[70vh] overflow-y-auto pr-2">
+                {despesasFiltradas.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <TrendingDown className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">
+                        {filtroItem ? "Nenhuma despesa encontrada" : "Nenhuma despesa adicionada"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {despesasFiltradas.map((item) => (
+                      <Card key={item.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{item.nome}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="secondary">{item.categoria}</Badge>
+                                <span className="text-sm text-muted-foreground">
+                                  {item.data && (() => {
+                                    const [ano, mes, dia] = item.data.split('-').map(Number)
+                                    return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR')
+                                  })()}
+                                </span>
+                              </div>
+                              {item.observacoes && (
+                                <p className="text-sm text-muted-foreground mt-1">{item.observacoes}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-red-600">
+                                {formatarMoeda(item.valor)}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoverItem(item.id, "despesa")}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
