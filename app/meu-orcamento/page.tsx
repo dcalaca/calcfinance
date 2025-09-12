@@ -487,36 +487,46 @@ export default function MeuOrcamentoPage() {
 
   // Receitas filtradas
   const receitasFiltradas = (() => {
-    if (filtroMes && orcamentoAtualFiltrado) {
-      return orcamentoAtualFiltrado.receitas.filter(item => {
-        if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
-        if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
-        return true
-      })
-    } else {
-      return orcamentos.flatMap(o => o.receitas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
-        if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
-        if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
-        return true
-      })
-    }
+    // Buscar todas as receitas de todos os orçamentos
+    const todasReceitas = orcamentos.flatMap(o => o.receitas.map(item => ({ ...item, mes_referencia: o.mes_referencia })))
+    
+    return todasReceitas.filter(item => {
+      // Filtro por mês baseado na data do item
+      if (filtroMes) {
+        const mesItem = item.data ? item.data.slice(0, 7) + '-01' : null
+        if (mesItem !== filtroMes) return false
+      }
+      
+      // Filtro por nome do item
+      if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
+      
+      // Filtro por tipo
+      if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
+      
+      return true
+    })
   })()
 
   // Despesas filtradas
   const despesasFiltradas = (() => {
-    if (filtroMes && orcamentoAtualFiltrado) {
-      return orcamentoAtualFiltrado.despesas.filter(item => {
-        if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
-        if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
-        return true
-      })
-    } else {
-      return orcamentos.flatMap(o => o.despesas.map(item => ({ ...item, mes_referencia: o.mes_referencia }))).filter(item => {
-        if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
-        if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
-        return true
-      })
-    }
+    // Buscar todas as despesas de todos os orçamentos
+    const todasDespesas = orcamentos.flatMap(o => o.despesas.map(item => ({ ...item, mes_referencia: o.mes_referencia })))
+    
+    return todasDespesas.filter(item => {
+      // Filtro por mês baseado na data do item
+      if (filtroMes) {
+        const mesItem = item.data ? item.data.slice(0, 7) + '-01' : null
+        if (mesItem !== filtroMes) return false
+      }
+      
+      // Filtro por nome do item
+      if (filtroItem && !item.nome.toLowerCase().includes(filtroItem.toLowerCase())) return false
+      
+      // Filtro por tipo
+      if (tipoFiltro !== "todos" && item.tipo !== tipoFiltro) return false
+      
+      return true
+    })
   })()
 
   // Debug logs removidos para melhor performance
@@ -671,7 +681,6 @@ export default function MeuOrcamentoPage() {
         <Button 
           className="w-full md:w-auto" 
           onClick={() => setMostrarFormulario(!mostrarFormulario)}
-          disabled={!orcamentoAtualFiltrado && !!filtroMes}
         >
           <Plus className="w-4 h-4 mr-2" />
           {mostrarFormulario ? "Ocultar Formulário" : "Adicionar Item"}
@@ -679,7 +688,7 @@ export default function MeuOrcamentoPage() {
       </div>
 
       {/* Formulário para adicionar item - MOVIDO PARA O TOPO */}
-      {mostrarFormulario && (orcamentoAtualFiltrado || !filtroMes) && (
+      {mostrarFormulario && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Adicionar Item</CardTitle>
@@ -774,17 +783,17 @@ export default function MeuOrcamentoPage() {
         </Card>
       )}
 
-      {!orcamentoAtualFiltrado && filtroMes ? (
+      {receitasFiltradas.length === 0 && despesasFiltradas.length === 0 && filtroMes ? (
         <Card>
           <CardContent className="p-8 text-center">
             <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum orçamento encontrado</h3>
+            <h3 className="text-xl font-semibold mb-2">Nenhum item encontrado</h3>
             <p className="text-muted-foreground mb-4">
-              Crie seu primeiro orçamento para começar a controlar suas finanças
+              Não há itens para o mês selecionado. Adicione um item para começar.
             </p>
             <Button onClick={() => setMostrarFormulario(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Criar Orçamento
+              Adicionar Item
             </Button>
           </CardContent>
         </Card>
@@ -812,11 +821,11 @@ export default function MeuOrcamentoPage() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      {filtroMes && orcamentoAtualFiltrado ? formatarMes(orcamentoAtualFiltrado.mes_referencia) : "Orçamento Geral"}
+                      {filtroMes ? formatarMes(filtroMes) : "Orçamento Geral"}
                     </CardTitle>
                   </div>
                   <CardDescription>
-                    {filtroMes && orcamentoAtualFiltrado ? `Orçamento ${formatarMes(orcamentoAtualFiltrado.mes_referencia)}` : "Orçamento Geral Acumulado"}
+                    {filtroMes ? `Orçamento ${formatarMes(filtroMes)}` : "Orçamento Geral Acumulado"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
