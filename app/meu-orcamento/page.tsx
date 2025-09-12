@@ -653,7 +653,7 @@ export default function MeuOrcamentoPage() {
   }, 0)
   const sobraMensal = totalReceitas - totalDespesas
 
-  const temSobra = sobraMensal > 0
+  const temSobra = sobraMensal > 0 // Forçar novo deploy
 
   return (
     <div className="w-full max-w-none py-8 px-4 pb-20 md:pb-8">
