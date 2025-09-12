@@ -229,6 +229,51 @@ export default function MeuOrcamentoPage() {
     )
   }
 
+  const formatarMoeda = (valor: number) => {
+    return valor.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
+  }
+
+  const formatarMesAbreviado = (data: string) => {
+    // Verificar se data existe e tem formato válido
+    if (!data || typeof data !== 'string') {
+      return 'Data inválida'
+    }
+    
+    // Se for "geral", retornar "Geral"
+    if (data === 'geral') {
+      return 'Geral'
+    }
+    
+    // Dividir a data em partes para evitar problemas de timezone
+    const partes = data.split('-')
+    if (partes.length !== 3) {
+      return 'Data inválida'
+    }
+    
+    const [ano, mes, dia] = partes.map(Number)
+    
+    // Verificar se os números são válidos
+    if (isNaN(ano) || isNaN(mes) || isNaN(dia)) {
+      return 'Data inválida'
+    }
+    
+    // Criar data local (mês é 0-indexado, então subtrair 1)
+    const date = new Date(ano, mes - 1, dia)
+    
+    // Verificar se a data é válida
+    if (isNaN(date.getTime())) {
+      return `${mes.toString().padStart(2, '0')}/${ano.toString().slice(-2)}`
+    }
+    
+    return date.toLocaleDateString('pt-BR', { 
+      year: '2-digit', 
+      month: 'short' 
+    })
+  }
+
   return (
     <div className="w-full max-w-none py-8 px-4 pb-20 md:pb-8">
       <div className="max-w-7xl mx-auto">
