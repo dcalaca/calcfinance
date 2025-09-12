@@ -31,6 +31,22 @@ import { ptBR } from "date-fns/locale"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useCFPTransactions, type CFPTransaction } from "@/hooks/use-cfp-transactions"
 import { useRouter } from "next/navigation"
+import { 
+  LineChart, 
+  Line, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar
+} from "recharts"
 
 interface FilterOptions {
   dateFrom: Date | null
@@ -160,6 +176,76 @@ export default function CPFPage() {
 
   // Categorias disponíveis baseadas no tipo
   const availableCategories = formData.type === 'receita' ? RECEITA_CATEGORIES : DESPESA_CATEGORIES
+
+  // Preparar dados para gráficos
+  const prepareChartData = () => {
+    // Agrupar por mês
+    const monthlyData = filteredTransactions.reduce((acc, transaction) => {
+      const month = format(transaction.date, 'MMM/yyyy', { locale: ptBR })
+      if (!acc[month]) {
+        acc[month] = { month, receitas: 0, despesas: 0, saldo: 0 }
+      }
+      if (transaction.type === 'receita') {
+        acc[month].receitas += transaction.amount
+      } else {
+        acc[month].despesas += transaction.amount
+      }
+      acc[month].saldo = acc[month].receitas - acc[month].despesas
+      return acc
+    }, {} as Record<string, any>)
+
+    return Object.values(monthlyData).sort((a, b) => {
+      const dateA = new Date(a.month.split('/')[1], a.month.split('/')[0] - 1)
+      const dateB = new Date(b.month.split('/')[1], b.month.split('/')[0] - 1)
+      return dateA.getTime() - dateB.getTime()
+    })
+  }
+
+  const prepareCategoryData = () => {
+    const categoryTotals = filteredTransactions.reduce((acc, transaction) => {
+      if (!acc[transaction.category]) {
+        acc[transaction.category] = { name: transaction.category, receitas: 0, despesas: 0 }
+      }
+      if (transaction.type === 'receita') {
+        acc[transaction.category].receitas += transaction.amount
+      } else {
+        acc[transaction.category].despesas += transaction.amount
+      }
+      return acc
+    }, {} as Record<string, any>)
+
+    return Object.values(categoryTotals)
+  }
+
+  const preparePieData = () => {
+    const receitas = filteredTransactions
+      .filter(t => t.type === 'receita')
+      .reduce((acc, t) => {
+        if (!acc[t.category]) acc[t.category] = 0
+        acc[t.category] += t.amount
+        return acc
+      }, {} as Record<string, number>)
+
+    const despesas = filteredTransactions
+      .filter(t => t.type === 'despesa')
+      .reduce((acc, t) => {
+        if (!acc[t.category]) acc[t.category] = 0
+        acc[t.category] += t.amount
+        return acc
+      }, {} as Record<string, number>)
+
+    return {
+      receitas: Object.entries(receitas).map(([name, value]) => ({ name, value })),
+      despesas: Object.entries(despesas).map(([name, value]) => ({ name, value }))
+    }
+  }
+
+  const chartData = prepareChartData()
+  const categoryData = prepareCategoryData()
+  const pieData = preparePieData()
+
+  // Cores para os gráficos
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF7C7C']
 
   if (authLoading || loading) {
     return (
@@ -315,6 +401,150 @@ export default function CPFPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Gráficos */}
+          {filteredTransactions.length > 0 && (
+            <div className="mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    Análise Visual
+                  </CardTitle>
+                  <CardDescription>
+                    Gráficos interativos baseados nos seus dados filtrados
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Tabs defaultValue="timeline" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
+                      <TabsTrigger value="categories">Categorias</TabsTrigger>
+                      <TabsTrigger value="distribution">Distribuição</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="timeline" className="mt-6">
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={chartData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis />
+                            <Tooltip 
+                              formatter={(value, name) => [
+                                `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                name === 'receitas' ? 'Receitas' : name === 'despesas' ? 'Despesas' : 'Saldo'
+                              ]}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="receitas" 
+                              stackId="1" 
+                              stroke="#10b981" 
+                              fill="#10b981" 
+                              fillOpacity={0.6}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="despesas" 
+                              stackId="2" 
+                              stroke="#ef4444" 
+                              fill="#ef4444" 
+                              fillOpacity={0.6}
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="categories" className="mt-6">
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={categoryData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip 
+                              formatter={(value, name) => [
+                                `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                name === 'receitas' ? 'Receitas' : 'Despesas'
+                              ]}
+                            />
+                            <Bar dataKey="receitas" fill="#10b981" name="Receitas" />
+                            <Bar dataKey="despesas" fill="#ef4444" name="Despesas" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="distribution" className="mt-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-lg font-semibold mb-4 text-green-600">Receitas por Categoria</h4>
+                          <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={pieData.receitas}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {pieData.receitas.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  formatter={(value) => [
+                                    `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                    'Valor'
+                                  ]}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-lg font-semibold mb-4 text-red-600">Despesas por Categoria</h4>
+                          <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={pieData.despesas}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {pieData.despesas.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  formatter={(value) => [
+                                    `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                                    'Valor'
+                                  ]}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Botão Adicionar */}
           <div className="mb-8">
