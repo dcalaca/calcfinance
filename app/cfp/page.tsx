@@ -673,45 +673,124 @@ export default function CPFPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredTransactions
-                    .sort((a, b) => b.date.getTime() - a.date.getTime())
-                    .map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <Badge variant={transaction.type === 'receita' ? 'default' : 'destructive'}>
-                          {transaction.type === 'receita' ? 'Receita' : 'Despesa'}
-                        </Badge>
-                        <div>
-                          <h4 className="font-medium">{transaction.description}</h4>
-                          <p className="text-sm text-slate-600">
-                            {transaction.category} • {format(transaction.date, 'dd/MM/yyyy')}
-                          </p>
-                          {transaction.observations && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              {transaction.observations}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <span className={`font-semibold ${transaction.type === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
-                          {transaction.type === 'receita' ? '+' : '-'}R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteTransaction(transaction.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          Excluir
-                        </Button>
-                      </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Coluna de Receitas */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <h3 className="text-lg font-semibold text-green-600">
+                        Receitas ({filteredTransactions.filter(t => t.type === 'receita').length})
+                      </h3>
                     </div>
-                  ))}
+                    {filteredTransactions
+                      .filter(t => t.type === 'receita')
+                      .sort((a, b) => b.date.getTime() - a.date.getTime())
+                      .length === 0 ? (
+                      <div className="text-center py-8 border-2 border-dashed border-green-200 rounded-lg">
+                        <TrendingUp className="w-8 h-8 text-green-300 mx-auto mb-2" />
+                        <p className="text-green-600 text-sm">Nenhuma receita encontrada</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {filteredTransactions
+                          .filter(t => t.type === 'receita')
+                          .sort((a, b) => b.date.getTime() - a.date.getTime())
+                          .map((transaction) => (
+                          <div
+                            key={transaction.id}
+                            className="flex items-center justify-between p-4 border border-green-200 rounded-lg hover:bg-green-50 transition-colors"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <div>
+                                <h4 className="font-medium text-slate-900">{transaction.description}</h4>
+                                <p className="text-sm text-slate-600">
+                                  {transaction.category} • {format(transaction.date, 'dd/MM/yyyy')}
+                                </p>
+                                {transaction.observations && (
+                                  <p className="text-xs text-slate-500 mt-1">
+                                    {transaction.observations}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <span className="font-semibold text-green-600">
+                                +R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteTransaction(transaction.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                Excluir
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Coluna de Despesas */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <TrendingDown className="w-5 h-5 text-red-600" />
+                      <h3 className="text-lg font-semibold text-red-600">
+                        Despesas ({filteredTransactions.filter(t => t.type === 'despesa').length})
+                      </h3>
+                    </div>
+                    {filteredTransactions
+                      .filter(t => t.type === 'despesa')
+                      .sort((a, b) => b.date.getTime() - a.date.getTime())
+                      .length === 0 ? (
+                      <div className="text-center py-8 border-2 border-dashed border-red-200 rounded-lg">
+                        <TrendingDown className="w-8 h-8 text-red-300 mx-auto mb-2" />
+                        <p className="text-red-600 text-sm">Nenhuma despesa encontrada</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {filteredTransactions
+                          .filter(t => t.type === 'despesa')
+                          .sort((a, b) => b.date.getTime() - a.date.getTime())
+                          .map((transaction) => (
+                          <div
+                            key={transaction.id}
+                            className="flex items-center justify-between p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <div>
+                                <h4 className="font-medium text-slate-900">{transaction.description}</h4>
+                                <p className="text-sm text-slate-600">
+                                  {transaction.category} • {format(transaction.date, 'dd/MM/yyyy')}
+                                </p>
+                                {transaction.observations && (
+                                  <p className="text-xs text-slate-500 mt-1">
+                                    {transaction.observations}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <span className="font-semibold text-red-600">
+                                -R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteTransaction(transaction.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                Excluir
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </CardContent>
