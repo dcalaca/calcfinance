@@ -47,6 +47,7 @@ import {
 interface FilterOptions {
   dateFrom: Date | null
   dateTo: Date | null
+  month: string
   type: 'all' | 'receita' | 'despesa'
   category: string
 }
@@ -80,9 +81,13 @@ export default function CPFPage() {
   const [filters, setFilters] = useState<FilterOptions>({
     dateFrom: null,
     dateTo: null,
+    month: 'all',
     type: 'all',
     category: 'all'
   })
+
+  // Estado para controlar se os filtros estão visíveis
+  const [showFilters, setShowFilters] = useState(false)
 
   // Verificar autenticação
   useEffect(() => {
@@ -101,6 +106,14 @@ export default function CPFPage() {
 
     if (filters.category !== 'all') {
       filtered = filtered.filter(t => t.category === filters.category)
+    }
+
+    if (filters.month !== 'all') {
+      const [year, month] = filters.month.split('-')
+      filtered = filtered.filter(t => 
+        t.date.getFullYear() === parseInt(year) && 
+        t.date.getMonth() === parseInt(month) - 1
+      )
     }
 
     if (filters.dateFrom) {
@@ -172,6 +185,22 @@ export default function CPFPage() {
 
   // Categorias disponíveis baseadas no tipo
   const availableCategories = formData.type === 'receita' ? RECEITA_CATEGORIES : DESPESA_CATEGORIES
+
+  // Gerar opções de mês para o filtro
+  const generateMonthOptions = () => {
+    const options = []
+    const currentDate = new Date()
+    
+    // Adicionar últimos 12 meses
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+      const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      const label = date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long' })
+      options.push({ value, label })
+    }
+    
+    return options
+  }
 
   // Preparar dados para gráficos
   const prepareChartData = () => {
@@ -330,83 +359,131 @@ export default function CPFPage() {
           {/* Filtros */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Filtros
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-5 h-5" />
+                  Filtros
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="w-4 h-4" />
+                  {showFilters ? 'Ocultar' : 'Mostrar'} Filtros
+                </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <Label>Data Inicial</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dateFrom ? format(filters.dateFrom, 'dd/MM/yyyy') : 'Selecionar'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={filters.dateFrom || undefined}
-                        onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: date || null }))}
-                        locale={ptBR}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+            {showFilters && (
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div>
+                    <Label>Mês</Label>
+                    <Select value={filters.month} onValueChange={(value) => setFilters(prev => ({ ...prev, month: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecionar mês" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os meses</SelectItem>
+                        {generateMonthOptions().map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Label>Data Final</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dateTo ? format(filters.dateTo, 'dd/MM/yyyy') : 'Selecionar'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={filters.dateTo || undefined}
-                        onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: date || null }))}
-                        locale={ptBR}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                  <div>
+                    <Label>Tipo</Label>
+                    <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value as any }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="receita">Receitas</SelectItem>
+                        <SelectItem value="despesa">Despesas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Label>Tipo</Label>
-                  <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value as any }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="receita">Receitas</SelectItem>
-                      <SelectItem value="despesa">Despesas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div>
+                    <Label>Categoria</Label>
+                    <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas</SelectItem>
+                        {[...RECEITA_CATEGORIES, ...DESPESA_CATEGORIES].map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <Label>Categoria</Label>
-                  <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      {[...RECEITA_CATEGORIES, ...DESPESA_CATEGORIES].map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <Label>Data Inicial</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start text-left">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateFrom ? format(filters.dateFrom, 'dd/MM/yyyy') : 'Selecionar'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={filters.dateFrom || undefined}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, dateFrom: date || null }))}
+                          locale={ptBR}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div>
+                    <Label>Data Final</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start text-left">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {filters.dateTo ? format(filters.dateTo, 'dd/MM/yyyy') : 'Selecionar'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={filters.dateTo || undefined}
+                          onSelect={(date) => setFilters(prev => ({ ...prev, dateTo: date || null }))}
+                          locale={ptBR}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
+                
+                {/* Botão para limpar filtros */}
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setFilters({
+                      dateFrom: null,
+                      dateTo: null,
+                      month: 'all',
+                      type: 'all',
+                      category: 'all'
+                    })}
+                    className="text-slate-600"
+                  >
+                    Limpar Filtros
+                  </Button>
+                </div>
+              </CardContent>
+            )}
           </Card>
 
           {/* Gráficos */}
