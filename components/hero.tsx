@@ -15,8 +15,7 @@ export function Hero() {
               <span className="text-blue-600"> Vida Financeira</span>
             </h1>
             <p className="text-xl lg:text-2xl text-slate-600 mb-8 max-w-3xl mx-auto">
-              Calculadoras avançadas, notícias em tempo real e educação gratuita para você tomar as melhores decisões
-              financeiras
+              Calculadoras avançadas e notícias em tempo real para você tomar as melhores decisões financeiras
             </p>
           </div>
 
@@ -33,7 +32,7 @@ export function Hero() {
                   >
                     <Link href="/calculadoras">
                       <Calculator className="w-5 h-5 mr-2" />
-                      Começar Agora
+                      Usar Calculadoras
                     </Link>
                   </Button>
                   <Button 

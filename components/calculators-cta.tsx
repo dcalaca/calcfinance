@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calculator, Lock, ArrowRight } from "lucide-react"
+import { Calculator, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 export function CalculatorsCTA() {
@@ -23,25 +23,16 @@ export function CalculatorsCTA() {
               </CardDescription>
             </CardHeader>
             <CardContent className="pb-8">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <Lock className="w-6 h-6 text-amber-600" />
-                  <h3 className="text-xl font-semibold text-amber-800">
-                    Login obrigatório para usar as calculadoras
-                  </h3>
-                </div>
-                <p className="text-amber-700 mb-6">
-                  Crie sua conta gratuita e tenha acesso a todas as ferramentas financeiras avançadas
-                </p>
+              <div className="text-center mb-8">
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button 
                     size="lg" 
                     className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold"
                     asChild
                   >
-                    <Link href="/registro">
+                    <Link href="/calculadoras">
                       <Calculator className="w-5 h-5 mr-2" />
-                      Criar Conta Gratuita
+                      Usar Calculadoras
                     </Link>
                   </Button>
                   <Button 
@@ -50,8 +41,8 @@ export function CalculatorsCTA() {
                     className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold"
                     asChild
                   >
-                    <Link href="/calculadoras">
-                      Ver Todas as Calculadoras
+                    <Link href="/educacao">
+                      Educação Gratuita
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Link>
                   </Button>
