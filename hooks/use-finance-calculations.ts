@@ -57,7 +57,10 @@ export function useFinanceCalculations() {
     results: Record<string, any>,
     tags?: string[],
   ) => {
-    if (!user) return { error: "Usuário não autenticado" }
+    if (!user) {
+      // Retornar um erro especial que indica que precisa de login
+      return { error: "LOGIN_REQUIRED", message: "Faça login para salvar seus cálculos" }
+    }
 
     const { data, error } = await supabase
       .from("calc_calculations")

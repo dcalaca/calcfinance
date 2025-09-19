@@ -129,18 +129,7 @@ export function CalculadorasPageClient() {
     ? calculators 
     : calculators.filter(calc => calc.category === activeCategory)
 
-  if (loading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Carregando calculadoras...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Remover loading - as calculadoras agora são acessíveis sem login
 
   return (
     <div className="container mx-auto py-8 px-4">

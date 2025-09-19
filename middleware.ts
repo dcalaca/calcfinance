@@ -6,12 +6,9 @@ export function middleware(request: NextRequest) {
   
   console.log("🔧 Middleware - Rota:", pathname)
   
-  // Rotas que precisam de autenticação
+  // Rotas que precisam de autenticação (apenas CFP e funcionalidades que salvam dados)
   const protectedRoutes = [
-    '/calculadoras',
-    '/calculadoras/juros-compostos',
-    '/calculadoras/financiamento',
-    '/calculadoras/financiamento-veicular',
+    '/cfp',
     '/dashboard',
     '/historico',
     '/meu-orcamento'
@@ -62,10 +59,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Desabilitar temporariamente para testar
-    // '/calculadoras/:path*',
-    // '/dashboard/:path*',
-    // '/historico/:path*',
-    // '/meu-orcamento/:path*'
+    '/cfp/:path*',
+    '/dashboard/:path*',
+    '/historico/:path*',
+    '/meu-orcamento/:path*'
   ]
 }

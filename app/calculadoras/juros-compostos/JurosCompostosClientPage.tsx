@@ -12,6 +12,7 @@ import { useFinanceCalculations } from "@/hooks/use-finance-calculations"
 import { Calculator, TrendingUp, DollarSign, Calendar } from "lucide-react"
 import { toast } from "sonner"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { LoginPrompt } from "@/components/login-prompt"
 
 export default function JurosCompostosClientPage() {
   const [valorInicial, setValorInicial] = useState(0)
@@ -100,22 +101,30 @@ export default function JurosCompostosClientPage() {
     setResultado(resultadoCalculo)
     setChartData(dadosGrafico)
     
-    // Salvar cálculo automaticamente se o usuário estiver logado
+    // Tentar salvar cálculo se o usuário estiver logado
     if (user) {
       try {
-        await saveCalculation(
+        const result = await saveCalculation(
           "juros_compostos",
           `Juros Compostos - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valorInicial)}`,
           { valorInicial, aporteMensal, taxa, periodo, tipoTaxa, tipoPeriodo },
           resultadoCalculo
         )
-        toast.success("Cálculo realizado e salvo com sucesso!")
+        
+        if (result.error === "LOGIN_REQUIRED") {
+          toast.success("Cálculo realizado com sucesso! Faça login para salvar.")
+        } else if (result.error) {
+          console.error("Erro ao salvar cálculo:", result.error)
+          toast.success("Cálculo realizado com sucesso!")
+        } else {
+          toast.success("Cálculo realizado e salvo com sucesso!")
+        }
       } catch (error) {
         console.error("Erro ao salvar cálculo:", error)
         toast.success("Cálculo realizado com sucesso!")
       }
     } else {
-      toast.success("Cálculo realizado com sucesso!")
+      toast.success("Cálculo realizado com sucesso! Faça login para salvar.")
     }
   }
 
@@ -291,6 +300,50 @@ export default function JurosCompostosClientPage() {
                         <Line type="monotone" dataKey="juros" stroke="#8b5cf6" strokeWidth={2} name="Juros" />
                       </LineChart>
                     </ResponsiveContainer>
+                  </div>
+                )}
+                
+                {/* Botão de Salvar */}
+                {resultado && (
+                  <div className="mt-6 pt-6 border-t">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      {user ? (
+                        <Button 
+                          onClick={async () => {
+                            try {
+                              const result = await saveCalculation(
+                                "juros_compostos",
+                                `Juros Compostos - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valorInicial)}`,
+                                { valorInicial, aporteMensal, taxa, periodo, tipoTaxa, tipoPeriodo },
+                                resultado
+                              )
+                              
+                              if (result.error) {
+                                toast.error("Erro ao salvar cálculo")
+                              } else {
+                                toast.success("Cálculo salvo com sucesso!")
+                              }
+                            } catch (error) {
+                              toast.error("Erro ao salvar cálculo")
+                            }
+                          }}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <Calculator className="w-4 h-4 mr-2" />
+                          Salvar Cálculo
+                        </Button>
+                      ) : (
+                        <LoginPrompt
+                          title="Salvar Cálculo"
+                          description="Faça login para salvar este cálculo e acessá-lo depois"
+                        >
+                          <Button className="bg-green-600 hover:bg-green-700">
+                            <Calculator className="w-4 h-4 mr-2" />
+                            Salvar Cálculo
+                          </Button>
+                        </LoginPrompt>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
