@@ -317,7 +317,24 @@ export function Header() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-inset-bottom ios-fixed-bottom">
+      <div 
+        className="md:hidden bg-white border-t border-gray-200 z-50 safe-area-inset-bottom ios-fixed-bottom"
+        style={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          right: '0',
+          width: '100%',
+          zIndex: 9999,
+          transform: 'translate3d(0, 0, 0)',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden',
+          WebkitPerspective: '1000px',
+          perspective: '1000px'
+        }}
+      >
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex items-center py-2 min-w-max px-2">
             {navigation.map((item) => {

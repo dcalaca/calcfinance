@@ -131,6 +131,46 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Fix para barra inferior no iOS
+              if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                // Força a barra inferior a ficar fixa
+                function fixBottomBar() {
+                  const bottomBar = document.querySelector('.ios-fixed-bottom');
+                  if (bottomBar) {
+                    bottomBar.style.position = 'fixed';
+                    bottomBar.style.bottom = '0';
+                    bottomBar.style.left = '0';
+                    bottomBar.style.right = '0';
+                    bottomBar.style.zIndex = '9999';
+                    bottomBar.style.transform = 'translate3d(0, 0, 0)';
+                    bottomBar.style.webkitTransform = 'translate3d(0, 0, 0)';
+                  }
+                }
+                
+                // Aplica o fix quando a página carrega
+                document.addEventListener('DOMContentLoaded', fixBottomBar);
+                
+                // Reaplica o fix quando a orientação muda
+                window.addEventListener('orientationchange', function() {
+                  setTimeout(fixBottomBar, 100);
+                });
+                
+                // Reaplica o fix quando a página ganha foco
+                window.addEventListener('focus', fixBottomBar);
+                
+                // Previne scroll da página quando toca na barra
+                document.addEventListener('touchstart', function(e) {
+                  if (e.target.closest('.ios-fixed-bottom')) {
+                    e.preventDefault();
+                  }
+                }, { passive: false });
+              }
+            `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
