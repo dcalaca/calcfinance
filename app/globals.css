@@ -199,3 +199,35 @@ body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+
+/* Fix para barra inferior no iOS */
+@supports (-webkit-touch-callout: none) {
+  .ios-fixed-bottom {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    will-change: transform !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+}
+
+/* Safe area para dispositivos com notch */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fix específico para viewport do iOS */
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .fixed {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}

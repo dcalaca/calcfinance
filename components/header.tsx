@@ -317,7 +317,7 @@ export function Header() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-inset-bottom ios-fixed-bottom">
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex items-center py-2 min-w-max px-2">
             {navigation.map((item) => {
