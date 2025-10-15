@@ -45,14 +45,14 @@ export default function EsqueciSenhaPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Image 
-            src="/logo.png" 
-            alt="CalcFy" 
-            width={120} 
-            height={48} 
-            className="mx-auto mb-4 h-12 w-auto"
-            priority
-          />
+            <Image
+              src="/calcfy-logo.svg"
+              alt="CalcFy"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
           <h1 className="text-2xl font-bold text-slate-900">Recuperar Senha</h1>
           <p className="text-slate-600">Digite seu e-mail para receber as instruções</p>
         </div>

@@ -35,7 +35,7 @@ function LoginFormContent() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/logo.png"
+              src="/calcfy-logo.svg"
               alt="CalcFy"
               width={120}
               height={48}
@@ -57,7 +57,7 @@ function LoginFormContent() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/logo.png"
+              src="/calcfy-logo.svg"
               alt="CalcFy"
               width={120}
               height={48}
@@ -71,7 +71,10 @@ function LoginFormContent() {
           <Card>
             <CardContent className="pt-6">
               <Button 
-                onClick={() => router.push(redirectTo)}
+                onClick={() => {
+                  console.log("🔄 Botão clicado! Redirecionando para:", redirectTo)
+                  router.push(redirectTo)
+                }}
                 className="w-full"
               >
                 Ir para Dashboard
@@ -221,7 +224,7 @@ function LoginForm() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/logo.png"
+              src="/calcfy-logo.svg"
               alt="CalcFy"
               width={120}
               height={48}
