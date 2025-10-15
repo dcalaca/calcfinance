@@ -39,8 +39,8 @@ function LoginFormContent() {
       console.log("✅ Usuário logado, redirecionando para:", redirectTo)
       setHasRedirected(true)
       
-      // Usar window.location.href para redirecionamento confiável em produção
-      window.location.href = redirectTo
+      // Usar window.location.replace para redirecionamento limpo (sem histórico)
+      window.location.replace(redirectTo)
     }
   }, [user, loading, hasRedirected, redirectTo])
 
@@ -71,7 +71,7 @@ function LoginFormContent() {
         setTimeout(() => {
           console.log("🔄 Redirecionando após login...")
           setHasRedirected(true)
-          window.location.href = redirectTo
+          window.location.replace(redirectTo)
         }, 1000)
       }
     } catch (error) {
