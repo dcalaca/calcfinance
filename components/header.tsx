@@ -61,7 +61,7 @@ export function Header() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/logoresumo.png"
+                  src="/logooriginal.png"
                   alt="CalcFy - Calculadoras Financeiras Gratuitas"
                   width={120}
                   height={40}
@@ -108,7 +108,7 @@ export function Header() {
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/logoresumo.png"
+                  src="/logooriginal.png"
                   alt="CalcFy - Calculadoras Financeiras Gratuitas"
                   width={120}
                   height={40}
