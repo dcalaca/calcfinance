@@ -23,7 +23,6 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasRedirected, setHasRedirected] = useState(false)
 
   const { user, loading, signIn } = useFinanceAuth()
   const router = useRouter()
@@ -31,18 +30,17 @@ function LoginFormContent() {
   const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   // Debug simples
-  console.log("🔍 Estado:", { user: !!user, loading, hasRedirected })
+  console.log("🔍 Estado:", { user: !!user, loading })
 
-  // Redirecionamento com proteção contra loops
+  // Redirecionamento simples
   useEffect(() => {
-    if (user && !loading && !hasRedirected) {
-      console.log("✅ Redirecionando para:", redirectTo)
-      setHasRedirected(true)
+    if (user && !loading) {
+      console.log("✅ Usuário logado detectado, redirecionando para:", redirectTo)
       
       // Usar router.push para navegação SPA (sem reload)
       router.push(redirectTo)
     }
-  }, [user, loading, hasRedirected, redirectTo, router])
+  }, [user, loading, redirectTo, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,7 +67,6 @@ function LoginFormContent() {
         
         setTimeout(() => {
           console.log("🔄 Redirecionando após login...")
-          setHasRedirected(true)
           router.push(redirectTo)
         }, 1000)
       }
