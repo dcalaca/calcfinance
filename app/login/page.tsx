@@ -39,10 +39,10 @@ function LoginFormContent() {
       console.log("✅ Usuário logado, redirecionando para:", redirectTo)
       setHasRedirected(true)
       
-      // Usar router.push para navegação SPA (sem reload)
-      router.push(redirectTo)
+      // Usar window.location.href para redirecionamento confiável em produção
+      window.location.href = redirectTo
     }
-  }, [user, loading, hasRedirected, redirectTo, router])
+  }, [user, loading, hasRedirected, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,7 +71,7 @@ function LoginFormContent() {
         setTimeout(() => {
           console.log("🔄 Redirecionando após login...")
           setHasRedirected(true)
-          router.push(redirectTo)
+          window.location.href = redirectTo
         }, 1000)
       }
     } catch (error) {
