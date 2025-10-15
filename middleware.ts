@@ -6,6 +6,22 @@ export function middleware(request: NextRequest) {
   
   console.log("🔧 Middleware - Rota:", pathname)
   
+  // Verificar se há cookies do Supabase (usuário logado)
+  const allCookies = request.cookies.getAll()
+  const supabaseCookies = allCookies.filter(cookie => 
+    cookie.name.startsWith('sb-') || 
+    cookie.name.includes('supabase') ||
+    cookie.name.includes('session')
+  )
+  const hasSupabaseCookie = supabaseCookies.length > 0
+  
+  // Se usuário está logado e tenta acessar /login, redirecionar para dashboard
+  if (pathname === '/login' && hasSupabaseCookie) {
+    console.log("✅ Middleware - Usuário logado tentando acessar login, redirecionando para dashboard")
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/dashboard'
+    return NextResponse.redirect(new URL(redirectTo, request.url))
+  }
+  
   // Rotas que precisam de autenticação (apenas CFP e funcionalidades que salvam dados)
   const protectedRoutes = [
     '/cfp',
@@ -59,6 +75,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/login',
     '/cfp/:path*',
     '/dashboard/:path*',
     '/historico/:path*',
