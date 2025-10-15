@@ -1,6 +1,7 @@
 "use client"
 
-export const dynamic = 'force-dynamic'
+// Remover dynamic = 'force-dynamic' que pode estar causando problemas
+// export const dynamic = 'force-dynamic'
 
 import type React from "react"
 import { useState, useEffect, Suspense } from "react"
@@ -20,16 +21,8 @@ import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 
 function LoginFormContent() {
+  // Log simples que deve aparecer sempre
   console.log("🚀 LoginFormContent iniciado")
-  
-  // Teste simples para verificar se JavaScript está executando
-  if (typeof window !== 'undefined') {
-    console.log("🌐 JavaScript executando no cliente")
-    // Alert simples para debug
-    setTimeout(() => {
-      console.log("🔔 Teste de execução JavaScript - se você ver este log, o JS está funcionando")
-    }, 1000)
-  }
   
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -37,156 +30,35 @@ function LoginFormContent() {
     password: "",
   })
 
-  // Dentro do componente, após const [formData, setFormData] = useState({...})
-  const { signIn, user, loading } = useFinanceAuth()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  // Simplificar - remover dependências complexas temporariamente
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false) // Começar como false para teste
 
-  // Verificar se está carregando
+  // Teste simples de useEffect
   useEffect(() => {
-    if (!loading) {
-      setIsLoading(false)
-    }
-  }, [loading])
-
-  // Debug: verificar configuração no ambiente de produção
-  useEffect(() => {
-    console.log("🔍 DEBUG - Configuração do ambiente:")
-    console.log("  - NODE_ENV:", process.env.NODE_ENV)
-    console.log("  - NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
-    console.log("  - NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
-    console.log("  - NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL)
-    
-    // Forçar log mesmo se houver erro
-    try {
-      console.log("🔍 Tentando acessar window:", typeof window)
-      console.log("🔍 Tentando acessar document:", typeof document)
-      
-      // Teste mais direto
-      console.log("🔍 TESTE DIRETO - Se você vê este log, o JavaScript está funcionando!")
-      
-      // Verificar se há erros JavaScript
-      window.addEventListener('error', (e) => {
-        console.error("❌ ERRO JAVASCRIPT:", e.error)
-      })
-      
-    } catch (error) {
-      console.log("🔍 Erro ao acessar window/document:", error)
-    }
+    console.log("🔍 useEffect executado - JavaScript funcionando!")
   }, [])
-
-  // Redirecionar se já estiver logado
-  useEffect(() => {
-    console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting)
-    console.log("🌐 Ambiente:", typeof window !== 'undefined' ? 'client' : 'server')
-    console.log("🔑 Supabase configurado:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'sim' : 'não')
-    
-    if (user && !loading && !isSubmitting) {
-      const redirectTo = searchParams.get('redirect') || '/dashboard'
-      console.log("🔄 useEffect - Redirecionando para:", redirectTo)
-      
-      // Usar timeout para garantir que o estado seja atualizado
-      setTimeout(() => {
-        console.log("🔄 Executando redirecionamento...")
-        router.replace(redirectTo)
-      }, 100)
-    }
-  }, [user, loading, router, searchParams, isSubmitting])
-
-  // Fallback: verificar se há usuário logado após um tempo
-  useEffect(() => {
-    if (!loading && !user && !isSubmitting) {
-      const checkUser = async () => {
-        try {
-          const { data: { user: currentUser } } = await supabase.auth.getUser()
-          if (currentUser) {
-            console.log("🔄 Fallback - Usuário encontrado:", currentUser.email)
-            const redirectTo = searchParams.get('redirect') || '/dashboard'
-            router.replace(redirectTo)
-          }
-        } catch (error) {
-          console.log("❌ Fallback - Erro ao verificar usuário:", error)
-        }
-      }
-      
-      // Verificar após 2 segundos se não há usuário
-      const timeoutId = setTimeout(checkUser, 2000)
-      return () => clearTimeout(timeoutId)
-    }
-  }, [loading, user, isSubmitting, router, searchParams])
 
   // Atualizar a função handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("🔐 Formulário submetido!")
     setIsSubmitting(true)
 
     // Validação básica
     if (!formData.email || !formData.password) {
-      toast.error("Por favor, preencha todos os campos")
+      console.log("❌ Campos obrigatórios não preenchidos")
       setIsSubmitting(false)
       return
     }
 
-    if (!formData.email.includes('@')) {
-      toast.error("Por favor, insira um email válido")
+    console.log("✅ Tentando fazer login com:", formData.email)
+    
+    // Simular login por enquanto para testar
+    setTimeout(() => {
+      console.log("✅ Login simulado com sucesso!")
       setIsSubmitting(false)
-      return
-    }
-
-    try {
-      console.log("🔐 Tentando fazer login com:", formData.email)
-      console.log("🔧 Hook de auth configurado:", !!signIn)
-      console.log("🔄 Build timestamp:", new Date().toISOString())
-      
-      const { data, error } = await signIn(formData.email, formData.password)
-      console.log("📊 Resultado do login:", { 
-        hasData: !!data, 
-        hasUser: !!data?.user, 
-        hasError: !!error,
-        errorMessage: error ? String(error) : null
-      })
-
-      if (error) {
-        console.error("❌ Erro no login:", error)
-        let errorMessage = "Erro ao fazer login"
-        
-        const errorString = String(error)
-        if (errorString.includes('Invalid login credentials')) {
-          errorMessage = "Email ou senha incorretos"
-        } else if (errorString.includes('Email not confirmed')) {
-          errorMessage = "Por favor, confirme seu email antes de fazer login"
-        } else if (errorString.includes('Too many requests')) {
-          errorMessage = "Muitas tentativas. Aguarde alguns minutos e tente novamente"
-        } else if (errorString !== 'Error') {
-          errorMessage = errorString
-        }
-        
-        toast.error(errorMessage)
-      } else if (data?.user) {
-        console.log("✅ Login realizado com sucesso!")
-        toast.success("Login realizado com sucesso!")
-        
-        // Não redirecionar aqui - deixar o useEffect fazer isso
-        // Isso evita conflitos entre handleSubmit e useEffect
-        console.log("🔄 Login bem-sucedido - aguardando useEffect para redirecionamento")
-      } else {
-        console.warn("⚠️ Login retornou sem dados nem erro")
-        toast.error("Erro inesperado. Tente novamente.")
-      }
-    } catch (error) {
-      console.error("💥 Erro inesperado no login:", error)
-      let errorMessage = "Erro inesperado ao fazer login"
-      
-      if (error instanceof Error) {
-        errorMessage = error.message
-      }
-      
-      toast.error(errorMessage)
-    } finally {
-      setIsSubmitting(false)
-    }
+    }, 1000)
   }
 
   return (
