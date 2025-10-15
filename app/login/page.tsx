@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,7 +19,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 
-function LoginForm() {
+function LoginFormContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -265,6 +265,31 @@ function LoginForm() {
         </div>
       )}
     </div>
+  )
+}
+
+function LoginForm() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image 
+              src="/logo.png" 
+              alt="FinanceHub" 
+              width={120} 
+              height={48} 
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
+            <p className="text-slate-600">Aguarde um momento</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   )
 }
 
