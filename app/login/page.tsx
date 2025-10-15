@@ -15,6 +15,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 function LoginFormContent() {
+  console.log("🚀 LoginFormContent iniciado")
+  
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -28,16 +30,23 @@ function LoginFormContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
 
+  // Debug simples
+  console.log("🔍 Estado:", { user: !!user, loading, hasRedirected })
+
   // Redirecionamento com proteção contra loops
   useEffect(() => {
     if (user && !loading && !hasRedirected) {
+      console.log("✅ Usuário logado, redirecionando para:", redirectTo)
       setHasRedirected(true)
+      
+      // Usar router.push para navegação SPA (sem reload)
       router.push(redirectTo)
     }
   }, [user, loading, hasRedirected, redirectTo, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("🔐 Formulário submetido!")
     setIsSubmitting(true)
 
     if (!formData.email || !formData.password) {
@@ -47,20 +56,26 @@ function LoginFormContent() {
     }
 
     try {
+      console.log("🔐 Tentando fazer login com:", formData.email)
+      
       const { data, error } = await signIn(formData.email, formData.password)
       
       if (error) {
+        console.error("❌ Erro no login:", error)
         toast.error("Email ou senha incorretos")
       } else if (data?.user) {
+        console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
         // Redirecionar após sucesso
         setTimeout(() => {
+          console.log("🔄 Redirecionando após login...")
           setHasRedirected(true)
           router.push(redirectTo)
         }, 1000)
       }
     } catch (error) {
+      console.error("💥 Erro inesperado:", error)
       toast.error("Erro inesperado. Tente novamente.")
     } finally {
       setIsSubmitting(false)
