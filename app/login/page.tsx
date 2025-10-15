@@ -10,61 +10,61 @@ import { Separator } from "@/components/ui/separator"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 function LoginFormContent() {
-  console.log("🚀 LoginFormContent iniciado")
-  
+  const { user, loading, signIn } = useFinanceAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
+
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasRedirected, setHasRedirected] = useState(() => {
-    // Verificar se já redirecionou nesta sessão
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('login-redirected') === 'true'
-    }
-    return false
-  })
 
-  const { user, loading, signIn } = useFinanceAuth()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/dashboard'
-
-  // Debug simples
-  console.log("🔍 Estado:", { user: !!user, loading, hasRedirected })
-
-  // Redirecionamento com proteção contra loops
+  // Redirecionamento IMEDIATO se usuário já estiver logado
   useEffect(() => {
-    if (user && !loading && !hasRedirected) {
-      console.log("✅ Usuário logado, redirecionando para:", redirectTo)
-      
-      // Marcar como redirecionado no sessionStorage
-      sessionStorage.setItem('login-redirected', 'true')
-      setHasRedirected(true)
-      
-      // Usar window.location.replace para redirecionamento limpo (sem histórico)
+    if (user && !loading) {
+      console.log("✅ Usuário já logado, redirecionando IMEDIATAMENTE para:", redirectTo)
       window.location.replace(redirectTo)
     }
-  }, [user, loading, hasRedirected, redirectTo])
+  }, [user, loading, redirectTo])
 
-  // Limpar flag de redirecionamento quando sair da página
-  useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('login-redirected')
-      }
-    }
-  }, [])
+  // Mostrar loading enquanto verifica autenticação
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/logo.png"
+              alt="FinanceHub"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Verificando...</h1>
+            <p className="text-slate-600">Aguarde um momento</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Se usuário já está logado, não renderizar nada (será redirecionado)
+  if (user) {
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("🔐 Formulário submetido!")
     setIsSubmitting(true)
 
     if (!formData.email || !formData.password) {
@@ -74,56 +74,34 @@ function LoginFormContent() {
     }
 
     try {
-      console.log("🔐 Tentando fazer login com:", formData.email)
-      
       const { data, error } = await signIn(formData.email, formData.password)
       
       if (error) {
-        console.error("❌ Erro no login:", error)
         toast.error("Email ou senha incorretos")
       } else if (data?.user) {
-        console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
         // Redirecionar após sucesso
         setTimeout(() => {
-          console.log("🔄 Redirecionando após login...")
-          
-          // Marcar como redirecionado no sessionStorage
-          sessionStorage.setItem('login-redirected', 'true')
-          setHasRedirected(true)
-          
           window.location.replace(redirectTo)
         }, 1000)
       }
     } catch (error) {
-      console.error("💥 Erro inesperado:", error)
       toast.error("Erro inesperado. Tente novamente.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
-          <p className="text-slate-600">Aguarde um momento</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Image 
-            src="/logo.png" 
-            alt="FinanceHub" 
-            width={120} 
-            height={48} 
+          <Image
+            src="/logo.png"
+            alt="FinanceHub"
+            width={120}
+            height={48}
             className="mx-auto mb-4 h-12 w-auto"
             priority
           />
@@ -189,9 +167,9 @@ function LoginFormContent() {
                 </Link>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
@@ -220,9 +198,19 @@ function LoginForm() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
-          <p className="text-slate-600">Aguarde um momento</p>
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/logo.png"
+              alt="FinanceHub"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
+            <p className="text-slate-600">Aguarde um momento</p>
+          </div>
         </div>
       </div>
     }>
