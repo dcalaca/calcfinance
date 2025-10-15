@@ -123,14 +123,45 @@
 
   /* Scroll horizontal suave no mobile */
   .mobile-horizontal-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    white-space: nowrap;
+    touch-action: pan-x;
   }
   
   .mobile-horizontal-scroll::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+  }
+
+  /* Garantir que os itens da barra inferior sejam roláveis */
+  .mobile-nav-item {
+    flex-shrink: 0 !important;
+    min-width: 60px !important;
+    display: inline-flex !important;
+  }
+
+  /* Melhorar scroll do dropdown no mobile */
+  .dropdown-scrollable {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .dropdown-scrollable::-webkit-scrollbar {
+    width: 4px !important;
+  }
+  
+  .dropdown-scrollable::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  
+  .dropdown-scrollable::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 2px !important;
   }
 
   /* Melhor contraste para acessibilidade */
@@ -267,7 +298,7 @@ body {
   /* Previne que a barra se mova com o scroll */
   html, body {
     height: 100%;
-    overflow-x: hidden;
+    /* Removido overflow-x: hidden para permitir scroll horizontal na barra inferior */
   }
   
   /* Garante que o conteúdo não sobreponha a barra */
