@@ -1,8 +1,5 @@
 "use client"
 
-// Remover dynamic = 'force-dynamic' que pode estar causando problemas
-// export const dynamic = 'force-dynamic'
-
 import type React from "react"
 import { useState, useEffect, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,15 +10,12 @@ import { Separator } from "@/components/ui/separator"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-
-// Atualizar as importações
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 
 function LoginFormContent() {
-  // Log simples que deve aparecer sempre
   console.log("🚀 LoginFormContent iniciado")
   
   const [showPassword, setShowPassword] = useState(false)
@@ -29,17 +23,62 @@ function LoginFormContent() {
     email: "",
     password: "",
   })
-
-  // Simplificar - remover dependências complexas temporariamente
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // Começar como false para teste
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Teste simples de useEffect
+  const { user, loading, signIn } = useFinanceAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
+
+  // Debug logs
+  console.log("🔍 DEBUG - Estado atual:", {
+    user: user?.email || 'null',
+    loading,
+    isSubmitting,
+    redirectTo
+  })
+
+  // Redirecionamento quando usuário estiver logado
   useEffect(() => {
-    console.log("🔍 useEffect executado - JavaScript funcionando!")
-  }, [])
+    console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting)
+    
+    if (user && !loading && !isSubmitting) {
+      console.log("✅ Usuário logado, redirecionando para:", redirectTo)
+      setTimeout(() => {
+        router.replace(redirectTo)
+      }, 100)
+    }
+  }, [user, loading, isSubmitting, router, redirectTo])
 
-  // Atualizar a função handleSubmit
+  // Verificar se está carregando
+  useEffect(() => {
+    if (!loading) {
+      setIsLoading(false)
+    }
+  }, [loading])
+
+  // Fallback para verificar usuário após 2 segundos
+  useEffect(() => {
+    const checkUser = async () => {
+      if (!loading && !user) {
+        console.log("🔍 Verificando usuário após timeout...")
+        try {
+          const { data } = await supabase.auth.getUser()
+          if (data.user) {
+            console.log("✅ Usuário encontrado via fallback:", data.user.email)
+            router.replace(redirectTo)
+          }
+        } catch (error) {
+          console.log("❌ Erro no fallback:", error)
+        }
+      }
+    }
+
+    const timeout = setTimeout(checkUser, 2000)
+    return () => clearTimeout(timeout)
+  }, [loading, user, router, redirectTo])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     console.log("🔐 Formulário submetido!")
@@ -48,17 +87,70 @@ function LoginFormContent() {
     // Validação básica
     if (!formData.email || !formData.password) {
       console.log("❌ Campos obrigatórios não preenchidos")
+      toast.error("Por favor, preencha todos os campos")
       setIsSubmitting(false)
       return
     }
 
-    console.log("✅ Tentando fazer login com:", formData.email)
-    
-    // Simular login por enquanto para testar
-    setTimeout(() => {
-      console.log("✅ Login simulado com sucesso!")
+    if (!formData.email.includes('@')) {
+      console.log("❌ Email inválido")
+      toast.error("Por favor, insira um email válido")
       setIsSubmitting(false)
-    }, 1000)
+      return
+    }
+
+    try {
+      console.log("🔐 Tentando fazer login com:", formData.email)
+      
+      const { data, error } = await signIn(formData.email, formData.password)
+      console.log("📊 Resultado do login:", { 
+        hasData: !!data, 
+        hasUser: !!data?.user, 
+        hasError: !!error,
+        errorMessage: error ? String(error) : null
+      })
+
+      if (error) {
+        console.error("❌ Erro no login:", error)
+        let errorMessage = "Erro ao fazer login"
+        
+        const errorString = String(error)
+        if (errorString.includes('Invalid login credentials')) {
+          errorMessage = "Email ou senha incorretos"
+        } else if (errorString.includes('Email not confirmed')) {
+          errorMessage = "Por favor, confirme seu email antes de fazer login"
+        } else if (errorString.includes('Too many requests')) {
+          errorMessage = "Muitas tentativas. Aguarde alguns minutos e tente novamente"
+        } else if (errorString !== 'Error') {
+          errorMessage = errorString
+        }
+        
+        toast.error(errorMessage)
+      } else if (data?.user) {
+        console.log("✅ Login realizado com sucesso!")
+        toast.success("Login realizado com sucesso!")
+        
+        // Redirecionar após sucesso
+        setTimeout(() => {
+          console.log("🔄 Redirecionando após login bem-sucedido...")
+          window.location.replace(redirectTo)
+        }, 1000)
+      } else {
+        console.warn("⚠️ Login retornou sem dados nem erro")
+        toast.error("Erro inesperado. Tente novamente.")
+      }
+    } catch (error) {
+      console.error("💥 Erro inesperado no login:", error)
+      let errorMessage = "Erro inesperado ao fazer login"
+      
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -151,7 +243,6 @@ function LoginFormContent() {
                   </Link>
                 </div>
 
-                {/* Atualizar o botão de submit */}
                 <Button 
                   type="submit" 
                   className="w-full" 
