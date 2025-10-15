@@ -77,7 +77,7 @@ function RegisterForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
             <Image
-              src="/calcfy-logo.svg"
+              src="/calcfy-logo.svg?v=2"
               alt="CalcFy"
               width={120}
               height={48}
@@ -215,7 +215,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/calcfy-logo.svg"
+              src="/calcfy-logo.svg?v=2"
               alt="CalcFy"
               width={120}
               height={48}
