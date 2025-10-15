@@ -62,6 +62,7 @@ function LoginForm() {
     try {
       console.log("🔐 Tentando fazer login com:", formData.email)
       console.log("🔧 Hook de auth configurado:", !!signIn)
+      console.log("🔄 Build timestamp:", new Date().toISOString())
       
       const { data, error } = await signIn(formData.email, formData.password)
       console.log("📊 Resultado do login:", { 
