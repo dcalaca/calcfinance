@@ -96,8 +96,10 @@ function LoginForm() {
         setTimeout(() => {
           const redirectTo = searchParams.get('redirect') || '/dashboard'
           console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
-          window.location.href = redirectTo
-        }, 500)
+          
+          // Forçar reload da página para garantir que o estado seja atualizado
+          window.location.replace(redirectTo)
+        }, 1000)
       } else {
         console.warn("⚠️ Login retornou sem dados nem erro")
         toast.error("Erro inesperado. Tente novamente.")

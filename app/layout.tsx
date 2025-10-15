@@ -158,10 +158,15 @@ export default function RootLayout({
                 // Reaplica o fix quando a página ganha foco
                 window.addEventListener('focus', fixBottomBar);
                 
-                // Previne scroll da página quando toca na barra
+                // Permite scroll horizontal na barra inferior, mas previne scroll vertical da página
                 document.addEventListener('touchstart', function(e) {
-                  if (e.target.closest('.ios-fixed-bottom')) {
-                    e.preventDefault();
+                  const bottomBar = e.target.closest('.ios-fixed-bottom');
+                  if (bottomBar) {
+                    // Só previne se não for um elemento rolável
+                    const scrollableElement = e.target.closest('.mobile-horizontal-scroll');
+                    if (!scrollableElement) {
+                      e.preventDefault();
+                    }
                   }
                 }, { passive: false });
               }

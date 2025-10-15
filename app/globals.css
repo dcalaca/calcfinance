@@ -128,8 +128,10 @@
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
-    white-space: nowrap;
-    touch-action: pan-x;
+    white-space: nowrap !important;
+    touch-action: pan-x !important;
+    overscroll-behavior-x: contain !important;
+    overscroll-behavior-y: none !important;
   }
   
   .mobile-horizontal-scroll::-webkit-scrollbar {
@@ -149,6 +151,8 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
   }
   
   .dropdown-scrollable::-webkit-scrollbar {
@@ -162,6 +166,19 @@
   .dropdown-scrollable::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.2) !important;
     border-radius: 2px !important;
+  }
+
+  /* CSS específico para mobile */
+  @media (max-width: 768px) {
+    .dropdown-scrollable {
+      max-height: 70vh !important;
+      touch-action: pan-y !important;
+    }
+    
+    .mobile-horizontal-scroll {
+      touch-action: pan-x !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
   }
 
   /* Melhor contraste para acessibilidade */
