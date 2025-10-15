@@ -33,28 +33,13 @@ function LoginFormContent() {
   // Debug simples
   console.log("🔍 Estado:", { user: !!user, loading, isRedirecting })
 
-  // Redirecionamento inteligente
+  // Sem redirecionamento automático - apenas manual após login
   useEffect(() => {
-    if (user && !loading && !isRedirecting) {
-      console.log("✅ Usuário logado detectado, verificando se precisa redirecionar...")
-      
-      // Verificar se já está na página de destino
-      const currentPath = window.location.pathname
-      const targetPath = redirectTo.startsWith('/') ? redirectTo : `/${redirectTo}`
-      
-      console.log("🔍 Verificação:", { currentPath, targetPath, needsRedirect: currentPath !== targetPath })
-      
-      if (currentPath !== targetPath) {
-        console.log("🚀 Redirecionando para:", redirectTo)
-        setIsRedirecting(true)
-        
-        // Usar window.location.replace para evitar histórico
-        window.location.replace(redirectTo)
-      } else {
-        console.log("✅ Já está na página correta, não precisa redirecionar")
-      }
+    if (user && !loading) {
+      console.log("✅ Usuário já está logado, mas não redirecionando automaticamente")
+      console.log("💡 Clique em 'Entrar' para ir para o dashboard")
     }
-  }, [user, loading, isRedirecting, redirectTo])
+  }, [user, loading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -79,11 +64,8 @@ function LoginFormContent() {
         console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
-        setTimeout(() => {
-          console.log("🔄 Redirecionando após login...")
-          setIsRedirecting(true)
-          window.location.replace(redirectTo)
-        }, 1000)
+        // Não redirecionar automaticamente - mostrar botão
+        console.log("🎉 Login bem-sucedido! Use o botão abaixo para ir ao dashboard")
       }
     } catch (error) {
       console.error("💥 Erro inesperado:", error)
@@ -185,6 +167,21 @@ function LoginFormContent() {
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
               </Button>
+              
+              {/* Botão de redirecionamento quando logado */}
+              {user && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full mt-2"
+                  onClick={() => {
+                    console.log("🚀 Redirecionamento manual para:", redirectTo)
+                    window.location.href = redirectTo
+                  }}
+                >
+                  🚀 Ir para Dashboard
+                </Button>
+              )}
             </form>
 
             <div className="mt-6">
