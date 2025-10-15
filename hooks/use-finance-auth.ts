@@ -101,11 +101,11 @@ export function useFinanceAuth() {
       return
     }
 
-    // Timeout muito mais curto - 3 segundos apenas
+    // Timeout mais curto - 2 segundos apenas
     const timeoutId = setTimeout(() => {
-      console.log("⏰ Timeout de autenticação - 3 segundos")
+      console.log("⏰ Timeout de autenticação - 2 segundos")
       setLoading(false)
-    }, 3000)
+    }, 2000)
 
     // Busca ULTRA SIMPLES - apenas uma verificação
     const checkAuth = async () => {
