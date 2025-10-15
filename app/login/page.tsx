@@ -23,7 +23,13 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasRedirected, setHasRedirected] = useState(false)
+  const [hasRedirected, setHasRedirected] = useState(() => {
+    // Verificar se já redirecionou nesta sessão
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('login-redirected') === 'true'
+    }
+    return false
+  })
 
   const { user, loading, signIn } = useFinanceAuth()
   const router = useRouter()
@@ -37,12 +43,24 @@ function LoginFormContent() {
   useEffect(() => {
     if (user && !loading && !hasRedirected) {
       console.log("✅ Usuário logado, redirecionando para:", redirectTo)
+      
+      // Marcar como redirecionado no sessionStorage
+      sessionStorage.setItem('login-redirected', 'true')
       setHasRedirected(true)
       
       // Usar window.location.replace para redirecionamento limpo (sem histórico)
       window.location.replace(redirectTo)
     }
   }, [user, loading, hasRedirected, redirectTo])
+
+  // Limpar flag de redirecionamento quando sair da página
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('login-redirected')
+      }
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,7 +88,11 @@ function LoginFormContent() {
         // Redirecionar após sucesso
         setTimeout(() => {
           console.log("🔄 Redirecionando após login...")
+          
+          // Marcar como redirecionado no sessionStorage
+          sessionStorage.setItem('login-redirected', 'true')
           setHasRedirected(true)
+          
           window.location.replace(redirectTo)
         }, 1000)
       }
