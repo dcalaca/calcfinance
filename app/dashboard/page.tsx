@@ -26,13 +26,6 @@ export default function DashboardPage() {
   const [calcLoading, setCalcLoading] = useState(true)
   const router = useRouter()
 
-  // Debug: verificar dados do usuário
-  console.log('🔍 Dashboard Debug:')
-  console.log('  - user:', user?.email || 'Nenhum')
-  console.log('  - financeUser:', financeUser)
-  console.log('  - full_name:', financeUser?.full_name || 'NÃO DEFINIDO')
-  console.log('  - authLoading:', authLoading)
-
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/login")
@@ -57,12 +50,12 @@ export default function DashboardPage() {
         .order("created_at", { ascending: false })
 
       if (error) {
-        console.error("Erro ao buscar cálculos:", error)
+        // Erro ao buscar cálculos
       } else {
         setCalculations(data || [])
       }
     } catch (error) {
-      console.error("Erro ao buscar cálculos:", error)
+      // Erro ao buscar cálculos
     } finally {
       setCalcLoading(false)
     }

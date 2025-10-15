@@ -12,18 +12,12 @@ export function useAnalytics() {
         // Verificar se está no cliente
         if (typeof window === 'undefined') return
         
-        console.log('🔍 Iniciando rastreamento de visita...')
-        console.log('📍 Página atual:', pathname)
-        
         // Gerar ID único para a sessão
         const sessionId = sessionStorage.getItem('sessionId') || 
           Math.random().toString(36).substring(2) + Date.now().toString(36)
         
         if (!sessionStorage.getItem('sessionId')) {
           sessionStorage.setItem('sessionId', sessionId)
-          console.log('🆔 Nova sessão criada:', sessionId)
-        } else {
-          console.log('🆔 Sessão existente:', sessionId)
         }
 
         // Detectar informações do dispositivo
@@ -50,8 +44,6 @@ export function useAnalytics() {
           city: null
         }
 
-        console.log('📤 Enviando dados para API:', visitData)
-
         // Enviar dados para a API (apenas POST para salvar visita)
         const response = await fetch('/api/analytics/track-visit', {
           method: 'POST',
@@ -62,15 +54,12 @@ export function useAnalytics() {
         })
 
         if (response.ok) {
-          const result = await response.json()
-          console.log('✅ Visita registrada com sucesso:', result)
+          // Visita registrada com sucesso
         } else {
-          console.error('❌ Erro na API:', response.status, response.statusText)
-          const errorText = await response.text()
-          console.error('❌ Detalhes do erro:', errorText)
+          // Erro na API
         }
       } catch (error) {
-        console.error('💥 Erro ao rastrear visita:', error)
+        // Erro ao rastrear visita
       }
     }
 
