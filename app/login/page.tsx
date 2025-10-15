@@ -31,13 +31,31 @@ function LoginFormContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
 
-  // Debug logs
+  // Debug logs detalhados
   console.log("🔍 DEBUG - Estado atual:", {
     user: user?.email || 'null',
+    userObject: user,
     loading,
     isSubmitting,
     redirectTo
   })
+  
+  // Log específico para debug do hook
+  console.log("🔍 Hook Debug:", {
+    hasUser: !!user,
+    userEmail: user?.email,
+    isLoading: loading,
+    userType: typeof user
+  })
+
+  // Monitorar mudanças no user
+  useEffect(() => {
+    console.log("👀 USER CHANGED - Novo valor:", {
+      user: user?.email || 'null',
+      loading,
+      timestamp: new Date().toISOString()
+    })
+  }, [user, loading])
 
   // Redirecionamento simples - sem loops
   useEffect(() => {
