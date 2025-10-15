@@ -25,6 +25,7 @@ function LoginFormContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasRedirected, setHasRedirected] = useState(false)
 
   const { user, loading, signIn } = useFinanceAuth()
   const router = useRouter()
@@ -41,14 +42,18 @@ function LoginFormContent() {
 
   // Redirecionamento quando usuário estiver logado
   useEffect(() => {
-    console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting)
+    console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting, "hasRedirected:", hasRedirected)
     
-    if (user && !loading && !isSubmitting) {
+    if (user && !loading && !isSubmitting && !hasRedirected) {
       console.log("✅ Usuário logado, redirecionando para:", redirectTo)
-      // Usar window.location para forçar navegação completa
-      window.location.href = redirectTo
+      setHasRedirected(true)
+      
+      // Usar router.push para navegação SPA (sem reload)
+      setTimeout(() => {
+        router.push(redirectTo)
+      }, 100)
     }
-  }, [user, loading, isSubmitting, redirectTo])
+  }, [user, loading, isSubmitting, hasRedirected, redirectTo, router])
 
   // Verificar se está carregando
   useEffect(() => {
@@ -113,7 +118,8 @@ function LoginFormContent() {
         // Redirecionar após sucesso
         setTimeout(() => {
           console.log("🔄 Redirecionando após login bem-sucedido...")
-          window.location.href = redirectTo
+          setHasRedirected(true)
+          router.push(redirectTo)
         }, 1000)
       } else {
         console.warn("⚠️ Login retornou sem dados nem erro")
