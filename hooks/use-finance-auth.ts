@@ -138,25 +138,39 @@ export function useFinanceAuth() {
   }, [])
 
 
-  // Listen for auth changes - SIMPLIFICADO
+  // Listen for auth changes - MELHORADO
   useEffect(() => {
     if (!isSupabaseConfigured()) return
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event: any, session: any) => {
-      console.log("🔄 Auth change:", event)
+      console.log("🔄 Auth change:", event, "session:", !!session, "user:", !!session?.user)
       
       if (event === 'SIGNED_OUT') {
+        console.log("🚪 Usuário deslogado")
         setUser(null)
         setFinanceUser(null)
         setLoading(false)
         return
       }
       
-      setUser(session?.user ?? null)
-      setFinanceUser(session?.user ?? null)
-      setLoading(false)
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        console.log("✅ Usuário logado/atualizado:", session?.user?.email)
+        setUser(session?.user ?? null)
+        setFinanceUser(session?.user ?? null)
+        setLoading(false)
+      } else if (session?.user) {
+        console.log("🔄 Sessão existente:", session?.user?.email)
+        setUser(session.user)
+        setFinanceUser(session.user)
+        setLoading(false)
+      } else {
+        console.log("❌ Nenhuma sessão ativa")
+        setUser(null)
+        setFinanceUser(null)
+        setLoading(false)
+      }
     })
 
     return () => subscription.unsubscribe()

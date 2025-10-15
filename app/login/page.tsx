@@ -17,6 +17,7 @@ import Image from "next/image"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
+import { supabase } from "@/lib/supabase"
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -37,10 +38,36 @@ function LoginForm() {
     if (user && !loading && !isSubmitting) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
       console.log("🔄 useEffect - Redirecionando para:", redirectTo)
-      // Usar replace para evitar histórico duplicado
-      router.replace(redirectTo)
+      
+      // Usar timeout para garantir que o estado seja atualizado
+      setTimeout(() => {
+        console.log("🔄 Executando redirecionamento...")
+        router.replace(redirectTo)
+      }, 100)
     }
   }, [user, loading, router, searchParams, isSubmitting])
+
+  // Fallback: verificar se há usuário logado após um tempo
+  useEffect(() => {
+    if (!loading && !user && !isSubmitting) {
+      const checkUser = async () => {
+        try {
+          const { data: { user: currentUser } } = await supabase.auth.getUser()
+          if (currentUser) {
+            console.log("🔄 Fallback - Usuário encontrado:", currentUser.email)
+            const redirectTo = searchParams.get('redirect') || '/dashboard'
+            router.replace(redirectTo)
+          }
+        } catch (error) {
+          console.log("❌ Fallback - Erro ao verificar usuário:", error)
+        }
+      }
+      
+      // Verificar após 2 segundos se não há usuário
+      const timeoutId = setTimeout(checkUser, 2000)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [loading, user, isSubmitting, router, searchParams])
 
   // Atualizar a função handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
