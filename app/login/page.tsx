@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, Suspense } from "react"
+import { useState, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,14 +28,6 @@ function LoginFormContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Redirecionamento IMEDIATO se usuário já estiver logado
-  useEffect(() => {
-    if (user && !loading) {
-      console.log("✅ Usuário já logado, redirecionando IMEDIATAMENTE para:", redirectTo)
-      window.location.replace(redirectTo)
-    }
-  }, [user, loading, redirectTo])
-
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
     return (
@@ -58,9 +50,37 @@ function LoginFormContent() {
     )
   }
 
-  // Se usuário já está logado, não renderizar nada (será redirecionado)
+  // Se usuário já está logado, mostrar botão para ir ao dashboard
   if (user) {
-    return null
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/logo.png"
+              alt="FinanceHub"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Você já está logado!</h1>
+            <p className="text-slate-600">Clique no botão abaixo para ir ao dashboard</p>
+          </div>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <Button 
+                onClick={() => router.push(redirectTo)}
+                className="w-full"
+              >
+                Ir para Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,9 +101,9 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar após sucesso
+        // Redirecionar após sucesso - APENAS AQUI
         setTimeout(() => {
-          window.location.replace(redirectTo)
+          router.push(redirectTo)
         }, 1000)
       }
     } catch (error) {
