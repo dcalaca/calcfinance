@@ -1,18 +1,4 @@
-// Service Worker desabilitado temporariamente para resolver problemas de cache
-// const CACHE_NAME = 'calcfy-v1'
+// Service Worker completamente desabilitado para evitar problemas de rede
+// Este arquivo não faz nada - apenas evita erros de console
 
-// Instalar service worker
-self.addEventListener('install', (event) => {
-  // Não fazer cache para evitar problemas de MIME type
-  event.waitUntil(
-    Promise.resolve()
-  )
-})
-
-// Interceptar requisições
-self.addEventListener('fetch', (event) => {
-  // Sempre buscar da rede, sem cache
-  event.respondWith(
-    fetch(event.request)
-  )
-})
+console.log('Service Worker carregado mas desabilitado')
