@@ -22,6 +22,15 @@ import { supabase } from "@/lib/supabase"
 function LoginFormContent() {
   console.log("🚀 LoginFormContent iniciado")
   
+  // Teste simples para verificar se JavaScript está executando
+  if (typeof window !== 'undefined') {
+    console.log("🌐 JavaScript executando no cliente")
+    // Alert simples para debug
+    setTimeout(() => {
+      console.log("🔔 Teste de execução JavaScript - se você ver este log, o JS está funcionando")
+    }, 1000)
+  }
+  
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -54,6 +63,15 @@ function LoginFormContent() {
     try {
       console.log("🔍 Tentando acessar window:", typeof window)
       console.log("🔍 Tentando acessar document:", typeof document)
+      
+      // Teste mais direto
+      console.log("🔍 TESTE DIRETO - Se você vê este log, o JavaScript está funcionando!")
+      
+      // Verificar se há erros JavaScript
+      window.addEventListener('error', (e) => {
+        console.error("❌ ERRO JAVASCRIPT:", e.error)
+      })
+      
     } catch (error) {
       console.log("🔍 Erro ao acessar window/document:", error)
     }
