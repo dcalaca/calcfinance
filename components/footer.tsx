@@ -12,7 +12,7 @@ export function Footer() {
           {/* Logo e Descrição */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Image
-              src="/calcfy-logo.svg?v=2"
+              src="/logoresumo.png"
               alt="CalcFy - Calculadoras Financeiras Gratuitas e Educação Financeira"
               width={180}
               height={40}
