@@ -68,23 +68,22 @@ function LoginForm() {
         hasData: !!data, 
         hasUser: !!data?.user, 
         hasError: !!error,
-        errorMessage: error?.message 
+        errorMessage: error ? String(error) : null
       })
 
       if (error) {
         console.error("❌ Erro no login:", error)
         let errorMessage = "Erro ao fazer login"
         
-        if (error.message) {
-          if (error.message.includes('Invalid login credentials')) {
-            errorMessage = "Email ou senha incorretos"
-          } else if (error.message.includes('Email not confirmed')) {
-            errorMessage = "Por favor, confirme seu email antes de fazer login"
-          } else if (error.message.includes('Too many requests')) {
-            errorMessage = "Muitas tentativas. Aguarde alguns minutos e tente novamente"
-          } else {
-            errorMessage = error.message
-          }
+        const errorString = String(error)
+        if (errorString.includes('Invalid login credentials')) {
+          errorMessage = "Email ou senha incorretos"
+        } else if (errorString.includes('Email not confirmed')) {
+          errorMessage = "Por favor, confirme seu email antes de fazer login"
+        } else if (errorString.includes('Too many requests')) {
+          errorMessage = "Muitas tentativas. Aguarde alguns minutos e tente novamente"
+        } else if (errorString !== 'Error') {
+          errorMessage = errorString
         }
         
         toast.error(errorMessage)
