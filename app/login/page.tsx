@@ -33,14 +33,26 @@ function LoginFormContent() {
   // Debug simples
   console.log("🔍 Estado:", { user: !!user, loading, isRedirecting })
 
-  // Redirecionamento simples
+  // Redirecionamento inteligente
   useEffect(() => {
     if (user && !loading && !isRedirecting) {
-      console.log("✅ Usuário logado detectado, redirecionando para:", redirectTo)
-      setIsRedirecting(true)
+      console.log("✅ Usuário logado detectado, verificando se precisa redirecionar...")
       
-      // Usar window.location.href para redirecionamento confiável
-      window.location.href = redirectTo
+      // Verificar se já está na página de destino
+      const currentPath = window.location.pathname
+      const targetPath = redirectTo.startsWith('/') ? redirectTo : `/${redirectTo}`
+      
+      console.log("🔍 Verificação:", { currentPath, targetPath, needsRedirect: currentPath !== targetPath })
+      
+      if (currentPath !== targetPath) {
+        console.log("🚀 Redirecionando para:", redirectTo)
+        setIsRedirecting(true)
+        
+        // Usar window.location.replace para evitar histórico
+        window.location.replace(redirectTo)
+      } else {
+        console.log("✅ Já está na página correta, não precisa redirecionar")
+      }
     }
   }, [user, loading, isRedirecting, redirectTo])
 
@@ -70,7 +82,7 @@ function LoginFormContent() {
         setTimeout(() => {
           console.log("🔄 Redirecionando após login...")
           setIsRedirecting(true)
-          window.location.href = redirectTo
+          window.location.replace(redirectTo)
         }, 1000)
       }
     } catch (error) {
