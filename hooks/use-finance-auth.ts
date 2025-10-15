@@ -98,8 +98,15 @@ export function useFinanceAuth() {
     console.log("🔑 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
     console.log("🔑 Supabase Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
     
+    // Forçar log mesmo se houver erro
+    try {
+      console.log("🔧 Tentando verificar configuração Supabase...")
+    } catch (error) {
+      console.log("🔧 Erro ao verificar configuração:", error)
+    }
+    
     if (!isSupabaseConfigured()) {
-      console.log("❌ Supabase não configurado")
+      console.log("❌ Supabase não configurado - definindo loading como false")
       setLoading(false)
       return
     }

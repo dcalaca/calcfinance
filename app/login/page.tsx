@@ -20,6 +20,8 @@ import { toast } from "sonner"
 import { supabase } from "@/lib/supabase"
 
 function LoginFormContent() {
+  console.log("🚀 LoginFormContent iniciado")
+  
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -47,6 +49,14 @@ function LoginFormContent() {
     console.log("  - NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
     console.log("  - NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
     console.log("  - NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL)
+    
+    // Forçar log mesmo se houver erro
+    try {
+      console.log("🔍 Tentando acessar window:", typeof window)
+      console.log("🔍 Tentando acessar document:", typeof document)
+    } catch (error) {
+      console.log("🔍 Erro ao acessar window/document:", error)
+    }
   }, [])
 
   // Redirecionar se já estiver logado
