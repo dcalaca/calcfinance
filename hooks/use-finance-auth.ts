@@ -94,6 +94,9 @@ export function useFinanceAuth() {
 
   useEffect(() => {
     console.log("🔧 Hook de autenticação iniciado")
+    console.log("🌐 Ambiente:", typeof window !== 'undefined' ? 'client' : 'server')
+    console.log("🔑 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
+    console.log("🔑 Supabase Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
     
     if (!isSupabaseConfigured()) {
       console.log("❌ Supabase não configurado")

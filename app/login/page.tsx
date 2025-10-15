@@ -40,9 +40,21 @@ function LoginFormContent() {
     }
   }, [loading])
 
+  // Debug: verificar configuração no ambiente de produção
+  useEffect(() => {
+    console.log("🔍 DEBUG - Configuração do ambiente:")
+    console.log("  - NODE_ENV:", process.env.NODE_ENV)
+    console.log("  - NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
+    console.log("  - NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
+    console.log("  - NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL)
+  }, [])
+
   // Redirecionar se já estiver logado
   useEffect(() => {
     console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting)
+    console.log("🌐 Ambiente:", typeof window !== 'undefined' ? 'client' : 'server')
+    console.log("🔑 Supabase configurado:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'sim' : 'não')
+    
     if (user && !loading && !isSubmitting) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
       console.log("🔄 useEffect - Redirecionando para:", redirectTo)
