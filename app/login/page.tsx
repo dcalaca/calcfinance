@@ -182,7 +182,30 @@ function LoginFormContent() {
                   🚀 Ir para Dashboard
                 </Button>
               )}
+              
+              {/* Debug do botão */}
+              {console.log("🔍 Renderização do botão:", { user: !!user, userEmail: user?.email })}
             </form>
+
+            {/* Botão de teste sempre visível */}
+            <div className="mt-4">
+              <Button 
+                type="button" 
+                variant="secondary" 
+                className="w-full"
+                onClick={() => {
+                  console.log("🧪 TESTE - Estado atual:", { user: !!user, userEmail: user?.email })
+                  if (user) {
+                    console.log("🚀 Usuário logado, redirecionando...")
+                    window.location.href = redirectTo
+                  } else {
+                    console.log("❌ Usuário não logado")
+                  }
+                }}
+              >
+                🧪 TESTE: Ir para Dashboard
+              </Button>
+            </div>
 
             <div className="mt-6">
               <Separator className="my-4" />
