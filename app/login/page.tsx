@@ -46,28 +46,71 @@ function LoginForm() {
     e.preventDefault()
     setIsSubmitting(true)
 
+    // Validação básica
+    if (!formData.email || !formData.password) {
+      toast.error("Por favor, preencha todos os campos")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (!formData.email.includes('@')) {
+      toast.error("Por favor, insira um email válido")
+      setIsSubmitting(false)
+      return
+    }
+
     try {
-      console.log("Tentando fazer login com:", formData.email)
+      console.log("🔐 Tentando fazer login com:", formData.email)
+      console.log("🔧 Hook de auth configurado:", !!signIn)
+      
       const { data, error } = await signIn(formData.email, formData.password)
-      console.log("Resultado do login:", { data, error })
+      console.log("📊 Resultado do login:", { 
+        hasData: !!data, 
+        hasUser: !!data?.user, 
+        hasError: !!error,
+        errorMessage: error?.message 
+      })
 
       if (error) {
-        console.error("Erro no login:", error)
-        toast.error("Erro ao fazer login: " + String(error))
-      } else {
-        console.log("Login realizado com sucesso!")
+        console.error("❌ Erro no login:", error)
+        let errorMessage = "Erro ao fazer login"
+        
+        if (error.message) {
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = "Email ou senha incorretos"
+          } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = "Por favor, confirme seu email antes de fazer login"
+          } else if (error.message.includes('Too many requests')) {
+            errorMessage = "Muitas tentativas. Aguarde alguns minutos e tente novamente"
+          } else {
+            errorMessage = error.message
+          }
+        }
+        
+        toast.error(errorMessage)
+      } else if (data?.user) {
+        console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
-        // Forçar redirecionamento imediatamente após login bem-sucedido
-        const redirectTo = searchParams.get('redirect') || '/dashboard'
-        console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
-        
-        // Usar window.location.href para forçar redirecionamento
-        window.location.href = redirectTo
+        // Aguardar um pouco antes de redirecionar para garantir que o estado seja atualizado
+        setTimeout(() => {
+          const redirectTo = searchParams.get('redirect') || '/dashboard'
+          console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
+          window.location.href = redirectTo
+        }, 500)
+      } else {
+        console.warn("⚠️ Login retornou sem dados nem erro")
+        toast.error("Erro inesperado. Tente novamente.")
       }
     } catch (error) {
-      console.error("Erro inesperado no login:", error)
-      toast.error("Erro inesperado ao fazer login: " + String(error))
+      console.error("💥 Erro inesperado no login:", error)
+      let errorMessage = "Erro inesperado ao fazer login"
+      
+      if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }

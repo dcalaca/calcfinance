@@ -151,44 +151,48 @@ export function Header() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <div className="flex items-center justify-start gap-2 p-2">
+                  <DropdownMenuContent className="w-56 max-h-80 overflow-y-auto" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2 sticky top-0 bg-white z-10">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{user.email}</p>
+                        <p className="font-medium text-sm truncate">{user.email}</p>
                       </div>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/historico" className="flex items-center">
-                        <TrendingUp className="mr-2 h-4 w-4" />
-                        Histórico
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/cfp" className="flex items-center">
-                        <DollarSign className="mr-2 h-4 w-4" />
-                        CFP - Controle de Finanças Pessoal
-                      </Link>
-                    </DropdownMenuItem>
-                    {isAuthorizedForAnalytics && (
+                    <div className="max-h-60 overflow-y-auto">
                       <DropdownMenuItem asChild>
-                        <Link href="/analytics" className="flex items-center">
-                          <TrendingUp className="mr-2 h-4 w-4" />
-                          Analytics
+                        <Link href="/dashboard" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
                         </Link>
                       </DropdownMenuItem>
-                    )}
+                      <DropdownMenuItem asChild>
+                        <Link href="/historico" className="flex items-center">
+                          <TrendingUp className="mr-2 h-4 w-4" />
+                          Histórico
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/cfp" className="flex items-center">
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          CFP - Controle de Finanças Pessoal
+                        </Link>
+                      </DropdownMenuItem>
+                      {isAuthorizedForAnalytics && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/analytics" className="flex items-center">
+                            <TrendingUp className="mr-2 h-4 w-4" />
+                            Analytics
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
-                    </DropdownMenuItem>
+                    <div className="sticky bottom-0 bg-white">
+                      <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sair
+                      </DropdownMenuItem>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
@@ -335,22 +339,23 @@ export function Header() {
           perspective: '1000px'
         }}
       >
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex items-center py-2 min-w-max px-2">
+        <div className="mobile-horizontal-scroll">
+          <div className="flex items-center py-2 min-w-max px-2" style={{ minWidth: 'max-content' }}>
             {navigation.map((item) => {
               const Icon = item.icon
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex flex-col items-center space-y-1 px-4 py-2 rounded-md transition-colors flex-shrink-0 ${
+                  className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-md transition-colors flex-shrink-0 min-w-0 ${
                     pathname === item.href 
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-blue-600"
                   }`}
+                  style={{ minWidth: '60px' }}
                 >
                   <Icon className="h-5 w-5" />
-                  <span className="text-xs font-medium whitespace-nowrap">{item.name}</span>
+                  <span className="text-xs font-medium whitespace-nowrap text-center">{item.name}</span>
                 </Link>
               )
             })}

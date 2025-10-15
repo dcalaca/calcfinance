@@ -215,24 +215,43 @@ export function useFinanceAuth() {
       throw new Error("Supabase not configured")
     }
 
+    // Validação básica
+    if (!email || !password) {
+      throw new Error("Email e senha são obrigatórios")
+    }
+
+    if (!email.includes('@')) {
+      throw new Error("Email inválido")
+    }
+
     try {
       console.log("🚀 Chamando supabase.auth.signInWithPassword...")
       const { data, error }: AuthResponse = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim().toLowerCase(),
         password,
       })
 
-      console.log("📊 Resposta do Supabase:", { data: data?.user?.id, error })
+      console.log("📊 Resposta do Supabase:", { 
+        hasData: !!data, 
+        hasUser: !!data?.user, 
+        hasError: !!error,
+        errorMessage: error?.message 
+      })
 
       if (error) {
         console.error("❌ Erro do Supabase:", error)
         throw error
       }
 
+      if (!data?.user) {
+        console.error("❌ Login retornou sem usuário")
+        throw new Error("Erro interno: usuário não encontrado")
+      }
+
       console.log("✅ Login bem-sucedido! Atualizando último login...")
 
-      // Atualizar último login na tabela calc_users
-      if (data.user) {
+      // Atualizar último login na tabela calc_users (opcional, não bloquear se falhar)
+      try {
         const { error: updateError } = await supabase
           .from('calc_users')
           .update({ last_login: new Date().toISOString() })
@@ -243,6 +262,8 @@ export function useFinanceAuth() {
         } else {
           console.log("✅ Último login atualizado com sucesso!")
         }
+      } catch (updateError) {
+        console.warn("⚠️ Erro ao atualizar último login (não crítico):", updateError)
       }
 
       console.log("🎉 Login completado com sucesso!")
