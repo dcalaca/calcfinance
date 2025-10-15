@@ -65,7 +65,7 @@ async function testConnection() {
           excerpt: 'Este é um teste de conexão com o Supabase',
           content: 'Teste realizado com sucesso!',
           category: 'Teste',
-          source: 'FinanceHub',
+          source: 'CalcFy',
           author: 'Sistema',
           published_at: new Date().toISOString()
         }

@@ -14,7 +14,7 @@ Copie e cole o seguinte código SQL no editor:
 
 ```sql
 -- =====================================================
--- FINANCEHUB - TABELAS COM PREFIXO CALC_
+-- CALCFY - TABELAS COM PREFIXO CALC_
 -- =====================================================
 
 -- 1. TABELA DE USUÁRIOS
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS CALC_articles (
     content TEXT NOT NULL,
     category VARCHAR(100) NOT NULL,
     read_time INTEGER DEFAULT 5,
-    author VARCHAR(255) DEFAULT 'FinanceHub',
+    author VARCHAR(255) DEFAULT 'CalcFy',
     image_url TEXT,
     tags TEXT[],
     published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

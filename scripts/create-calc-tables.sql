@@ -1,7 +1,7 @@
 -- =====================================================
--- FINANCEHUB - TABELAS COM PREFIXO CALC_
+-- CALCFY - TABELAS COM PREFIXO CALC_
 -- =====================================================
--- Este script cria as tabelas necessárias para o FinanceHub
+-- Este script cria as tabelas necessárias para o CalcFy
 -- com o prefixo CALC_ para aproveitar um projeto Supabase existente
 
 -- =====================================================
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS CALC_articles (
     content TEXT NOT NULL,
     category VARCHAR(100) NOT NULL,
     read_time INTEGER DEFAULT 5,
-    author VARCHAR(255) DEFAULT 'FinanceHub',
+    author VARCHAR(255) DEFAULT 'CalcFy',
     image_url TEXT,
     tags TEXT[],
     published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -299,7 +299,7 @@ INSERT INTO CALC_currency_rates (from_currency, to_currency, rate, variation_per
 -- =====================================================
 DO $$
 BEGIN
-    RAISE NOTICE 'FinanceHub: Todas as tabelas CALC_ foram criadas com sucesso!';
+    RAISE NOTICE 'CalcFy: Todas as tabelas CALC_ foram criadas com sucesso!';
     RAISE NOTICE 'Tabelas criadas: CALC_users, CALC_calculations, CALC_news, CALC_articles, CALC_currency_rates, CALC_alerts, CALC_templates, CALC_user_preferences';
     RAISE NOTICE 'Dados de exemplo inseridos com sucesso!';
     RAISE NOTICE 'Row Level Security (RLS) configurado!';

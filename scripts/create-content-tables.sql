@@ -162,7 +162,7 @@ Para iniciantes, recomendamos começar com:
 
 O importante é começar, mesmo que com pouco. O tempo e a disciplina são seus maiores aliados no mundo dos investimentos.',
     'Investimentos',
-    'FinanceHub',
+    'CalcFy',
     '/placeholder.svg?height=300&width=400',
     5,
     NOW() - INTERVAL '10 hours'
@@ -196,7 +196,7 @@ Se a inflação está em 6% ao ano e seu dinheiro está rendendo apenas 2% na po
 
 Proteger-se da inflação é essencial para manter seu poder de compra ao longo do tempo.',
     'Conceitos Básicos',
-    'FinanceHub',
+    'CalcFy',
     '/placeholder.svg?height=300&width=400',
     4,
     NOW() - INTERVAL '12 hours'
@@ -232,7 +232,7 @@ O tempo é seu maior aliado. Mesmo pequenas quantias investidas regularmente pod
 
 A aposentadoria dos sonhos não acontece por acaso. Ela é resultado de planejamento e disciplina financeira.',
     'Planejamento Financeiro',
-    'FinanceHub',
+    'CalcFy',
     '/placeholder.svg?height=300&width=400',
     6,
     NOW() - INTERVAL '14 hours'
@@ -269,7 +269,7 @@ Quando você vê um investimento que rende "120% do CDI", significa que ele paga
 
 O CDI é uma referência fundamental no mercado brasileiro. Conhecê-lo ajuda a comparar e escolher melhores investimentos.',
     'Conceitos Básicos',
-    'FinanceHub',
+    'CalcFy',
     '/placeholder.svg?height=300&width=400',
     5,
     NOW() - INTERVAL '16 hours'

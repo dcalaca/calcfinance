@@ -1,4 +1,4 @@
-# CONFIGURAÇÃO DO FINANCEHUB
+# CONFIGURAÇÃO DO CALCFY
 # ================================
 
 # Para configurar o projeto, crie um arquivo .env.local na raiz do projeto

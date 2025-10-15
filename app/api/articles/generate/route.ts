@@ -111,7 +111,7 @@ Começar a investir com pouco dinheiro é possível e necessário. O importante 
 *Comece hoje mesmo, mesmo que seja com R$ 50. O importante é começar!*
       `,
       category: "Investimentos",
-      author: "Equipe FinanceHub",
+      author: "Equipe CalcFy",
       reading_time: 8,
     },
     {
@@ -209,7 +209,7 @@ O planejamento financeiro é um processo contínuo que requer disciplina e paci�
 *Sua jornada para a independência financeira começa agora!*
       `,
       category: "Planejamento Financeiro",
-      author: "Equipe FinanceHub",
+      author: "Equipe CalcFy",
       reading_time: 12,
     },
     {
@@ -329,7 +329,7 @@ A aposentadoria confortável é resultado de planejamento e disciplina ao longo 
 *Sua aposentadoria dos sonhos depende das decisões que você toma hoje!*
       `,
       category: "Aposentadoria",
-      author: "Equipe FinanceHub",
+      author: "Equipe CalcFy",
       reading_time: 15,
     },
   ]

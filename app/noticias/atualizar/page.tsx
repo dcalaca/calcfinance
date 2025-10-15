@@ -11,7 +11,7 @@ export default async function AtualizarNoticias() {
     await fetch(`${baseUrl}/api/news/force-update`, {
       cache: "no-store",
       headers: {
-        "User-Agent": "FinanceHub/1.0",
+        "User-Agent": "CalcFy/1.0",
       },
     })
     

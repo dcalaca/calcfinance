@@ -1,4 +1,4 @@
-# 🚀 FinanceHub - Deploy Guide
+# 🚀 CalcFy - Deploy Guide
 
 ## 📋 Pré-requisitos
 
@@ -18,7 +18,7 @@ git init
 git add .
 
 # Commit inicial
-git commit -m "Initial commit - FinanceHub"
+git commit -m "Initial commit - CalcFy"
 
 # Conectar com GitHub
 git remote add origin https://github.com/SEU_USUARIO/calcfinance.git

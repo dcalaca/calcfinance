@@ -1,7 +1,7 @@
 import AposentadoriaPageClient from "./AposentadoriaPageClient"
 
 export const metadata = {
-  title: "Calculadora de Aposentadoria | FinanceHub",
+  title: "Calculadora de Aposentadoria | CalcFy",
   description: "Planeje sua aposentadoria estimando quanto poupar para atingir a renda desejada no futuro.",
   keywords: "aposentadoria, planejamento financeiro, poupança, renda futura",
 }

@@ -36,7 +36,7 @@ function LoginFormContent() {
           <div className="text-center mb-8">
             <Image
               src="/logo.png"
-              alt="FinanceHub"
+              alt="CalcFy"
               width={120}
               height={48}
               className="mx-auto mb-4 h-12 w-auto"
@@ -58,7 +58,7 @@ function LoginFormContent() {
           <div className="text-center mb-8">
             <Image
               src="/logo.png"
-              alt="FinanceHub"
+              alt="CalcFy"
               width={120}
               height={48}
               className="mx-auto mb-4 h-12 w-auto"
@@ -119,7 +119,7 @@ function LoginFormContent() {
         <div className="text-center mb-8">
           <Image
             src="/logo.png"
-            alt="FinanceHub"
+            alt="CalcFy"
             width={120}
             height={48}
             className="mx-auto mb-4 h-12 w-auto"
@@ -222,7 +222,7 @@ function LoginForm() {
           <div className="text-center mb-8">
             <Image
               src="/logo.png"
-              alt="FinanceHub"
+              alt="CalcFy"
               width={120}
               height={48}
               className="mx-auto mb-4 h-12 w-auto"

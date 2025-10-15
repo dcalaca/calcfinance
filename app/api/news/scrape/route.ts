@@ -65,7 +65,7 @@ async function fetchRealNews() {
       try {
         const response = await fetch(source, {
           headers: {
-            "User-Agent": "Mozilla/5.0 (compatible; FinanceHub/1.0)",
+            "User-Agent": "Mozilla/5.0 (compatible; CalcFy/1.0)",
           },
         })
 

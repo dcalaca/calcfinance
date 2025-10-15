@@ -5,7 +5,7 @@ async function fetchCurrencyRates() {
   try {
     const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL', {
       headers: {
-        'User-Agent': 'FinanceHub/1.0'
+        'User-Agent': 'CalcFy/1.0'
       }
     })
     

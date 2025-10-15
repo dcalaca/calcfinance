@@ -21,7 +21,7 @@ async function fetchRSSFeed(url: string): Promise<RSSItem[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; FinanceHub/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; CalcFy/1.0)",
       },
     })
 

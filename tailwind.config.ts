@@ -53,7 +53,7 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Cores personalizadas do FinanceHub
+        // Cores personalizadas do CalcFy
         finance: {
           blue: "#1e40af", // Azul escuro (confiança)
           green: "#10b981", // Verde (crescimento)

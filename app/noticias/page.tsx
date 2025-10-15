@@ -35,7 +35,7 @@ async function getNewsFromAPI(): Promise<NewsItem[]> {
       cache: "no-store", // Sem cache - sempre buscar notícias frescas
       next: { revalidate: 0 }, // Forçar revalidação
       headers: {
-        "User-Agent": "FinanceHub/1.0",
+        "User-Agent": "CalcFy/1.0",
       },
     })
 

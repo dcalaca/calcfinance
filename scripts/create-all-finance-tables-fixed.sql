@@ -1,7 +1,7 @@
--- Script completo para criar todas as tabelas do FinanceHub
+-- Script completo para criar todas as tabelas do CalcFy
 -- Execute este script uma vez no Supabase SQL Editor
 
--- 1. Criar tabela de usuários do FinanceHub
+-- 1. Criar tabela de usuários do CalcFy
 CREATE TABLE IF NOT EXISTS public.finance_users (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.finance_calculations (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 3. Criar tabela de preferências específicas do FinanceHub
+-- 3. Criar tabela de preferências específicas do CalcFy
 CREATE TABLE IF NOT EXISTS public.finance_user_preferences (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.finance_users(id) ON DELETE CASCADE UNIQUE NOT NULL,

@@ -1,5 +1,5 @@
 -- =====================================================
--- FINANCEHUB - SCRIPT COMPLETO DE CRIAÇÃO DE TABELAS
+-- CALCFY - SCRIPT COMPLETO DE CRIAÇÃO DE TABELAS
 -- =====================================================
 
 -- Limpar tabelas existentes (se necessário)
@@ -74,7 +74,7 @@ CREATE TABLE educational_articles (
     content TEXT NOT NULL,
     category VARCHAR(100) NOT NULL,
     read_time INTEGER DEFAULT 5,
-    author VARCHAR(255) DEFAULT 'FinanceHub',
+    author VARCHAR(255) DEFAULT 'CalcFy',
     image_url TEXT,
     tags TEXT[],
     published_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -270,7 +270,7 @@ INSERT INTO currency_rates (from_currency, to_currency, rate, variation_percent,
 -- =====================================================
 DO $$
 BEGIN
-    RAISE NOTICE 'FinanceHub: Todas as tabelas foram criadas com sucesso!';
+    RAISE NOTICE 'CalcFy: Todas as tabelas foram criadas com sucesso!';
     RAISE NOTICE 'Tabelas criadas: finance_users, finance_calculations, financial_news, educational_articles, currency_rates, finance_alerts, calculation_templates, finance_user_preferences';
     RAISE NOTICE 'Dados de exemplo inseridos com sucesso!';
 END $$;

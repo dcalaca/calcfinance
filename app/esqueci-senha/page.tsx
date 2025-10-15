@@ -47,7 +47,7 @@ export default function EsqueciSenhaPage() {
         <div className="text-center mb-8">
           <Image 
             src="/logo.png" 
-            alt="FinanceHub" 
+            alt="CalcFy" 
             width={120} 
             height={48} 
             className="mx-auto mb-4 h-12 w-auto"

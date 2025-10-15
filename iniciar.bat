@@ -1,8 +1,8 @@
 @echo off
-title FinanceHub - Servidor de Desenvolvimento
+title CalcFy - Servidor de Desenvolvimento
 echo.
 echo ========================================
-echo    FINANCEHUB - INICIANDO SERVIDOR
+echo    CALCFY - INICIANDO SERVIDOR
 echo ========================================
 echo.
 echo Iniciando servidor em http://localhost:3000

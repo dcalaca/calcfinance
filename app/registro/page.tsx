@@ -78,14 +78,14 @@ function RegisterForm() {
         <div className="text-center mb-8">
           <Image 
             src="/logo.png" 
-            alt="FinanceHub" 
+            alt="CalcFy" 
             width={120} 
             height={48} 
             className="mx-auto mb-4 h-12 w-auto"
             priority
           />
           <h1 className="text-2xl font-bold text-slate-900">Criar conta</h1>
-          <p className="text-slate-600">Junte-se ao FinanceHub e comece a planejar seu futuro</p>
+          <p className="text-slate-600">Junte-se ao CalcFy e comece a planejar seu futuro</p>
         </div>
 
         <Card>
@@ -216,7 +216,7 @@ export default function RegisterPage() {
           <div className="text-center mb-8">
             <Image 
               src="/logo.png" 
-              alt="FinanceHub" 
+              alt="CalcFy" 
               width={120} 
               height={48} 
               className="mx-auto mb-4 h-12 w-auto"
