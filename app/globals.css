@@ -145,7 +145,7 @@
     display: inline-flex !important;
   }
 
-  /* Melhorar scroll do dropdown no mobile */
+  /* Melhorar scroll do dropdown no mobile - sobrescrever Radix UI */
   .dropdown-scrollable {
     max-height: 80vh !important;
     overflow-y: auto !important;
@@ -153,6 +153,12 @@
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
     overscroll-behavior: contain !important;
+  }
+  
+  /* Sobrescrever o overflow-hidden padrão do Radix UI */
+  [data-radix-popper-content-wrapper] .dropdown-scrollable {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
   
   .dropdown-scrollable::-webkit-scrollbar {
@@ -173,6 +179,13 @@
     .dropdown-scrollable {
       max-height: 70vh !important;
       touch-action: pan-y !important;
+      overflow-y: auto !important;
+    }
+    
+    /* Forçar scroll no mobile */
+    [data-radix-popper-content-wrapper] .dropdown-scrollable {
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     
     .mobile-horizontal-scroll {

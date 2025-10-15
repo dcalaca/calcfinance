@@ -33,13 +33,14 @@ function LoginForm() {
 
   // Redirecionar se já estiver logado
   useEffect(() => {
-    console.log("🔄 useEffect - user:", !!user, "loading:", loading)
-    if (user && !loading) {
+    console.log("🔄 useEffect - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting)
+    if (user && !loading && !isSubmitting) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
       console.log("🔄 useEffect - Redirecionando para:", redirectTo)
-      router.push(redirectTo)
+      // Usar replace para evitar histórico duplicado
+      router.replace(redirectTo)
     }
-  }, [user, loading, router, searchParams])
+  }, [user, loading, router, searchParams, isSubmitting])
 
   // Atualizar a função handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,14 +93,9 @@ function LoginForm() {
         console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
-        // Aguardar um pouco antes de redirecionar para garantir que o estado seja atualizado
-        setTimeout(() => {
-          const redirectTo = searchParams.get('redirect') || '/dashboard'
-          console.log("🔄 handleSubmit - Redirecionando para:", redirectTo)
-          
-          // Forçar reload da página para garantir que o estado seja atualizado
-          window.location.replace(redirectTo)
-        }, 1000)
+        // Não redirecionar aqui - deixar o useEffect fazer isso
+        // Isso evita conflitos entre handleSubmit e useEffect
+        console.log("🔄 Login bem-sucedido - aguardando useEffect para redirecionamento")
       } else {
         console.warn("⚠️ Login retornou sem dados nem erro")
         toast.error("Erro inesperado. Tente novamente.")
