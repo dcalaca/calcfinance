@@ -25,7 +25,6 @@ function LoginFormContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [hasRedirected, setHasRedirected] = useState(false)
 
   const { user, loading, signIn } = useFinanceAuth()
   const router = useRouter()
@@ -40,45 +39,16 @@ function LoginFormContent() {
     redirectTo
   })
 
-  // Redirecionamento quando usuário estiver logado - versão simplificada
+  // Redirecionamento simples - sem loops
   useEffect(() => {
-    console.log("🔄 useEffect REDIRECT - user:", !!user, "loading:", loading, "isSubmitting:", isSubmitting, "hasRedirected:", hasRedirected)
+    console.log("🔄 REDIRECT CHECK - user:", !!user, "loading:", loading)
     
-    if (user && !loading && !isSubmitting) {
-      console.log("✅ CONDIÇÕES ATENDIDAS - Usuário logado!")
-      console.log("🎯 Tentando redirecionar para:", redirectTo)
-      
-      if (!hasRedirected) {
-        console.log("🚀 PRIMEIRA TENTATIVA - Marcando como redirecionado")
-        setHasRedirected(true)
-        
-        // Tentar múltiplas abordagens
-        console.log("🔄 Tentativa 1: router.push")
-        router.push(redirectTo)
-        
-        // Fallback após 500ms
-        setTimeout(() => {
-          console.log("🔄 Tentativa 2: window.location.href")
-          window.location.href = redirectTo
-        }, 500)
-        
-        // Último recurso após 1s
-        setTimeout(() => {
-          console.log("🔄 Tentativa 3: window.location.replace")
-          window.location.replace(redirectTo)
-        }, 1000)
-      } else {
-        console.log("⚠️ JÁ TENTOU REDIRECIONAR - hasRedirected:", hasRedirected)
-      }
-    } else {
-      console.log("❌ CONDIÇÕES NÃO ATENDIDAS:", {
-        user: !!user,
-        loading,
-        isSubmitting,
-        hasRedirected
-      })
+    if (user && !loading) {
+      console.log("✅ REDIRECIONANDO para:", redirectTo)
+      // Uma única tentativa - window.location.replace (mais confiável)
+      window.location.replace(redirectTo)
     }
-  }, [user, loading, isSubmitting, hasRedirected, redirectTo, router])
+  }, [user, loading, redirectTo])
 
   // Verificar se está carregando
   useEffect(() => {
@@ -140,23 +110,8 @@ function LoginFormContent() {
         console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar após sucesso - múltiplas tentativas
-        console.log("🔄 Redirecionando após login bem-sucedido...")
-        setHasRedirected(true)
-        
-        // Tentar múltiplas abordagens
-        console.log("🔄 Tentativa 1: router.push")
-        router.push(redirectTo)
-        
-        // Fallback após 500ms
         setTimeout(() => {
-          console.log("🔄 Tentativa 2: window.location.href")
-          window.location.href = redirectTo
-        }, 500)
-        
-        // Último recurso após 1s
-        setTimeout(() => {
-          console.log("🔄 Tentativa 3: window.location.replace")
+          console.log("🔄 Redirecionando após login...")
           window.location.replace(redirectTo)
         }, 1000)
       } else {
@@ -274,22 +229,6 @@ function LoginFormContent() {
                 >
                   {isSubmitting ? "Entrando..." : "Entrar"}
                 </Button>
-                
-                {/* Botão de teste para debug */}
-                {user && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full mt-2"
-                    onClick={() => {
-                      console.log("🧪 TESTE MANUAL - Forçando redirecionamento")
-                      setHasRedirected(false)
-                      window.location.href = redirectTo
-                    }}
-                  >
-                    🧪 TESTE: Ir para Dashboard
-                  </Button>
-                )}
               </form>
 
               <div className="mt-6">
