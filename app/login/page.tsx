@@ -40,6 +40,11 @@ function LoginFormContent() {
       console.log("💡 Clique em 'Entrar' para ir para o dashboard")
     }
   }, [user, loading])
+  
+  // Debug da renderização do botão
+  useEffect(() => {
+    console.log("🔍 Renderização do botão:", { user: !!user, userEmail: user?.email })
+  }, [user])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -183,8 +188,7 @@ function LoginFormContent() {
                 </Button>
               )}
               
-              {/* Debug do botão */}
-              {console.log("🔍 Renderização do botão:", { user: !!user, userEmail: user?.email })}
+              {/* Debug do botão removido - causava erro de build */}
             </form>
 
             {/* Botão de teste sempre visível */}
