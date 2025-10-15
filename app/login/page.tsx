@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,9 +10,12 @@ import { Separator } from "@/components/ui/separator"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
-export default function LoginPage() {
-  console.log("🚀 LoginPage iniciado - versão mínima")
+function LoginFormContent() {
+  console.log("🚀 LoginFormContent iniciado")
   
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -21,13 +24,30 @@ export default function LoginPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const { user, loading, signIn } = useFinanceAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
+
+  // Debug simples
+  console.log("🔍 Estado:", { user: !!user, loading })
+
+  // Redirecionamento simples - apenas quando usuário estiver logado
+  useEffect(() => {
+    if (user && !loading) {
+      console.log("✅ Usuário logado, redirecionando para:", redirectTo)
+      // Usar window.location.href para redirecionamento confiável
+      window.location.href = redirectTo
+    }
+  }, [user, loading, redirectTo])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     console.log("🔐 Formulário submetido!")
     setIsSubmitting(true)
 
     if (!formData.email || !formData.password) {
-      alert("Por favor, preencha todos os campos")
+      toast.error("Por favor, preencha todos os campos")
       setIsSubmitting(false)
       return
     }
@@ -35,18 +55,38 @@ export default function LoginPage() {
     try {
       console.log("🔐 Tentando fazer login com:", formData.email)
       
-      // Simular login por enquanto
-      setTimeout(() => {
-        console.log("✅ Login simulado com sucesso!")
-        alert("Login realizado com sucesso!")
-        setIsSubmitting(false)
-      }, 1000)
+      const { data, error } = await signIn(formData.email, formData.password)
       
+      if (error) {
+        console.error("❌ Erro no login:", error)
+        toast.error("Email ou senha incorretos")
+      } else if (data?.user) {
+        console.log("✅ Login realizado com sucesso!")
+        toast.success("Login realizado com sucesso!")
+        
+        // Redirecionar após sucesso
+        setTimeout(() => {
+          console.log("🔄 Redirecionando após login...")
+          window.location.href = redirectTo
+        }, 1000)
+      }
     } catch (error) {
       console.error("💥 Erro inesperado:", error)
-      alert("Erro inesperado. Tente novamente.")
+      toast.error("Erro inesperado. Tente novamente.")
+    } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
+          <p className="text-slate-600">Aguarde um momento</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -148,4 +188,23 @@ export default function LoginPage() {
       </div>
     </div>
   )
+}
+
+function LoginForm() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Carregando...</h1>
+          <p className="text-slate-600">Aguarde um momento</p>
+        </div>
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
+  )
+}
+
+export default function LoginPage() {
+  return <LoginForm />
 }
