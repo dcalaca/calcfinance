@@ -23,7 +23,6 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isRedirecting, setIsRedirecting] = useState(false)
 
   const { user, loading, signIn } = useFinanceAuth()
   const router = useRouter()
@@ -31,20 +30,15 @@ function LoginFormContent() {
   const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   // Debug simples
-  console.log("🔍 Estado:", { user: !!user, loading, isRedirecting })
+  console.log("🔍 Estado:", { user: !!user, loading })
 
-  // Sem redirecionamento automático - apenas manual após login
+  // Redirecionamento simples quando usuário estiver logado
   useEffect(() => {
     if (user && !loading) {
-      console.log("✅ Usuário já está logado, mas não redirecionando automaticamente")
-      console.log("💡 Clique em 'Entrar' para ir para o dashboard")
+      console.log("✅ Usuário logado, redirecionando para:", redirectTo)
+      window.location.href = redirectTo
     }
-  }, [user, loading])
-  
-  // Debug da renderização do botão
-  useEffect(() => {
-    console.log("🔍 Renderização do botão:", { user: !!user, userEmail: user?.email })
-  }, [user])
+  }, [user, loading, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,8 +63,10 @@ function LoginFormContent() {
         console.log("✅ Login realizado com sucesso!")
         toast.success("Login realizado com sucesso!")
         
-        // Não redirecionar automaticamente - mostrar botão
-        console.log("🎉 Login bem-sucedido! Use o botão abaixo para ir ao dashboard")
+        setTimeout(() => {
+          console.log("🔄 Redirecionando após login...")
+          window.location.href = redirectTo
+        }, 1000)
       }
     } catch (error) {
       console.error("💥 Erro inesperado:", error)
@@ -172,44 +168,7 @@ function LoginFormContent() {
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
               </Button>
-              
-              {/* Botão de redirecionamento quando logado */}
-              {user && (
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full mt-2"
-                  onClick={() => {
-                    console.log("🚀 Redirecionamento manual para:", redirectTo)
-                    window.location.href = redirectTo
-                  }}
-                >
-                  🚀 Ir para Dashboard
-                </Button>
-              )}
-              
-              {/* Debug do botão removido - causava erro de build */}
             </form>
-
-            {/* Botão de teste sempre visível */}
-            <div className="mt-4">
-              <Button 
-                type="button" 
-                variant="secondary" 
-                className="w-full"
-                onClick={() => {
-                  console.log("🧪 TESTE - Estado atual:", { user: !!user, userEmail: user?.email })
-                  if (user) {
-                    console.log("🚀 Usuário logado, redirecionando...")
-                    window.location.href = redirectTo
-                  } else {
-                    console.log("❌ Usuário não logado")
-                  }
-                }}
-              >
-                🧪 TESTE: Ir para Dashboard
-              </Button>
-            </div>
 
             <div className="mt-6">
               <Separator className="my-4" />
