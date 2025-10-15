@@ -45,11 +45,10 @@ function LoginFormContent() {
     
     if (user && !loading && !isSubmitting) {
       console.log("✅ Usuário logado, redirecionando para:", redirectTo)
-      setTimeout(() => {
-        router.replace(redirectTo)
-      }, 100)
+      // Usar window.location para forçar navegação completa
+      window.location.href = redirectTo
     }
-  }, [user, loading, isSubmitting, router, redirectTo])
+  }, [user, loading, isSubmitting, redirectTo])
 
   // Verificar se está carregando
   useEffect(() => {
@@ -58,26 +57,7 @@ function LoginFormContent() {
     }
   }, [loading])
 
-  // Fallback para verificar usuário após 2 segundos
-  useEffect(() => {
-    const checkUser = async () => {
-      if (!loading && !user) {
-        console.log("🔍 Verificando usuário após timeout...")
-        try {
-          const { data } = await supabase.auth.getUser()
-          if (data.user) {
-            console.log("✅ Usuário encontrado via fallback:", data.user.email)
-            router.replace(redirectTo)
-          }
-        } catch (error) {
-          console.log("❌ Erro no fallback:", error)
-        }
-      }
-    }
-
-    const timeout = setTimeout(checkUser, 2000)
-    return () => clearTimeout(timeout)
-  }, [loading, user, router, redirectTo])
+  // Removido fallback que pode causar conflito com redirecionamento principal
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -133,7 +113,7 @@ function LoginFormContent() {
         // Redirecionar após sucesso
         setTimeout(() => {
           console.log("🔄 Redirecionando após login bem-sucedido...")
-          window.location.replace(redirectTo)
+          window.location.href = redirectTo
         }, 1000)
       } else {
         console.warn("⚠️ Login retornou sem dados nem erro")
