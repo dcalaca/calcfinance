@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, Suspense, useEffect } from "react"
+import { useState, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,14 +12,10 @@ import Link from "next/link"
 import Image from "next/image"
 
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 function LoginFormContent() {
-  const { user, loading, signIn } = useFinanceAuth()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/dashboard'
+  const { signIn } = useFinanceAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -27,41 +23,6 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // Se usuário já está logado, redirecionar diretamente
-  useEffect(() => {
-    if (user && !loading) {
-      console.log("🔄 Usuário já logado, redirecionando para:", redirectTo)
-      window.location.href = redirectTo
-    }
-  }, [user, loading, redirectTo])
-
-  // Mostrar loading enquanto verifica autenticação
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <Image
-              src="/calcfy-logo.svg?v=2"
-              alt="CalcFy"
-              width={120}
-              height={48}
-              className="mx-auto mb-4 h-12 w-auto"
-              priority
-            />
-            <h1 className="text-2xl font-bold text-slate-900">Verificando...</h1>
-            <p className="text-slate-600">Aguarde um momento</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Se usuário já está logado, não mostrar nada (já redirecionou)
-  if (user) {
-    return null
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,8 +42,8 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar após sucesso - simples e direto
-        window.location.href = redirectTo
+        // Redirecionar para dashboard - simples
+        window.location.href = '/dashboard'
       }
     } catch (error) {
       toast.error("Erro inesperado. Tente novamente.")

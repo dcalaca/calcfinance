@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import type React from "react"
-import { useState, useEffect, Suspense } from "react"
+import { useState, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,6 @@ import { Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useFinanceAuth } from "@/hooks/use-finance-auth"
-import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 function RegisterForm() {
@@ -26,19 +25,8 @@ function RegisterForm() {
     confirmPassword: "",
   })
 
-  const { signUp, user, loading } = useFinanceAuth()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const { signUp } = useFinanceAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // Redirecionar se já estiver logado - simples e direto
-  useEffect(() => {
-    if (user && !loading) {
-      const redirectTo = searchParams.get('redirect') || '/dashboard'
-      console.log("🔄 Usuário já logado na página de registro, redirecionando para:", redirectTo)
-      window.location.href = redirectTo
-    }
-  }, [user, loading, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,7 +52,7 @@ function RegisterForm() {
         toast.error("Erro ao criar conta: " + String(error))
       } else {
         toast.success("Conta criada com sucesso! Verifique seu e-mail para confirmar.")
-        router.push("/login")
+        window.location.href = "/login"
       }
     } catch (error) {
       toast.error("Erro inesperado ao criar conta")
