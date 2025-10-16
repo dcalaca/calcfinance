@@ -11,11 +11,11 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
-import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
 
 function LoginFormContent() {
-  const { signIn } = useFinanceAuth()
+  const { user, loading, signIn } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -23,6 +23,34 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Se usuário já está logado, redirecionar
+  if (user) {
+    window.location.href = '/dashboard'
+    return null
+  }
+
+  // Mostrar loading enquanto verifica
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/calcfy-logo.svg?v=2"
+              alt="CalcFy"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Verificando...</h1>
+            <p className="text-slate-600">Aguarde um momento</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
