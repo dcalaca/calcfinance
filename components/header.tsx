@@ -30,7 +30,11 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading } = useAuth()
+  
+  // Debug logs
+  console.log("🔍 Header - User:", user?.email || "null")
+  console.log("🔍 Header - Loading:", loading)
   
   // Verificar se é o usuário autorizado para ver Analytics
   const isAuthorizedForAnalytics = user?.email === 'dcalaca@gmail.com'
