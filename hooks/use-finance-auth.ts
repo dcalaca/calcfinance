@@ -92,93 +92,35 @@ export function useFinanceAuth() {
     }
   }
 
+  // Verificação simples de autenticação - SEM LOOPS
   useEffect(() => {
-    console.log("🔧 Hook de autenticação iniciado")
-    console.log("🌐 Ambiente:", typeof window !== 'undefined' ? 'client' : 'server')
-    console.log("🔑 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? 'configurado' : 'não configurado')
-    console.log("🔑 Supabase Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'configurado' : 'não configurado')
-    
-    // Forçar log mesmo se houver erro
-    try {
-      console.log("🔧 Tentando verificar configuração Supabase...")
-    } catch (error) {
-      console.log("🔧 Erro ao verificar configuração:", error)
-    }
-    
     if (!isSupabaseConfigured()) {
-      console.log("❌ Supabase não configurado - definindo loading como false")
       setLoading(false)
       return
     }
 
-    // Timeout mais curto - 2 segundos apenas
-    const timeoutId = setTimeout(() => {
-      console.log("⏰ Timeout de autenticação - 2 segundos")
-      setLoading(false)
-    }, 2000)
-
-    // Busca ULTRA SIMPLES - apenas uma verificação
+    // Verificação única e simples
     const checkAuth = async () => {
       try {
-        console.log("🔍 Verificação simples de auth...")
         const { data: { user } } = await supabase.auth.getUser()
-        
-        if (user) {
-          console.log("✅ Usuário encontrado:", user.email)
-          setUser(user)
-          setFinanceUser(user) // Simplificar - usar apenas user
-        } else {
-          console.log("❌ Nenhum usuário")
-          setUser(null)
-          setFinanceUser(null)
-        }
+        setUser(user)
+        setFinanceUser(user)
       } catch (error) {
-        console.error("❌ Erro na verificação:", error)
+        console.error("Erro na verificação:", error)
         setUser(null)
         setFinanceUser(null)
       } finally {
-        console.log("🏁 Finalizando auth - setLoading(false)")
         setLoading(false)
-        clearTimeout(timeoutId)
       }
     }
 
     checkAuth()
-    return () => clearTimeout(timeoutId)
-  }, [])
 
-
-  // Listen for auth changes - MELHORADO
-  useEffect(() => {
-    if (!isSupabaseConfigured()) return
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: any, session: any) => {
-      console.log("🔄 Auth change:", event, "session:", !!session, "user:", !!session?.user)
-      
-      if (event === 'SIGNED_OUT') {
-        console.log("🚪 Usuário deslogado")
-        setUser(null)
-        setFinanceUser(null)
-        setLoading(false)
-        return
-      }
-      
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        console.log("✅ Usuário logado/atualizado:", session?.user?.email)
+    // Escutar mudanças de auth (apenas para login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         setUser(session?.user ?? null)
         setFinanceUser(session?.user ?? null)
-        setLoading(false)
-      } else if (session?.user) {
-        console.log("🔄 Sessão existente:", session?.user?.email)
-        setUser(session.user)
-        setFinanceUser(session.user)
-        setLoading(false)
-      } else {
-        console.log("❌ Nenhuma sessão ativa")
-        setUser(null)
-        setFinanceUser(null)
         setLoading(false)
       }
     })
