@@ -46,9 +46,7 @@ export function middleware(request: NextRequest) {
     
     if (!hasSupabaseCookie && !hasAuthHeader) {
       console.log("❌ Middleware - Usuário não autenticado, redirecionando para login")
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
+      return NextResponse.redirect(new URL('/login', request.url))
     }
     
     console.log("✅ Middleware - Usuário autenticado, permitindo acesso")

@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useFinanceAuth } from "@/hooks/use-finance-auth"
+import { useAuth } from "@/hooks/use-auth"
 
 const navigation = [
   { name: "Início", href: "/", icon: Home },
@@ -30,7 +30,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-  const { user, signOut } = useFinanceAuth()
+  const { user, signOut } = useAuth()
   
   // Verificar se é o usuário autorizado para ver Analytics
   const isAuthorizedForAnalytics = user?.email === 'dcalaca@gmail.com'

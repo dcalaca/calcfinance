@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useFinanceAuth } from '@/hooks/use-finance-auth'
+import { useAuth } from '@/hooks/use-auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2, Lock, User } from 'lucide-react'
@@ -14,7 +14,7 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
-  const { user, loading } = useFinanceAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [timeoutReached, setTimeoutReached] = useState(false)
 
