@@ -32,7 +32,23 @@ function LoginFormContent() {
     if (user && !loading && !hasRedirected) {
       console.log("🔄 Usuário logado detectado, redirecionando para dashboard...")
       setHasRedirected(true)
-      router.push('/dashboard')
+      
+      // Tentar múltiplas formas de redirecionamento
+      try {
+        router.push('/dashboard')
+        console.log("✅ router.push() chamado")
+        
+        // Fallback: usar window.location se router não funcionar
+        setTimeout(() => {
+          if (window.location.pathname === '/login') {
+            console.log("⚠️ router.push() não funcionou, usando window.location")
+            window.location.href = '/dashboard'
+          }
+        }, 1000)
+      } catch (error) {
+        console.error("❌ Erro no router.push():", error)
+        window.location.href = '/dashboard'
+      }
     }
   }, [user, loading, hasRedirected, router])
 
@@ -125,7 +141,16 @@ function LoginFormContent() {
         
         // Aguardar um pouco para garantir que o estado de auth seja atualizado
         setTimeout(() => {
+          console.log("🔄 Tentando redirecionar após login...")
           router.push('/dashboard')
+          
+          // Fallback se router não funcionar
+          setTimeout(() => {
+            if (window.location.pathname === '/login') {
+              console.log("⚠️ router.push() não funcionou após login, usando window.location")
+              window.location.href = '/dashboard'
+            }
+          }, 1000)
         }, 500)
       }
     } catch (error) {

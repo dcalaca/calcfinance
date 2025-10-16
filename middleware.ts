@@ -58,9 +58,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/cfp/:path*',
-    '/dashboard/:path*',
-    '/historico/:path*',
-    '/meu-orcamento/:path*'
+    // Temporariamente desabilitado para debug
+    // '/cfp/:path*',
+    // '/dashboard/:path*',
+    // '/historico/:path*',
+    // '/meu-orcamento/:path*'
   ]
 }
