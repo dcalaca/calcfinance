@@ -30,6 +30,7 @@ function LoginFormContent() {
   // Redirecionar usuário logado apenas uma vez
   useEffect(() => {
     if (user && !loading && !hasRedirected) {
+      console.log("🔄 Usuário logado detectado, redirecionando para dashboard...")
       setHasRedirected(true)
       router.push('/dashboard')
     }
@@ -122,8 +123,10 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar para dashboard usando Next.js router
-        router.push('/dashboard')
+        // Aguardar um pouco para garantir que o estado de auth seja atualizado
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 500)
       }
     } catch (error) {
       toast.error("Erro inesperado. Tente novamente.")

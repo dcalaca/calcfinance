@@ -43,6 +43,7 @@ export function middleware(request: NextRequest) {
     const hasAuthHeader = !!authHeader
     
     console.log("🔐 Header Authorization:", hasAuthHeader)
+    console.log("🔐 Has Supabase Cookie:", hasSupabaseCookie)
     
     if (!hasSupabaseCookie && !hasAuthHeader) {
       console.log("❌ Middleware - Usuário não autenticado, redirecionando para login")
