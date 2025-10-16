@@ -31,15 +31,12 @@ function RegisterForm() {
   const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Redirecionar se já estiver logado
+  // Redirecionar se já estiver logado - simples e direto
   useEffect(() => {
     if (user && !loading) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
       console.log("🔄 Usuário já logado na página de registro, redirecionando para:", redirectTo)
-      // Usar window.location.href para garantir funcionamento em produção
-      setTimeout(() => {
-        window.location.href = redirectTo
-      }, 500)
+      window.location.href = redirectTo
     }
   }, [user, loading, searchParams])
 

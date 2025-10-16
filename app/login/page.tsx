@@ -28,14 +28,11 @@ function LoginFormContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Redirecionamento automático quando usuário já está logado
+  // Se usuário já está logado, redirecionar diretamente
   useEffect(() => {
     if (user && !loading) {
-      console.log("🔄 Usuário já logado, redirecionando automaticamente para:", redirectTo)
-      // Usar window.location.href para garantir que funcione em produção
-      setTimeout(() => {
-        window.location.href = redirectTo
-      }, 500)
+      console.log("🔄 Usuário já logado, redirecionando para:", redirectTo)
+      window.location.href = redirectTo
     }
   }, [user, loading, redirectTo])
 
@@ -61,41 +58,9 @@ function LoginFormContent() {
     )
   }
 
-  // Se usuário já está logado, mostrar botão para ir ao dashboard
+  // Se usuário já está logado, não mostrar nada (já redirecionou)
   if (user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <Image
-              src="/calcfy-logo.svg?v=2"
-              alt="CalcFy"
-              width={120}
-              height={48}
-              className="mx-auto mb-4 h-12 w-auto"
-              priority
-            />
-            <h1 className="text-2xl font-bold text-slate-900">Você já está logado!</h1>
-            <p className="text-slate-600">Clique no botão abaixo para ir ao dashboard</p>
-          </div>
-          
-          <Card>
-            <CardContent className="pt-6">
-              <Button 
-                onClick={() => {
-                  console.log("🔄 Botão clicado! Redirecionando para:", redirectTo)
-                  // Usar window.location.href para garantir funcionamento em produção
-                  window.location.href = redirectTo
-                }}
-                className="w-full"
-              >
-                Ir para Dashboard
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
+    return null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,11 +81,8 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar após sucesso - usar window.location.href para produção
-        setTimeout(() => {
-          console.log("🔄 Redirecionando após login para:", redirectTo)
-          window.location.href = redirectTo
-        }, 1000)
+        // Redirecionar após sucesso - simples e direto
+        window.location.href = redirectTo
       }
     } catch (error) {
       toast.error("Erro inesperado. Tente novamente.")
