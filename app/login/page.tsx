@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,6 +27,17 @@ function LoginFormContent() {
     password: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Redirecionamento automático quando usuário já está logado
+  useEffect(() => {
+    if (user && !loading) {
+      console.log("🔄 Usuário já logado, redirecionando automaticamente para:", redirectTo)
+      // Usar window.location.href para garantir que funcione em produção
+      setTimeout(() => {
+        window.location.href = redirectTo
+      }, 500)
+    }
+  }, [user, loading, redirectTo])
 
   // Mostrar loading enquanto verifica autenticação
   if (loading) {
@@ -73,7 +84,8 @@ function LoginFormContent() {
               <Button 
                 onClick={() => {
                   console.log("🔄 Botão clicado! Redirecionando para:", redirectTo)
-                  router.push(redirectTo)
+                  // Usar window.location.href para garantir funcionamento em produção
+                  window.location.href = redirectTo
                 }}
                 className="w-full"
               >
@@ -104,9 +116,10 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar após sucesso - APENAS AQUI
+        // Redirecionar após sucesso - usar window.location.href para produção
         setTimeout(() => {
-          router.push(redirectTo)
+          console.log("🔄 Redirecionando após login para:", redirectTo)
+          window.location.href = redirectTo
         }, 1000)
       }
     } catch (error) {

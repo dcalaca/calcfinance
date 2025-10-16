@@ -35,9 +35,13 @@ function RegisterForm() {
   useEffect(() => {
     if (user && !loading) {
       const redirectTo = searchParams.get('redirect') || '/dashboard'
-      router.push(redirectTo)
+      console.log("🔄 Usuário já logado na página de registro, redirecionando para:", redirectTo)
+      // Usar window.location.href para garantir funcionamento em produção
+      setTimeout(() => {
+        window.location.href = redirectTo
+      }, 500)
     }
-  }, [user, loading, router, searchParams])
+  }, [user, loading, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
