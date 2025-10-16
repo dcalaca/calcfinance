@@ -7,15 +7,32 @@ import { supabase } from "@/lib/supabase"
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [timeoutReached, setTimeoutReached] = useState(false)
 
   useEffect(() => {
+    // Timeout de segurança para evitar loading infinito
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn("⚠️ Timeout de autenticação atingido")
+        setTimeoutReached(true)
+        setLoading(false)
+      }
+    }, 10000) // 10 segundos
+
     // Obter sessão inicial
     const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        setUser(session?.user ?? null)
+        setLoading(false)
+        clearTimeout(timeoutId)
+      } catch (error) {
+        console.error("❌ Erro ao obter sessão inicial:", error)
+        setLoading(false)
+        clearTimeout(timeoutId)
+      }
     }
 
     getInitialSession()
@@ -24,12 +41,17 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
+      console.log("🔄 Auth state changed:", event, session?.user?.email)
       setUser(session?.user ?? null)
       setLoading(false)
+      clearTimeout(timeoutId)
     })
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeoutId)
+    }
+  }, []) // ← REMOVIDO [loading] - esta era a causa do loop!
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -67,6 +89,7 @@ export function useAuth() {
   return {
     user,
     loading,
+    timeoutReached,
     signIn,
     signUp,
     signOut,

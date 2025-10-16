@@ -1,12 +1,18 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 
 export function useAnalytics() {
   const pathname = usePathname()
+  const hasTrackedRef = useRef(new Set<string>())
 
   useEffect(() => {
+    // Evitar tracking duplicado da mesma página
+    if (hasTrackedRef.current.has(pathname)) {
+      return
+    }
+
     const trackVisit = async () => {
       try {
         // Verificar se está no cliente
@@ -52,6 +58,9 @@ export function useAnalytics() {
 
         console.log('📤 Enviando dados para API:', visitData)
 
+        // Marcar como tracked antes de enviar
+        hasTrackedRef.current.add(pathname)
+
         // Enviar dados para a API (apenas POST para salvar visita)
         const response = await fetch('/api/analytics/track-visit', {
           method: 'POST',
@@ -71,6 +80,8 @@ export function useAnalytics() {
         }
       } catch (error) {
         console.error('💥 Erro ao rastrear visita:', error)
+        // Em caso de erro, remover da lista para permitir nova tentativa
+        hasTrackedRef.current.delete(pathname)
       }
     }
 

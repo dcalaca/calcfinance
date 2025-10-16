@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,7 +16,9 @@ import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
 
 function LoginFormContent() {
-  const { user, loading, signIn } = useAuth()
+  const { user, loading, timeoutReached, signIn } = useAuth()
+  const router = useRouter()
+  const [hasRedirected, setHasRedirected] = useState(false)
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -24,10 +27,59 @@ function LoginFormContent() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Se usuário já está logado, redirecionar
-  if (user) {
-    window.location.href = '/dashboard'
-    return null
+  // Redirecionar usuário logado apenas uma vez
+  useEffect(() => {
+    if (user && !loading && !hasRedirected) {
+      setHasRedirected(true)
+      router.push('/dashboard')
+    }
+  }, [user, loading, hasRedirected, router])
+
+  // Se usuário já está logado, mostrar loading de redirecionamento
+  if (user && !hasRedirected) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/calcfy-logo.svg"
+              alt="CalcFy"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-slate-900">Redirecionando...</h1>
+            <p className="text-slate-600">Você já está logado</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar erro se timeout foi atingido
+  if (timeoutReached) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Image
+              src="/calcfy-logo.svg"
+              alt="CalcFy"
+              width={120}
+              height={48}
+              className="mx-auto mb-4 h-12 w-auto"
+              priority
+            />
+            <h1 className="text-2xl font-bold text-red-600">Erro de Conexão</h1>
+            <p className="text-slate-600 mb-4">Não foi possível verificar sua autenticação</p>
+            <Button onClick={() => window.location.reload()}>
+              Tentar Novamente
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // Mostrar loading enquanto verifica
@@ -37,7 +89,7 @@ function LoginFormContent() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/calcfy-logo.svg?v=2"
+              src="/calcfy-logo.svg"
               alt="CalcFy"
               width={120}
               height={48}
@@ -70,8 +122,8 @@ function LoginFormContent() {
       } else if (data?.user) {
         toast.success("Login realizado com sucesso!")
         
-        // Redirecionar para dashboard - simples
-        window.location.href = '/dashboard'
+        // Redirecionar para dashboard usando Next.js router
+        router.push('/dashboard')
       }
     } catch (error) {
       toast.error("Erro inesperado. Tente novamente.")
@@ -85,7 +137,7 @@ function LoginFormContent() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Image
-            src="/calcfy-logo.svg?v=2"
+            src="/calcfy-logo.svg"
             alt="CalcFy"
             width={120}
             height={48}
@@ -188,7 +240,7 @@ function LoginForm() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Image
-              src="/calcfy-logo.svg?v=2"
+              src="/calcfy-logo.svg"
               alt="CalcFy"
               width={120}
               height={48}

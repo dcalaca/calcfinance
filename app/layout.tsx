@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/logoresumo.png',
-    shortcut: '/logoresumo.png',
-    apple: '/logoresumo.png',
+    icon: '/calcfy-favicon.svg',
+    shortcut: '/calcfy-favicon.svg',
+    apple: '/calcfy-logo.svg',
   },
   openGraph: {
     title: "CalcFy - Controle sua vida financeira com inteligência",
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://calcfy.me/logoresumo.png',
+        url: 'https://calcfy.me/calcfy-logo.svg',
         width: 1200,
         height: 630,
         alt: 'CalcFy - Calculadoras Financeiras',
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "CalcFy - Controle sua vida financeira com inteligência",
     description: "Plataforma completa com calculadoras financeiras, notícias do mercado e educação financeira gratuita.",
-    images: ['https://calcfy.me/logoresumo.png'],
+    images: ['https://calcfy.me/calcfy-logo.svg'],
   },
 }
 
@@ -127,7 +127,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="apple-mobile-web-app-title" content="CalcFy" />
-        <link rel="apple-touch-icon" href="/logoresumo.png" />
+        <link rel="apple-touch-icon" href="/calcfy-logo.svg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
